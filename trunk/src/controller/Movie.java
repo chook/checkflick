@@ -3,7 +3,7 @@ package controller;
 public class Movie {
 	private int id;
 	private int year;
-	private String Name;
+	private String name;
 	private int    directorId;
 	
 	/**
@@ -34,13 +34,13 @@ public class Movie {
 	 * @return the name
 	 */
 	public String getName() {
-		return Name;
+		return name;
 	}
 	/**
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
-		Name = name;
+		this.name = name;
 	}
 	/**
 	 * @return the directorId
@@ -75,7 +75,7 @@ public class Movie {
 		super();
 		this.id = id;
 		this.year = year;
-		Name = name;
+		this.name = name;
 		this.directorId = directorId;
 	}
 	

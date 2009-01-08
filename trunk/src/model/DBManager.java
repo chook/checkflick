@@ -2,20 +2,18 @@ package model;
 
 import java.sql.*;
 import java.util.ArrayList;
-
+import controller.Filter;
 import controller.Movie;
 
 public class DBManager {
-	Connection			  conn;			// DB connection
-	ArrayList<Connection> arlConnections; // Conn pool
-	
 	// The strings for prepared statments
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO demo(fname,lname) VALUES(?,?)";
 	private static String DELETE_MOVIE_PSTMT = "DELETE FROM demo where id=?";
+	private static String SEARCH_MOVIE_PSTMT = "SELECT * FROM MOVIES ?";
 	
 	// Singleton instance
 	private static DBManager instance = null;
-
+	private DBConnectionPool pool  = null;
 	/**
 	 * Singleton
 	 * @return a DB manager instance
@@ -27,62 +25,17 @@ public class DBManager {
 		return instance;
 	}
 	
+	/**
+	 * Default Constructor - Initiates the connection pool
+	 */
 	protected DBManager() {
-		
+		pool = DBConnectionPool.
+				getInstance("jdbc:oracle:thin:@localhost:1521:XE",
+							"admin",
+							"admin",
+							"oracle.jdbc.OracleDriver",
+							6);
 	}
-	
-	/**
-	 * 
-	 * @return the connection (null on error)
-	 */
-	private void openConnection()
-	{
-		// loading the driver
-		try
-		{
-			Class.forName("oracle.jdbc.OracleDriver");
-		}
-		catch (ClassNotFoundException e)
-		{
-			System.out.println("Unable to load the Oracle JDBC driver..");
-			java.lang.System.exit(0); 
-		}
-		System.out.println("Driver loaded successfully");
-		
-		// creating the connection
-		System.out.print("Trying to connect.. ");
-		try
-		{
-			conn = DriverManager.getConnection(
-					"jdbc:oracle:thin:@localhost:1521:XE","dvir","dvir");
-		}
-		catch (SQLException e)
-		{
-			System.out.println("Unable to connect - " + e.toString());
-			java.lang.System.exit(0); 
-		}
-		System.out.println("Connected!");
-	}
-	
-	/**
-	 * close the connection
-	 */
-	public void closeConnections()
-	{
-		// closing the connection
-		for(Connection conn : arlConnections)
-		{
-			try
-			{
-				conn.close();
-			}
-			catch (SQLException e)
-			{
-				System.out.println("Unable to close the connection - " + e.toString());
-				java.lang.System.exit(0); 
-			}
-		}
-	}	
 
 	/**
 	 * This function used to send a movie query into the DB.
@@ -92,11 +45,11 @@ public class DBManager {
 	 * @return If the operation was successful or not
 	 */
 	public boolean sendMovieToDB(DBOperation oper, Movie movie) {
-		PreparedStatement pstmt = null;// = conn.prepareStatement
-		
-		// This is a bug for now, cause I don't remember how to work with ENUMs
-		switch(oper.ordinal()) {
-			case(1):
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		switch(oper) {
+			case InsertMovie:
 			{
 				try {
 					pstmt = conn.prepareStatement(INSERT_MOVIE_PSTMT);
@@ -110,17 +63,18 @@ public class DBManager {
 				}
 				break;
 			}
-			case(2):
+			case DeleteMovie:
 			{
 				break;
 			}
-			case(3):
+			case UpdateMovie:
 			{
 				break;
 			}
 		}
-		
-		return executePreparedStatement(pstmt);		
+		bReturn = executePreparedStatement(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;		
 	}
 	
 	/**
@@ -131,6 +85,9 @@ public class DBManager {
 	 */
 	public boolean deleteOperation(DBOperation oper, int id) {
 		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		
 		switch(oper.ordinal()) {
 			case(1):
 			{
@@ -145,7 +102,9 @@ public class DBManager {
 				break;
 			}
 		}
-		return executePreparedStatement(pstmt);
+		bReturn = executePreparedStatement(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
 	}
 	
 	/**
@@ -153,31 +112,88 @@ public class DBManager {
 	 */
 	private boolean executePreparedStatement(PreparedStatement pstmt)
 	{
-		//PreparedStatement   pstmt;
 		int	    			result;
-		//int 				i;
 		
-		try
-		{
-			/*pstmt	=	conn.prepareStatement(s);
-			for(int i=0;i<objects.size();++i) {
-				if(objects.get(i))
-			}
-			
-			pstmt.setString(1, "Rubi-");
-			pstmt.setString(2, "Boim-");
-			*/
+		try {
 			result = pstmt.executeUpdate();
 			
 			// closing
 			pstmt.close();
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			System.out.println("ERROR executeUpdate - " + e.toString());
 			java.lang.System.exit(0); 
 			return false;
 		}
 		return (result == 0);
+	}
+
+	/**
+	 * Search movies in the database
+	 * @param arlFilters - A list of filters to prepare the WHERE clause
+	 * @return - An array of movies that were fetched from the select
+	 */
+	public ArrayList<Movie> searchMovies(ArrayList<Filter> arlFilters) {
+		// Variables Declaration
+		ArrayList<Movie> arlMovies = new ArrayList<Movie>();
+		StringBuilder stbFilter = new StringBuilder();
+		Movie tempMovie = null;
+		ResultSet set = null;
+		int nFilterCounter = 0;
+		int nNumberOfFilters = arlFilters.size();
+		PreparedStatement pstmt = null;
+		Connection conn = pool.getConnection();
+		
+		try {
+			pstmt = conn.prepareStatement(SEARCH_MOVIE_PSTMT);
+			
+			// Building the WHERE clause 
+			if(arlFilters.size() > 0) {
+				stbFilter.append("WHERE ");
+				for(Filter filter : arlFilters) {
+					++nFilterCounter;
+					stbFilter.append(filter);
+					if(nFilterCounter < nNumberOfFilters) {
+						stbFilter.append(" AND ");
+					}
+				}
+				
+				pstmt.setString(0, stbFilter.toString());
+			// Else - No WHERE clause
+			} else {
+				pstmt.setString(0, "");
+			}
+			
+			// Executing the query and building the movies array
+			set = pstmt.executeQuery();
+			while(set.next() == true) {				
+				tempMovie = getMovieFromSetRecord(set);
+				if (tempMovie != null)
+					arlMovies.add(tempMovie);
+			}
+		} catch (SQLException e) {
+			System.out.println("Error in searchMovies");
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer in searchMovies");
+		}
+		
+		return arlMovies;
+	}
+
+	/**
+	 * Builds a movie object from a result set tuple
+	 * @param set - The set containing the tuple
+	 * @return - The movie object initialized
+	 */
+	private Movie getMovieFromSetRecord(ResultSet set) {
+		try {
+			Movie movie = new Movie();
+			movie.setId(set.getInt("ID"));
+			movie.setDirectorId(set.getInt("DIRECTOR_ID"));
+			movie.setName(set.getString("NAME"));
+			movie.setYear(set.getInt("YEAR"));
+			return movie;
+		} catch(SQLException e) {
+			return null;
+		}
 	}
 }
