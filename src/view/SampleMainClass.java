@@ -1,5 +1,6 @@
 package view;
 import controller.SamplePersonClass;
+import model.DBManager;
 import model.SampleDataBaseClass;
 
 /**
@@ -17,8 +18,11 @@ public class SampleMainClass {
 		// TODO Auto-generated method stub
 		SamplePersonClass person = new SamplePersonClass();
 		
-		person.setName("Netzer Zaidenberg");
+		person.setName("Nadav (OMG I was bitten by a kitten) Shamgar");
 		System.out.println("Hi " + person.getName() + ". Have a nice day!");
 		System.out.println(SampleDataBaseClass.getInstance().getVersion());
+		
+		//DBManager db = DBManager.getInstance();
+		//db.openConnection();
 	}
 }
