@@ -57,12 +57,26 @@ public class DataManager {
 	}
 	
 	public boolean deleteMovie(int id) {
-		// Get Conn
-		
 		// Try to delete the movie
-		//DBManager.getInstance().
-		// Return if operation succeeded
+		return DBManager.getInstance().deleteOperation(DBOperation.DeleteMovie, id);
+	}
+	
+	/**
+	 * Search movies using filters
+	 * @param arlFilters - List of filters for WHERE clause
+	 * @see  todo inside
+	 * @return List of movies
+	 */
+	public ArrayList<Movie> getMoviesBySearch(ArrayList<Filter> arlFilters) {
+		// TODO: For now this doesn't make much sense, I agree.
+		//		 But once we have a full DB, we will make the search generic
+		//		 i.e. We will have a generic "search" function that 
+		//		 receives a 'table' and filters, and the dbmanager will build
+		//		 the query.
+		ArrayList<Movie> arlMovies;
 		
-		return false;
+		arlMovies = DBManager.getInstance().searchMovies(arlFilters);
+		
+		return arlMovies;
 	}
 }

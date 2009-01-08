@@ -10,5 +10,6 @@ package model;
 public enum DBOperation {
 	InsertMovie,
 	UpdateMovie,
-	DeleteMovie
+	DeleteMovie,
+	SearchMovie
 }
