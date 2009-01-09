@@ -1,6 +1,7 @@
 package view;
 import java.util.ArrayList;
 
+import com.hexapixel.widgets.ribbon.RibbonTester;
 import controller.Filter;
 import controller.FilterOption;
 import controller.Movie;
@@ -18,7 +19,11 @@ public class SampleMainClass {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		testDBManager();
+		
+		//RibbonTester ribbon = new RibbonTester();
+		RibbonTester.main(args);
+		
+		//testDBManager();
 		
 		/*SamplePersonClass person = new SamplePersonClass();
 		
