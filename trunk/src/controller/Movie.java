@@ -79,4 +79,8 @@ public class Movie {
 		this.directorId = directorId;
 	}
 	
+	public Movie(int id) {
+		this.id = id;
+	}
+	
 }

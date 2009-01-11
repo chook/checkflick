@@ -1,7 +1,7 @@
 package controller;
 
 public class Filter {
-	FilterOption option;
+	FilterOptionEnum option;
 	String	 	 columnName;
 	String		 value;
 	
@@ -15,7 +15,7 @@ public class Filter {
 	 * @param columnName - Which column name should be used
 	 * @param value - Which value to search on
 	 */
-	public Filter(FilterOption option, String columnName, String value) {
+	public Filter(FilterOptionEnum option, String columnName, String value) {
 		super();
 		this.option = option;
 		this.columnName = columnName;

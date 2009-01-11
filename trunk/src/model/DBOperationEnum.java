@@ -7,7 +7,7 @@ package model;
  * @author CHENH
  *
  */
-public enum DBOperation {
+public enum DBOperationEnum {
 	InsertMovie,
 	UpdateMovie,
 	DeleteMovie,
