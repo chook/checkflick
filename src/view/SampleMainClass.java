@@ -1,10 +1,7 @@
 package view;
-import java.util.ArrayList;
 
-import com.hexapixel.widgets.ribbon.RibbonTester;
-import controller.Filter;
-import controller.FilterOption;
-import controller.Movie;
+import java.util.ArrayList;
+import controller.*;
 import model.DBManager;
 
 /**
@@ -14,38 +11,38 @@ import model.DBManager;
  *
  */
 public class SampleMainClass {
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// Creates a GUI thread
+		Thread guiThread = new SampleRibbonThread();
+		guiThread.start();
+
+		try {
+			// This is a join try
+			guiThread.join(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
-		//RibbonTester ribbon = new RibbonTester();
-		RibbonTester.main(args);
+		// In the mean time, make some more tests for DB
+		testDBManager();
 		
-		//testDBManager();
-		
-		/*SamplePersonClass person = new SamplePersonClass();
-		
-		person.setName("Nadav (OMG I was bitten by a kitten) Shamgar");
-		System.out.println("Hi " + person.getName() + ". Have a nice day!");
-		System.out.println(SampleDataBaseClass.getInstance().getVersion());
-		*/
-		//DBManager db = DBManager.getInstance();
-		//db.openConnection();
+		//AppData app = new AppData();
+		//app.parseXMLFile();
 	}
-	
+
 	public static void testDBManager() {
 		DBManager db = DBManager.getInstance();
 		ArrayList<Filter> list = new ArrayList<Filter>();
 		try{
-			Filter filter = new Filter(FilterOption.Number, "YEAR", "1999");
+			Filter filter = new Filter(FilterOptionEnum.Number, "YEAR", "1999");
 			list.add(filter);
-			list.add(new Filter(FilterOption.String, "NAME", "%H%"));
+			list.add(new Filter(FilterOptionEnum.String, "NAME", "%H%"));
 			
 		} catch(Exception e) {
 			System.out.println("bla bla");
-			
 		}
 		
 		ArrayList<Movie> searched = db.searchMovies(list);

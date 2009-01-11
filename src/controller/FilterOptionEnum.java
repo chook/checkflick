@@ -1,6 +1,6 @@
 package controller;
 
-public enum FilterOption {
+public enum FilterOptionEnum {
 	Number,
 	String,
 	Date,

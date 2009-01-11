@@ -1,8 +1,8 @@
 package controller;
-import java.util.*;
 
+import java.util.*;
 import model.DBManager;
-import model.DBOperation;
+import model.DBOperationEnum;
 
 public class DataManager {
 	private static DataManager manager = null;
@@ -23,42 +23,34 @@ public class DataManager {
 	 */
 	protected DataManager() {
 	}
-	
-	public ArrayList<Movie> getMoviesByName(String name) {
-		
-		// Initiates a new array of movies
-		ArrayList<Movie> arlMoviesList = new ArrayList<Movie>();
-		
-		// Get movies from DB
-		
-		return arlMoviesList;
-	}
-	
-	public Movie getMovieById(int id) {
-		
-		return null;
-	}
-	
+
+	/**
+	 * Save the movie (Update or Insert according to movie id)
+	 * @param movie - The movie to update/insert
+	 * @return True - If update succeeded, Else - Otherwise
+	 */
 	public boolean saveMovie(Movie movie) {
-		// Get conn from pool
-		//Connection conn = DBManager.getInstance().getConnection();
-		
 		// If we have a movie id, then we need to update
 		if(movie.getId() != 0)
 		{
-			DBManager.getInstance().sendMovieToDB(DBOperation.UpdateMovie, movie);
+			DBManager.getInstance().sendMovieToDB(DBOperationEnum.UpdateMovie, movie);
 		}
 		// Else - Insert a new movie into the DB
 		else
 		{
-			DBManager.getInstance().sendMovieToDB(DBOperation.InsertMovie, movie);
+			DBManager.getInstance().sendMovieToDB(DBOperationEnum.InsertMovie, movie);
 		}
 		return false;
 	}
 	
+	/**
+	 * Delete a movie from the database
+	 * @param id - The id to delete
+	 * @return True - If delete succeeded, Else - Otherwise
+	 */
 	public boolean deleteMovie(int id) {
 		// Try to delete the movie
-		return DBManager.getInstance().deleteOperation(DBOperation.DeleteMovie, id);
+		return DBManager.getInstance().sendMovieToDB(DBOperationEnum.DeleteMovie, new Movie(id));
 	}
 	
 	/**
@@ -71,12 +63,8 @@ public class DataManager {
 		// TODO: For now this doesn't make much sense, I agree.
 		//		 But once we have a full DB, we will make the search generic
 		//		 i.e. We will have a generic "search" function that 
-		//		 receives a 'table' and filters, and the dbmanager will build
+		//		 receives a 'table' and filters, and the DB manager will build
 		//		 the query.
-		ArrayList<Movie> arlMovies;
-		
-		arlMovies = DBManager.getInstance().searchMovies(arlFilters);
-		
-		return arlMovies;
+		return DBManager.getInstance().searchMovies(arlFilters);
 	}
 }

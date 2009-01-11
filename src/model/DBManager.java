@@ -6,9 +6,10 @@ import controller.Filter;
 import controller.Movie;
 
 public class DBManager {
-	// The strings for prepared statments
-	private static String INSERT_MOVIE_PSTMT = "INSERT INTO demo(fname,lname) VALUES(?,?)";
-	private static String DELETE_MOVIE_PSTMT = "DELETE FROM demo where id=?";
+	// The strings for prepared statements
+	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
+	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE ID=?";
+	private static String DELETE_MOVIE_PSTMT = "DELETE FROM MOVIES WHERE ID=?";
 	private static String SEARCH_MOVIE_PSTMT = "SELECT * FROM MOVIES ?";
 	
 	// Singleton instance
@@ -30,9 +31,9 @@ public class DBManager {
 	 */
 	protected DBManager() {
 		pool = DBConnectionPool.
-				getInstance("jdbc:oracle:thin:@localhost:1521:XE",
-							"admin",
-							"admin",
+				getInstance("jdbc:oracle:thin:@localhost:1555:csodb",
+							"hr_readonly",
+							"hrro",
 							"oracle.jdbc.OracleDriver",
 							6);
 	}
@@ -44,7 +45,7 @@ public class DBManager {
 	 * @param movie - The movie to send
 	 * @return If the operation was successful or not
 	 */
-	public boolean sendMovieToDB(DBOperation oper, Movie movie) {
+	public boolean sendMovieToDB(DBOperationEnum oper, Movie movie) {
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
@@ -58,17 +59,33 @@ public class DBManager {
 					pstmt.setInt(2, movie.getYear());
 					
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				break;
 			}
 			case DeleteMovie:
 			{
+				try {
+					pstmt = conn.prepareStatement(DELETE_MOVIE_PSTMT);
+					pstmt.setInt(1, movie.getId());
+				} catch(SQLException e) {
+					System.out.println(e.getMessage());
+				}
 				break;
 			}
 			case UpdateMovie:
 			{
+				try {
+					pstmt = conn.prepareStatement(UPDATE_MOVIE_PSTMT);
+					
+					// TODO: Get the "set" clause
+					pstmt.setString(1, movie.getName());
+					
+					pstmt.setInt(2, movie.getId());
+					
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 				break;
 			}
 		}
@@ -76,39 +93,9 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;		
 	}
-	
+
 	/**
-	 * 
-	 * @param oper
-	 * @param id
-	 * @return
-	 */
-	public boolean deleteOperation(DBOperation oper, int id) {
-		PreparedStatement pstmt = null;
-		boolean bReturn = false;
-		Connection conn = pool.getConnection();
-		
-		switch(oper.ordinal()) {
-			case(1):
-			{
-				try {
-					pstmt = conn.prepareStatement(DELETE_MOVIE_PSTMT);
-					pstmt.setInt(0, id);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				break;
-			}
-		}
-		bReturn = executePreparedStatement(pstmt);
-		pool.returnConnection(conn);
-		return bReturn;
-	}
-	
-	/**
-	 * Shows the executePreparedStatement()
+	 * Shows the executePreparedStatement
 	 */
 	private boolean executePreparedStatement(PreparedStatement pstmt)
 	{
@@ -157,10 +144,10 @@ public class DBManager {
 					}
 				}
 				
-				pstmt.setString(0, stbFilter.toString());
+				pstmt.setString(1, stbFilter.toString());
 			// Else - No WHERE clause
 			} else {
-				pstmt.setString(0, "");
+				pstmt.setString(1, "");
 			}
 			
 			// Executing the query and building the movies array
