@@ -1,8 +1,10 @@
 package controller;
 
 import java.util.*;
+import controller.entity.*;
 import model.DBManager;
 import model.DBOperationEnum;
+import model.DBTablesEnum;
 
 public class DataManager {
 	private static DataManager manager = null;
@@ -56,15 +58,49 @@ public class DataManager {
 	/**
 	 * Search movies using filters
 	 * @param arlFilters - List of filters for WHERE clause
-	 * @see  todo inside
 	 * @return List of movies
 	 */
-	public ArrayList<Movie> getMoviesBySearch(ArrayList<Filter> arlFilters) {
-		// TODO: For now this doesn't make much sense, I agree.
-		//		 But once we have a full DB, we will make the search generic
-		//		 i.e. We will have a generic "search" function that 
-		//		 receives a 'table' and filters, and the DB manager will build
-		//		 the query.
+	private List<Movie> getMoviesBySearch(List<Filter> arlFilters) {
 		return DBManager.getInstance().searchMovies(arlFilters);
+	}
+	
+	private List<Person> getPersonsBySearch(List<Filter> arlFilters) {
+		return DBManager.getInstance().searchPersons(arlFilters);
+	}
+	
+	private Movie getMovieById(int id) {
+		return DBManager.getInstance().getMovieById(id);
+	}
+	
+	public List<?> search(DBTablesEnum table, List<Filter> arlFilters) {
+		switch(table)
+		{
+			case MOVIES:
+			{
+				return getMoviesBySearch(arlFilters);
+			}
+			case PERSONS:
+			{
+				return getPersonsBySearch(arlFilters);
+			}
+			default:
+				return null;
+		}
+	}
+	
+	public Object getEntityById(DBTablesEnum table, int id) {
+		switch(table)
+		{
+			case MOVIES:
+			{
+				return getMovieById(id);
+			}
+			case PERSONS:
+			{
+				return null; //getPersonsBySearch(arlFilters);
+			}
+			default:
+				return null;
+		}
 	}
 }

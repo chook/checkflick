@@ -4,6 +4,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="src/jar/ojdbc5.jar"/>
 	<classpathentry kind="lib" path="src/jar/com.hexapixel.widgets.ribbon.alphatest.jar"/>
-	<classpathentry exported="true"  kind="lib" path="/src/jar/swt.jar"/>
+	<classpathentry kind="lib" path="src/jar/swt/win x64/swt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
