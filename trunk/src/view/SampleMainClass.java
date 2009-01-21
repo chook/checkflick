@@ -1,8 +1,12 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import controller.*;
+import controller.entity.Movie;
 import model.DBManager;
+import model.DBTablesEnum;
 
 /**
  * This is a sample of a main class
@@ -16,8 +20,9 @@ public class SampleMainClass {
 	 */
 	public static void main(String[] args) {
 		// Creates a GUI thread
+		testDBManager();
 		Thread guiThread = new SampleRibbonThread();
-		guiThread.start();
+		//guiThread.start();
 
 		try {
 			// This is a join try
@@ -27,7 +32,6 @@ public class SampleMainClass {
 		}
 		
 		// In the mean time, make some more tests for DB
-		testDBManager();
 		
 		//AppData app = new AppData();
 		//app.parseXMLFile();
@@ -35,17 +39,22 @@ public class SampleMainClass {
 
 	public static void testDBManager() {
 		DBManager db = DBManager.getInstance();
-		ArrayList<Filter> list = new ArrayList<Filter>();
+		DataManager dm = DataManager.getInstance();
+		List<Filter> list = new ArrayList<Filter>();
 		try{
-			Filter filter = new Filter(FilterOptionEnum.Number, "YEAR", "1999");
+			Filter filter = new Filter(FilterOptionEnum.Number, "MOVIE_YEAR", "2010");
 			list.add(filter);
-			list.add(new Filter(FilterOptionEnum.String, "NAME", "%H%"));
+			list.add(new Filter(FilterOptionEnum.String, "MOVIE_NAME", "%o%"));
 			
 		} catch(Exception e) {
 			System.out.println("bla bla");
 		}
 		
-		ArrayList<Movie> searched = db.searchMovies(list);
-		System.out.println(searched.size());
+		List<Movie> searched = (List<Movie>) dm.search(DBTablesEnum.MOVIES, list);
+		Movie mo = (Movie)dm.getEntityById(DBTablesEnum.MOVIES, searched.get(0).getId());
+		
+		System.out.println(mo.toString());
+		//searched = db.searchMovies(list);
+		//System.out.println(searched.size());
 	}
 }
