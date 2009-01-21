@@ -18,6 +18,8 @@ import com.hexapixel.widgets.ribbon.*;
 public class SampleRibbonClass {
 	static RibbonShell shell;
 	static Display display;
+	static Composite searchByMovie;
+	static Composite searchByPerson;
 	public static void main(String args []) {
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
@@ -30,7 +32,7 @@ public class SampleRibbonClass {
 		while (!app.shell.isDisposed ()) {
 			if (!display.readAndDispatch ()) display.sleep ();
 		}
-		display.dispose ();
+		display.dispose();
 	}
 	private void createShell() {
 		shell = new RibbonShell(display);
@@ -40,7 +42,7 @@ public class SampleRibbonClass {
 		shell.setText("DB Project, TAU 2009");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		//shell.setSize(new Point(550,monitor_bounds.height/3));
-		shell.setSize(550, 550);
+		shell.setSize(570, 550);
 		
 		//closing the program.
 		shell.getShell().addListener(SWT.Close, new Listener(){
@@ -90,15 +92,15 @@ public class SampleRibbonClass {
 	
 		// Groups
 
-		// Seach tab
+		// Search tab
 		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , toolTip);
 		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(searching);
 		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		
-		final Composite searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
+		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
 		searchByMovie.setVisible(false);
-		final Composite searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
+		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
 		searchByPerson.setVisible(false);
 		
 		// listeners for the buttons in the search tab
@@ -108,7 +110,7 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e){
 					searchByMovie.setVisible(true);
 					if (searchByPerson.isVisible())
-						searchByPerson.setVisible(false);;
+						searchByPerson.setVisible(false);
 					searchByMovie(searchByMovie);
 				}
 			}			
@@ -120,7 +122,7 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				searchByPerson.setVisible(true);
 				if (searchByMovie.isVisible())
-					searchByMovie.setVisible(false);;
+					searchByMovie.setVisible(false);
 				searchByPerson(searchByPerson);
 			}			
 		});
@@ -181,16 +183,19 @@ public class SampleRibbonClass {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		//searchByActor.setVisible(checked);
-		search.setSize(548, monitor_bounds.height/4);
-	}
-	//message box that is opened whenever Yes/No/Cancel question is asked
-	public int yesNoCancelMessageBox(String q){	
-		shell.getShell().setEnabled(false);
-		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
-		mb.setMessage(q);
-		int answer = mb.open();	
-		shell.getShell().setEnabled(true);
-		return answer;		
+		search.setSize(568, monitor_bounds.height/4);
+		//listener for the search button
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				RibbonTabFolder tabs = shell.getRibbonTabFolder();
+				RibbonTab movieTab = new RibbonTab(tabs, "Movie");
+				movieTab.setSelected(true);
+				ShowMovieResult(movieTab);
+				tabs.selectTab(movieTab);
+			}			
+		});
 	}
 	public static void searchByPerson(Composite search){
 		search.setLocation(0, 145);
@@ -225,7 +230,280 @@ public class SampleRibbonClass {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		//searchByActor.setVisible(checked);
-		search.setSize(548, monitor_bounds.height/4);
+		search.setSize(568, monitor_bounds.height/4);
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				RibbonTabFolder tabs = shell.getRibbonTabFolder();
+				RibbonTab personTab = new RibbonTab(tabs, "Person");
+				personTab.setSelected(true);
+				ShowPersonResult(personTab);
+				tabs.selectTab(personTab);
+			}			
+		});
 
+	}
+	//message box that is opened whenever Yes/No/Cancel question is asked
+	public int yesNoCancelMessageBox(String q){	
+		shell.getShell().setEnabled(false);
+		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
+		mb.setMessage(q);
+		int answer = mb.open();	
+		shell.getShell().setEnabled(true);
+		return answer;		
+	}
+	public static void ShowMovieResult(RibbonTab tab){
+		searchByMovie.setVisible(false);
+		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
+		
+		// Groups
+
+		// Seach tab
+		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
+		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton goofs = new RibbonButton(results, ImageCache.getImage("smile_grin_48.png"), " \nGoofs", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton locations = new RibbonButton(results, ImageCache.getImage("image_48.png"), " \nLocations", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		
+		ButtonSelectGroup group = new ButtonSelectGroup();
+		aka.setButtonSelectGroup(group);
+		countries.setButtonSelectGroup(group);
+		genres.setButtonSelectGroup(group);
+		goofs.setButtonSelectGroup(group);
+		languages.setButtonSelectGroup(group);
+		quotes.setButtonSelectGroup(group);
+		locations.setButtonSelectGroup(group);
+
+		final Composite movieDetails = new Composite(shell.getShell(),SWT.BORDER);
+		movieDetails.setVisible(true);
+		movieDetails.setLocation(0, 145);
+		movieDetails.setLayout(new FillLayout());
+		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
+		final ExpandBar bar = new ExpandBar (movieDetails, SWT.V_SCROLL);
+		Image image = ImageCache.getImage("paper_content_48.png");
+		
+		// general information
+		Composite composite = new Composite (bar, SWT.FILL);
+		GridLayout layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout);
+		Label movieName = new Label(composite,SWT.NONE);
+		movieName.setText("Movie Name:");
+		Text nameText = new Text(composite ,SWT.FILL);
+		nameText.setText("Pulp Fiction");
+		Label movieYear = new Label(composite,SWT.NONE);
+		movieYear.setText("Movie Year:");
+		Text yearText = new Text(composite ,SWT.FILL);
+		yearText.setText("2009");
+		Label runningTime = new Label(composite ,SWT.NONE);
+		runningTime.setText("Running Time:");
+		Text timeText = new Text(composite ,SWT.FILL);
+		timeText.setText("180 min");
+		Label plot = new Label(composite,SWT.NONE);
+		plot.setText("Plot: ");
+		Text plotText = new Text(composite ,SWT.FILL);
+		plotText.setText("bla bla bla bla");
+		Button button = new Button (composite, SWT.PUSH);
+		button.setText("Save");
+		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
+		item0.setText("General Information About The Movie");
+		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item0.setControl(composite);
+		item0.setImage(image);
+		item0.setExpanded(true);
+		
+		//final Composite buttonsComp = new Composite (bar, SWT.FILL);
+		//buttonsComp.setVisible(false);
+
+		aka.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//buttonsComp.setVisible(true);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Image image = ImageCache.getImage("book_48.png");
+				GridLayout layout = new GridLayout (6,false);
+				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+				layout.verticalSpacing = 10;
+				buttonsComp.setLayout(layout);
+				//result table goes here
+				Text text = new Text(buttonsComp ,SWT.None);
+				text.setText( "result table goes here");
+				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+				item1.setText("General Information About The Movie");
+				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+				item1.setControl(buttonsComp);
+				item1.setImage(image);
+				item1.setExpanded(true);
+			}			
+		});
+		countries.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//buttonsComp.setVisible(false);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Image image = ImageCache.getImage("globe_48.png");
+				GridLayout layout = new GridLayout (6,false);
+				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+				layout.verticalSpacing = 10;
+				buttonsComp.setLayout(layout);
+				//result table goes here
+				Text text = new Text(buttonsComp ,SWT.None);
+				text.setText( "result table goes here");
+				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+				item1.setText("General Information About The Movie");
+				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+				item1.setControl(buttonsComp);
+				item1.setImage(image);
+				item1.setExpanded(true);
+			}			
+		});
+		bar.setSpacing(8);
+		movieDetails.setSize(568, monitor_bounds.height/3);
+		
+	}
+	
+	public static void ShowPersonResult(RibbonTab tab){
+		searchByPerson.setVisible(false);
+		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
+
+		// Person Tab
+		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
+		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton movies = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nMovies", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton role = new RibbonButton(results, ImageCache.getImage("spanner_48.png"), " \nRole", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+
+		ButtonSelectGroup group = new ButtonSelectGroup();
+		aka.setButtonSelectGroup(group);
+		movies.setButtonSelectGroup(group);
+		role.setButtonSelectGroup(group);
+		quotes.setButtonSelectGroup(group);
+
+		final Composite movieDetails = new Composite(shell.getShell(),SWT.BORDER);
+		movieDetails.setVisible(true);
+		movieDetails.setLocation(0, 145);
+		movieDetails.setLayout(new FillLayout());
+		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
+		final ExpandBar bar = new ExpandBar (movieDetails, SWT.V_SCROLL);
+		Image image = ImageCache.getImage("paper_content_48.png");
+		
+		// general information
+		Composite composite = new Composite (bar, SWT.FILL);
+		GridLayout layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout);
+		Label personName = new Label(composite,SWT.NONE);
+		personName.setText("Person Name:");
+		Text nameText = new Text(composite ,SWT.FILL);
+		nameText.setText("Brad Pit");
+		Label realName = new Label(composite,SWT.NONE);
+		realName.setText("Real Name:");
+		Text rnameText = new Text(composite ,SWT.FILL);
+		rnameText.setText("Overrated");
+		Label nicks = new Label(composite ,SWT.NONE);
+		nicks.setText("Nick Names:");
+		Text nicksText = new Text(composite ,SWT.FILL);
+		nicksText.setText("Angelina's husband");
+		Label date = new Label(composite,SWT.NONE);
+		date.setText("Date Of Birth: ");
+		Text dateText = new Text(composite ,SWT.FILL);
+		dateText.setText("11.3.85");
+		Label city = new Label(composite,SWT.NONE);
+		city.setText("Born in: ");
+		Text cityText = new Text(composite ,SWT.FILL);
+		cityText.setText("Rishon");
+		Label country = new Label(composite,SWT.NONE);
+		country.setText("Country: ");
+		Text countryText = new Text(composite ,SWT.FILL);
+		countryText.setText("Israel");
+		Label death = new Label(composite,SWT.NONE);
+		death.setText("Died in: ");
+		Text deathText = new Text(composite ,SWT.FILL);
+		deathText.setText("it's alive...ALIVE!");
+		Label height = new Label(composite,SWT.NONE);
+		height.setText("Height: ");
+		Text heightText = new Text(composite ,SWT.FILL);
+		heightText.setText("1.88");
+		Label bio = new Label(composite,SWT.NONE);
+		bio.setText("Biography: ");
+		Text bioText = new Text(composite ,SWT.FILL);
+		bioText.setText("bla bla bla bla bla");
+		
+		Button button = new Button (composite, SWT.PUSH);
+		button.setText("Save");
+		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
+		item0.setText("General Information About The Person");
+		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item0.setControl(composite);
+		item0.setImage(image);
+		item0.setExpanded(true);
+		
+		//final Composite buttonsComp = new Composite (bar, SWT.FILL);
+		//buttonsComp.setVisible(false);
+
+		aka.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//buttonsComp.setVisible(true);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Image image = ImageCache.getImage("book_48.png");
+				GridLayout layout = new GridLayout (6,false);
+				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+				layout.verticalSpacing = 10;
+				buttonsComp.setLayout(layout);
+				//result table goes here
+				Text text = new Text(buttonsComp ,SWT.None);
+				text.setText( "result table goes here");
+				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+				item1.setText("General Information About The Movie");
+				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+				item1.setControl(buttonsComp);
+				item1.setImage(image);
+				item1.setExpanded(true);
+			}			
+		});
+		movies.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//buttonsComp.setVisible(false);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Image image = ImageCache.getImage("globe_48.png");
+				GridLayout layout = new GridLayout (6,false);
+				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+				layout.verticalSpacing = 10;
+				buttonsComp.setLayout(layout);
+				//result table goes here
+				Text text = new Text(buttonsComp ,SWT.None);
+				text.setText( "result table goes here");
+				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+				item1.setText("General Information About The Movie");
+				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+				item1.setControl(buttonsComp);
+				item1.setImage(image);
+				item1.setExpanded(true);
+			}			
+		});
+		bar.setSpacing(8);
+		movieDetails.setSize(568, monitor_bounds.height/2);
+		
 	}
 }
