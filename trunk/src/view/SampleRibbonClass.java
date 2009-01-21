@@ -165,12 +165,13 @@ public class SampleRibbonClass {
 		Button nameCheck = new Button(composite,SWT.CHECK);
 		nameCheck.setText("Movie Name");
 		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL);
-		Button YearCheck = new Button(composite,SWT.CHECK);
-		YearCheck.setText("Movie Year");
-		Text YearText = new Text(composite ,SWT.SINGLE|SWT.FILL);
+		Button yearCheck = new Button(composite,SWT.CHECK);
+		yearCheck.setText("Movie Year");
+		Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL);
 		Button genreCheck = new Button(composite ,SWT.CHECK);
 		genreCheck.setText("Movie Genre");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
+		//get the genres list from a table
 		combo.setItems (new String [] {"Action", "Fiction", "Sheker"});
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
@@ -216,9 +217,9 @@ public class SampleRibbonClass {
 		YearCheck.setText("Person Age");
 		Text YearText = new Text(composite ,SWT.SINGLE|SWT.FILL);
 		Button genreCheck = new Button(composite ,SWT.CHECK);
-		genreCheck.setText("Person Job");
+		genreCheck.setText("Production Role");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
-		combo.setItems (new String [] {"Action", "Fiction", "Sheker"});
+		combo.setItems (new String [] {"Actor/Actress", "Writer", "Producer" , "Director"});
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -341,7 +342,7 @@ public class SampleRibbonClass {
 				Text text = new Text(buttonsComp ,SWT.None);
 				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("General Information About The Movie");
+				item1.setText("AKA Name For The Movie");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
@@ -363,7 +364,7 @@ public class SampleRibbonClass {
 				Text text = new Text(buttonsComp ,SWT.None);
 				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("General Information About The Movie");
+				item1.setText("Movie's Countries");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
@@ -473,7 +474,7 @@ public class SampleRibbonClass {
 				Text text = new Text(buttonsComp ,SWT.None);
 				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("General Information About The Movie");
+				item1.setText("AKA Names For The Person");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
@@ -495,7 +496,7 @@ public class SampleRibbonClass {
 				Text text = new Text(buttonsComp ,SWT.None);
 				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("General Information About The Movie");
+				item1.setText("Movies The Person Participated In");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
@@ -503,7 +504,7 @@ public class SampleRibbonClass {
 			}			
 		});
 		bar.setSpacing(8);
-		movieDetails.setSize(568, monitor_bounds.height/2);
+		movieDetails.setSize(568, monitor_bounds.height/3);
 		
 	}
 }
