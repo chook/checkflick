@@ -486,7 +486,7 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
-				Image image = ImageCache.getImage("globe_48.png");
+				Image image = ImageCache.getImage("camera_48.png");
 				GridLayout layout = new GridLayout (6,false);
 				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 				layout.verticalSpacing = 10;
