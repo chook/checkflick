@@ -7,7 +7,7 @@ package controller.entity;
  * @author CHENH
  *
  */
-public abstract class AbsEntity {
+public class Entity {
 	private int 	id;
 	private String 	name;
 	/**
@@ -35,16 +35,16 @@ public abstract class AbsEntity {
 		this.name = name;
 	}
 	
-	public AbsEntity() {
+	public Entity() {
 		
 	}
 	
-	public AbsEntity(int id) {
+	public Entity(int id) {
 		super();
 		this.id = id;
 	}
 	
-	public AbsEntity(int id, String name) {
+	public Entity(int id, String name) {
 		super();
 		this.id = id;
 		this.name = name;
