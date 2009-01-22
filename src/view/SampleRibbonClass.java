@@ -41,8 +41,8 @@ public class SampleRibbonClass {
 		
 		shell.setText("DB Project, TAU 2009");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
-		//shell.setSize(new Point(550,monitor_bounds.height/3));
-		shell.setSize(570, 550);
+		shell.setSize(new Point(monitor_bounds.width,monitor_bounds.height-25));
+		//shell.setSize(570, 550);
 		
 		//closing the program.
 		shell.getShell().addListener(SWT.Close, new Listener(){
@@ -162,6 +162,7 @@ public class SampleRibbonClass {
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
+		//to add- search by languages, color-info 
 		Button nameCheck = new Button(composite,SWT.CHECK);
 		nameCheck.setText("Movie Name");
 		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL);
@@ -184,7 +185,7 @@ public class SampleRibbonClass {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		//searchByActor.setVisible(checked);
-		search.setSize(568, monitor_bounds.height/4);
+		search.setSize(monitor_bounds.width-5, monitor_bounds.height/4);
 		//listener for the search button
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -210,9 +211,10 @@ public class SampleRibbonClass {
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
+		//to add- search by origin country, age-range 
 		Button nameCheck = new Button(composite,SWT.CHECK);
 		nameCheck.setText("Person Name");
-		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL);
+		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		Button YearCheck = new Button(composite,SWT.CHECK);
 		YearCheck.setText("Person Age");
 		Text YearText = new Text(composite ,SWT.SINGLE|SWT.FILL);
