@@ -7,7 +7,7 @@ public class SampleRibbonThread extends Thread  {
 	public void run() {
 		String[] a = {"",""};
 		//RibbonTester.main(a);
-		
+		rc = new SampleRibbonClass();
 		rc.main(a);
 	}
 }

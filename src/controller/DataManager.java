@@ -2,12 +2,15 @@ package controller;
 
 import java.util.*;
 import controller.entity.*;
+import controller.filter.AbsFilter;
+import controller.filter.Filter;
 import model.DBManager;
 import model.DBOperationEnum;
 import model.DBTablesEnum;
 
 public class DataManager {
 	private static DataManager manager = null;
+	private DBManager db = null;
 	
 	/**
 	 * This function retrieves the database object
@@ -24,6 +27,7 @@ public class DataManager {
 	 * Protected Constructor
 	 */
 	protected DataManager() {
+		db = DBManager.getInstance();
 	}
 
 	/**
@@ -60,11 +64,11 @@ public class DataManager {
 	 * @param arlFilters - List of filters for WHERE clause
 	 * @return List of movies
 	 */
-	private List<EntitySearchResult> getMoviesBySearch(List<Filter> arlFilters) {
+	private List<BasicSearchEntity> getMoviesBySearch(List<Filter> arlFilters) {
 		return DBManager.getInstance().searchMovies(arlFilters);
 	}
 	
-	private List<EntitySearchResult> getPersonsBySearch(List<Filter> arlFilters) {
+	private List<BasicSearchEntity> getPersonsBySearch(List<Filter> arlFilters) {
 		return DBManager.getInstance().searchPersons(arlFilters);
 	}
 	
@@ -72,7 +76,7 @@ public class DataManager {
 		return DBManager.getInstance().getMovieById(id);
 	}
 	
-	public List<EntitySearchResult> search(DBTablesEnum table, List<Filter> arlFilters) {
+	public List<BasicSearchEntity> search(DBTablesEnum table, List<Filter> arlFilters) {
 		switch(table)
 		{
 			case MOVIES:
@@ -102,5 +106,22 @@ public class DataManager {
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * This function creates a filter object for the user to help search
+	 * @param entity
+	 * @param value
+	 * @return
+	 */
+	public AbsFilter getFilter(SearchEntitiesEnum entity, String value) {
+		return getFilterFromDB(entity, value, "");
+	}
+	public AbsFilter getFilter(SearchEntitiesEnum entity, String value, String value2) {
+		return getFilterFromDB(entity, value, value2);
+	}
+	
+	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
+		return db.getFilter(entity, value, value2);
 	}
 }
