@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import controller.*;
-import controller.entity.Movie;
-import model.DBManager;
-import model.DBTablesEnum;
+import controller.entity.*;
+import model.*;
 
 /**
  * This is a sample of a main class
@@ -22,8 +21,8 @@ public class SampleMainClass {
 		// Creates a GUI thread
 		testDBManager();
 		Thread guiThread = new SampleRibbonThread();
-		//guiThread.start();
-
+		guiThread.start();
+		
 		try {
 			// This is a join try
 			guiThread.join(1000);
@@ -38,7 +37,6 @@ public class SampleMainClass {
 	}
 
 	public static void testDBManager() {
-		DBManager db = DBManager.getInstance();
 		DataManager dm = DataManager.getInstance();
 		List<Filter> list = new ArrayList<Filter>();
 		try{
@@ -50,10 +48,11 @@ public class SampleMainClass {
 			System.out.println("bla bla");
 		}
 		
-		List<Movie> searched = (List<Movie>) dm.search(DBTablesEnum.MOVIES, list);
+		List<EntitySearchResult> searched = dm.search(DBTablesEnum.MOVIES, list);
+		
 		Movie mo = (Movie)dm.getEntityById(DBTablesEnum.MOVIES, searched.get(0).getId());
 		
-		System.out.println(mo.toString());
+		System.out.println(mo);
 		//searched = db.searchMovies(list);
 		//System.out.println(searched.size());
 	}

@@ -4,16 +4,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import oracle.net.ns.SessionAtts;
+
 import controller.Filter;
 import controller.entity.Movie;
 import controller.entity.Person;
+import controller.entity.EntitySearchResult;
 
 public class DBManager {
 	// The strings for prepared statements
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
 	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE MOVIE_ID=?";
 	private static String DELETE_MOVIE_PSTMT = "DELETE FROM MOVIES WHERE MOVIE_ID=?";
-	private static String SEARCH_MOVIE_STMT  = "SELECT * FROM MOVIES ";
+	private static String SEARCH_MOVIE_STMT  = "SELECT MOVIE_ID, MOVIE_NAME, MOVIE_YEAR FROM MOVIES ";
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	
 	
@@ -36,18 +39,18 @@ public class DBManager {
 	 */
 	protected DBManager() {
 		pool = DBConnectionPool.
-				getInstance("jdbc:oracle:thin:@localhost:1521:XE",
+		/*		getInstance("jdbc:oracle:thin:@localhost:1521:XE",
 							"chook",
 							"shoochi",
 							"oracle.jdbc.OracleDriver",
 							6);
-		/*
-		 * getInstance("jdbc:oracle:thin:@localhost:1555:csodb",
-							"hr_readonly",
-							"hrro",
+		*/
+		 getInstance("jdbc:oracle:thin:@localhost:1555:csodb",
+							"chenhare",
+							"Shoochi0",
 							"oracle.jdbc.OracleDriver",
 							6);
-		 */
+		 
 	}
 
 	/**
@@ -158,24 +161,22 @@ public class DBManager {
 	 * @param arlFilters - A list of filters to prepare the WHERE clause
 	 * @return - An array of movies that were fetched from the select
 	 */
-	public List<Movie> searchMovies(List<Filter> arlFilters) {
+	public List<EntitySearchResult> searchMovies(List<Filter> arlFilters) {
 		// Variables Declaration
-		List<Movie> arlMovies = new ArrayList<Movie>();
-		Movie tempMovie = null;
+		List<EntitySearchResult> arlSearchResults = new ArrayList<EntitySearchResult>();
+		EntitySearchResult result = null;
 		ResultSet set = null;
 		Statement s = null;
-		//PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
 		
 		try {
 			s = conn.createStatement();
-			//pstmt.setString(1, "WHERE MOVIE_YEAR=2010"); //parseWhereClauseFromFilters(arlFilters));
 			
 			// Executing the query and building the movies array
 			set = s.executeQuery(SEARCH_MOVIE_STMT + parseWhereClauseFromFilters(arlFilters));
 			while(set.next() == true) {				
-				if ((tempMovie = fillMovieSearch(set)) != null) {
-					arlMovies.add(tempMovie);
+				if ((result = fillSearchResult(set)) != null) {
+					arlSearchResults.add(result);
 				}
 			}
 		} catch (SQLException e) {
@@ -184,7 +185,7 @@ public class DBManager {
 			System.out.println("Null pointer in searchMovies");
 		}
 		
-		return arlMovies;
+		return arlSearchResults;
 	}
 	
 	public Movie getMovieById(int id) {
@@ -202,8 +203,7 @@ public class DBManager {
 			// Executing the query and building the movies array
 			set = pstmt.executeQuery();
 			if (set.next() == true) {
-				tempMovie = fillMovieSearch(set);
-				tempMovie = fillRestOfMovieFromSet(set, tempMovie);
+				tempMovie = fillMovieFromSet(set);
 			}
 			return tempMovie;
 		} catch (SQLException e) {
@@ -219,30 +219,30 @@ public class DBManager {
 	 * @param arlFilters
 	 * @return List of persons
 	 */
-	public List<Person> searchPersons(List<Filter> arlFilters) {
+	public List<EntitySearchResult> searchPersons(List<Filter> arlFilters) {
 		return null;
 	}
 	
-	/**
-	 * Builds a movie object from a result set tuple
-	 * @param set - The set containing the tuple
-	 * @return - The movie object initialized
-	 */
-	private Movie fillMovieSearch(ResultSet set) {
+	private EntitySearchResult fillSearchResult(ResultSet set) {
+		EntitySearchResult res = null;
+		try {
+			res = new EntitySearchResult();
+			res.setId(set.getInt("MOVIE_ID"));
+			res.setName(set.getString("MOVIE_NAME"));
+			res.setYear(set.getInt("MOVIE_YEAR"));
+			return res;
+		} catch(SQLException e) {
+			return null;
+		}
+	}
+		
+	private Movie fillMovieFromSet(ResultSet set) {
 		Movie movie = null;
 		try {
 			movie = new Movie();
 			movie.setId(set.getInt("MOVIE_ID"));
 			movie.setName(set.getString("MOVIE_NAME"));
 			movie.setYear(set.getInt("MOVIE_YEAR"));
-			return movie;
-		} catch(SQLException e) {
-			return null;
-		}
-	}
-	
-	private Movie fillRestOfMovieFromSet(ResultSet set, Movie movie) {
-		try {
 			movie.setColorInfo(set.getInt("MOVIE_COLOR_INFO_ID"));
 			movie.setRunningTime(set.getInt("MOVIE_RUNNING_TIME"));
 			movie.setTaglines(set.getString("MOVIE_TAGLINE"));

@@ -60,11 +60,11 @@ public class DataManager {
 	 * @param arlFilters - List of filters for WHERE clause
 	 * @return List of movies
 	 */
-	private List<Movie> getMoviesBySearch(List<Filter> arlFilters) {
+	private List<EntitySearchResult> getMoviesBySearch(List<Filter> arlFilters) {
 		return DBManager.getInstance().searchMovies(arlFilters);
 	}
 	
-	private List<Person> getPersonsBySearch(List<Filter> arlFilters) {
+	private List<EntitySearchResult> getPersonsBySearch(List<Filter> arlFilters) {
 		return DBManager.getInstance().searchPersons(arlFilters);
 	}
 	
@@ -72,7 +72,7 @@ public class DataManager {
 		return DBManager.getInstance().getMovieById(id);
 	}
 	
-	public List<?> search(DBTablesEnum table, List<Filter> arlFilters) {
+	public List<EntitySearchResult> search(DBTablesEnum table, List<Filter> arlFilters) {
 		switch(table)
 		{
 			case MOVIES:
