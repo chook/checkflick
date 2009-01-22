@@ -1,7 +1,7 @@
 package controller.entity;
 import java.util.Date;
 
-public class Person extends AbsEntity{
+public class Person extends Entity{
 	private String 	personRealName;
 	private String 	personNickNames;
 	private Date   	dateOfBirth;

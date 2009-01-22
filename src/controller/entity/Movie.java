@@ -1,6 +1,6 @@
 package controller.entity;
 
-public class Movie extends AbsEntity{
+public class Movie extends Entity {
 	private int		year;
 	private int    	colorInfo;
 	private int		runningTime;
