@@ -1,19 +1,26 @@
 package controller.entity;
+
 import java.util.Date;
 
-public class Person extends Entity{
-	private String 	personRealName;
-	private String 	personNickNames;
-	private Date   	dateOfBirth;
-	private int		yearOfBirth;
-	private String	cityOfBirth;
-	private int		countryOfBirth;
-	private Date	dateOfDeath;
-	private int		yearOfDeath;
-	private int		height;
-	private String	trademark;
-	private String	biography;
-		
+/**
+ * Person Entity
+ * 
+ * @author Chook
+ * 
+ */
+public class Person extends NamedEntity {
+	private String personRealName;
+	private String personNickNames;
+	private Date dateOfBirth;
+	private int yearOfBirth;
+	private String cityOfBirth;
+	private int countryOfBirth;
+	private Date dateOfDeath;
+	private int yearOfDeath;
+	private int height;
+	private String trademark;
+	private String biography;
+
 	/**
 	 * @return the personRealName
 	 */
@@ -22,13 +29,12 @@ public class Person extends Entity{
 	}
 
 	/**
-	 * @param personRealName the personRealName to set
+	 * @param personRealName
+	 *            the personRealName to set
 	 */
 	public void setPersonRealName(String personRealName) {
 		this.personRealName = personRealName;
 	}
-
-
 
 	/**
 	 * @return the personNickNames
@@ -37,16 +43,13 @@ public class Person extends Entity{
 		return personNickNames;
 	}
 
-
-
 	/**
-	 * @param personNickNames the personNickNames to set
+	 * @param personNickNames
+	 *            the personNickNames to set
 	 */
 	public void setPersonNickNames(String personNickNames) {
 		this.personNickNames = personNickNames;
 	}
-
-
 
 	/**
 	 * @return the dateOfBirth
@@ -55,16 +58,13 @@ public class Person extends Entity{
 		return dateOfBirth;
 	}
 
-
-
 	/**
-	 * @param dateOfBirth the dateOfBirth to set
+	 * @param dateOfBirth
+	 *            the dateOfBirth to set
 	 */
 	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
-
-
 
 	/**
 	 * @return the yearOfBirth
@@ -73,16 +73,13 @@ public class Person extends Entity{
 		return yearOfBirth;
 	}
 
-
-
 	/**
-	 * @param yearOfBirth the yearOfBirth to set
+	 * @param yearOfBirth
+	 *            the yearOfBirth to set
 	 */
 	public void setYearOfBirth(int yearOfBirth) {
 		this.yearOfBirth = yearOfBirth;
 	}
-
-
 
 	/**
 	 * @return the cityOfBirth
@@ -91,16 +88,13 @@ public class Person extends Entity{
 		return cityOfBirth;
 	}
 
-
-
 	/**
-	 * @param cityOfBirth the cityOfBirth to set
+	 * @param cityOfBirth
+	 *            the cityOfBirth to set
 	 */
 	public void setCityOfBirth(String cityOfBirth) {
 		this.cityOfBirth = cityOfBirth;
 	}
-
-
 
 	/**
 	 * @return the countryOfBirth
@@ -109,16 +103,13 @@ public class Person extends Entity{
 		return countryOfBirth;
 	}
 
-
-
 	/**
-	 * @param countryOfBirth the countryOfBirth to set
+	 * @param countryOfBirth
+	 *            the countryOfBirth to set
 	 */
 	public void setCountryOfBirth(int countryOfBirth) {
 		this.countryOfBirth = countryOfBirth;
 	}
-
-
 
 	/**
 	 * @return the dateOfDeath
@@ -127,16 +118,13 @@ public class Person extends Entity{
 		return dateOfDeath;
 	}
 
-
-
 	/**
-	 * @param dateOfDeath the dateOfDeath to set
+	 * @param dateOfDeath
+	 *            the dateOfDeath to set
 	 */
 	public void setDateOfDeath(Date dateOfDeath) {
 		this.dateOfDeath = dateOfDeath;
 	}
-
-
 
 	/**
 	 * @return the yearOfDeath
@@ -145,16 +133,13 @@ public class Person extends Entity{
 		return yearOfDeath;
 	}
 
-
-
 	/**
-	 * @param yearOfDeath the yearOfDeath to set
+	 * @param yearOfDeath
+	 *            the yearOfDeath to set
 	 */
 	public void setYearOfDeath(int yearOfDeath) {
 		this.yearOfDeath = yearOfDeath;
 	}
-
-
 
 	/**
 	 * @return the height
@@ -163,16 +148,13 @@ public class Person extends Entity{
 		return height;
 	}
 
-
-
 	/**
-	 * @param height the height to set
+	 * @param height
+	 *            the height to set
 	 */
 	public void setHeight(int height) {
 		this.height = height;
 	}
-
-
 
 	/**
 	 * @return the trademark
@@ -181,16 +163,13 @@ public class Person extends Entity{
 		return trademark;
 	}
 
-
-
 	/**
-	 * @param trademark the trademark to set
+	 * @param trademark
+	 *            the trademark to set
 	 */
 	public void setTrademark(String trademark) {
 		this.trademark = trademark;
 	}
-
-
 
 	/**
 	 * @return the biography
@@ -199,10 +178,9 @@ public class Person extends Entity{
 		return biography;
 	}
 
-
-
 	/**
-	 * @param biography the biography to set
+	 * @param biography
+	 *            the biography to set
 	 */
 	public void setBiography(String biography) {
 		this.biography = biography;
@@ -211,15 +189,15 @@ public class Person extends Entity{
 	public Person(int id) {
 		super(id);
 	}
-	
+
 	public Person(int id, String name) {
 		super(id, name);
 	}
 
-	public Person(int id, String name, String personRealName, String personNickNames,
-			Date dateOfBirth, int yearOfBirth, String cityOfBirth,
-			int countryOfBirth, Date dateOfDeath, int yearOfDeath, int height,
-			String trademark, String biography) {
+	public Person(int id, String name, String personRealName,
+			String personNickNames, Date dateOfBirth, int yearOfBirth,
+			String cityOfBirth, int countryOfBirth, Date dateOfDeath,
+			int yearOfDeath, int height, String trademark, String biography) {
 		super(id, name);
 		this.personRealName = personRealName;
 		this.personNickNames = personNickNames;
@@ -233,6 +211,5 @@ public class Person extends Entity{
 		this.trademark = trademark;
 		this.biography = biography;
 	}
-	
-	
+
 }

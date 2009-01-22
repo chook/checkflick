@@ -5,6 +5,9 @@ import java.util.List;
 
 import controller.*;
 import controller.entity.*;
+import controller.filter.AbsFilter;
+import controller.filter.Filter;
+import controller.filter.FilterOptionEnum;
 import model.*;
 
 /**
@@ -19,7 +22,8 @@ public class SampleMainClass {
 	 */
 	public static void main(String[] args) {
 		// Creates a GUI thread
-		testDBManager();
+		//testDBManager();
+		testDataManager();
 		Thread guiThread = new SampleRibbonThread();
 		guiThread.start();
 		
@@ -36,6 +40,17 @@ public class SampleMainClass {
 		//app.parseXMLFile();
 	}
 
+	public static void testDataManager() {
+		DataManager dm = DataManager.getInstance();
+		List<AbsFilter> list = new ArrayList<AbsFilter>();
+		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "2");
+		list.add(af);
+		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "will"));
+	}
+	
+	/**
+	 * @deprecated
+	 */
 	public static void testDBManager() {
 		DataManager dm = DataManager.getInstance();
 		List<Filter> list = new ArrayList<Filter>();
@@ -48,7 +63,7 @@ public class SampleMainClass {
 			System.out.println("bla bla");
 		}
 		
-		List<EntitySearchResult> searched = dm.search(DBTablesEnum.MOVIES, list);
+		List<BasicSearchEntity> searched = dm.search(DBTablesEnum.MOVIES, list);
 		
 		Movie mo = (Movie)dm.getEntityById(DBTablesEnum.MOVIES, searched.get(0).getId());
 		

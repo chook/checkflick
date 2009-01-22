@@ -1,5 +1,4 @@
 package model;
-import java.io.*;
 import java.util.regex.*;
 import java.util.*;
 
@@ -51,7 +50,7 @@ public class DataImporter {
 //					 System.out.println(m.group(1));
 //					 System.out.println("couldn't found a match!");
 				 }
-				 i++;
+				 ++i;
 			 }
 			 DBManager.getInstance().insertSetToDB(languagesSet, DBTablesEnum.LANGUAGES, DBFieldsEnum.LANGUAGES_LANGUAGE_NAME);
 		 }
