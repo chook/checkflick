@@ -1,6 +1,6 @@
 package controller.entity;
 
-public class EntitySearchResult extends AbsEntity {
+public class EntitySearchResult extends Entity {
 	int year;
 	
 	/**

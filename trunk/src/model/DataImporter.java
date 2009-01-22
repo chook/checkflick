@@ -13,10 +13,9 @@ public class DataImporter {
 	 
 	 // Making sure we find the start of the language list
 	 if (languageParser.findLine("LANGUAGE LIST")) {
-		 if (languageParser.findLine("============="))
-		 {
+		 if (languageParser.findLine("=============")) {
 			 // defining a dictionary to find all the different languages
-			 Set languagesSet = new HashSet();  
+			 Set<String> languagesSet = new HashSet<String>();  
 			 
 			 System.out.println("Found the start of the list!");
 			 //Pattern p = Pattern.compile("[^\"].+[)}]\\s+([a-zA-Z_\\-\\s',0-9]+)(\\s+\\(.+\\)\\s*)*");
@@ -54,13 +53,11 @@ public class DataImporter {
 				 }
 				 i++;
 			 }
-			 for (Object language : languagesSet)
-				 System.out.println(language);
-			 
+			 DBManager.getInstance().insertSetToDB(languagesSet, DBTablesEnum.LANGUAGES, DBFieldsEnum.LANGUAGES_LANGUAGE_NAME);
 		 }
 	 }
 	 
 	 languageParser.closeFile();
-
  }
+
 }
