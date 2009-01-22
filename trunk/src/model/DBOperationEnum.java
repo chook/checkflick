@@ -11,5 +11,7 @@ public enum DBOperationEnum {
 	InsertMovie,
 	UpdateMovie,
 	DeleteMovie,
-	SearchMovie
+	SearchMovie,
+	
+	InsertLanguage
 }
