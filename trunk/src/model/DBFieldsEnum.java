@@ -99,7 +99,7 @@ public enum DBFieldsEnum {
 		fieldName = value;
 	}
 	
-	public String getFieldName(String tableName) {
+	public String getFieldName() {
 		return fieldName;
 		
 	}
