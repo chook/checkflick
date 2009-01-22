@@ -1,8 +1,6 @@
 package controller.entity;
 
-public class Movie {
-	private int 	id;
-	private String 	name;
+public class Movie extends AbsEntity{
 	private int		year;
 	private int    	colorInfo;
 	private int		runningTime;
@@ -14,6 +12,7 @@ public class Movie {
 	 * Default Constructor
 	 */
 	public Movie() {
+		super();
 	}
 
 	/**
@@ -21,59 +20,9 @@ public class Movie {
 	 * @param id
 	 */
 	public Movie(int id) {
-		this.id = id;
+		super(id);
 	}
 	
-	/**
-	 * A Movie Constructor
-	 * @param id
-	 * @param name
-	 * @param year
-	 * @param colorInfo
-	 * @param runningTime
-	 * @param taglines
-	 * @param plot
-	 * @param filmingLocations
-	 */
-	public Movie(int id, String name, int year, int colorInfo, int runningTime,
-			String taglines, String plot, String filmingLocations) {
-		this.id = id;
-		this.name = name;
-		this.year = year;
-		this.colorInfo = colorInfo;
-		this.runningTime = runningTime;
-		this.taglines = taglines;
-		this.plot = plot;
-		this.filmingLocations = filmingLocations;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	/**
 	 * @return the year
@@ -159,9 +108,32 @@ public class Movie {
 		this.filmingLocations = filmingLocations;
 	}
 	
+	/**
+	 * A Movie Constructor
+	 * @param id
+	 * @param name
+	 * @param year
+	 * @param colorInfo
+	 * @param runningTime
+	 * @param taglines
+	 * @param plot
+	 * @param filmingLocations
+	 */
+	public Movie(int id, String name, int year, int colorInfo, int runningTime,
+			String taglines, String plot, String filmingLocations) {
+		super(id, name);
+		
+		this.year = year;
+		this.colorInfo = colorInfo;
+		this.runningTime = runningTime;
+		this.taglines = taglines;
+		this.plot = plot;
+		this.filmingLocations = filmingLocations;
+	}
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "id: " + id + ". Name: " + name + ". Was filmed in: " + filmingLocations;
+		return "id: " + getId() + ". Name: " + getName() + ". Was filmed in: " + getFilmingLocations();
 	}
 }
