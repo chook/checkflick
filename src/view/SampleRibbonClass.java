@@ -3,6 +3,7 @@ package view;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.util.Calendar;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,6 +18,10 @@ import com.hexapixel.widgets.generic.ImageCache;
 import com.hexapixel.widgets.generic.Utils;
 import com.hexapixel.widgets.ribbon.*;
 
+import controller.DataManager;
+import controller.NamedEntitiesEnum;
+import controller.entity.NamedEntity;
+
 public class SampleRibbonClass {
 	static RibbonShell shell;
 	static Display display;
@@ -26,6 +31,13 @@ public class SampleRibbonClass {
 	static Composite resultsPersonTable;
 	static RibbonTab movieTab;
 	static RibbonTab personTab;
+	static String[] genresString;
+	static List<NamedEntity> genresList;
+	static List<NamedEntity> colorList;
+	static List<NamedEntity> countriesList;
+	static List<NamedEntity> langList;
+	static List<NamedEntity> rolesList;
+	
 	public static void main(String args []) {
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
@@ -80,6 +92,12 @@ public class SampleRibbonClass {
 			}
 			
 		});		
+		//getting the lists from the DB
+		DataManager dm = DataManager.getInstance();
+		genresList = dm.getNamedEntity(NamedEntitiesEnum.GENRES);
+		colorList = dm.getNamedEntity(NamedEntitiesEnum.COLOR_INFOS);
+		langList = dm.getNamedEntity(NamedEntitiesEnum.LANGUAGES);
+		rolesList =dm.getNamedEntity(NamedEntitiesEnum.PRODUCTION_ROLES);
 		
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
@@ -193,20 +211,30 @@ public class SampleRibbonClass {
 		yearTo.setSelection(year);
 		yearTo.setPageIncrement(1);
 		yearTo.pack();
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Movie Genre");
+		Label movieGenres = new Label(composite ,SWT.NONE);
+		movieGenres.setText("Movie Genre");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
-		//get the genres list from a table
-		combo.setItems (new String [] {"Action", "Fiction", "Sheker"});
+		String[] genresString= new String[genresList.size()];
+		for (int i=0; i<genresList.size(); i++){
+			genresString[i]=genresList.get(i).getName();
+		}
+		combo.setItems (genresString);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Language");
 		Combo langText = new Combo(composite ,SWT.READ_ONLY);
-		langText.setItems(new String [] {"Hebrew", "English", "SHEKER"});
+		String[] langString= new String[langList.size()];
+		for (int i=0; i<langList.size(); i++){
+			langString[i]=langList.get(i).getName();
+		}
+		langText.setItems(langString);
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Color-Info");
 		Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
-		//get the genres list from a table
-		colorCombo.setItems (new String [] {"Black&White", "Colors", "SHEKER"});
+		String[] colorString= new String[colorList.size()];
+		for (int i=0; i<colorList.size(); i++){
+			colorString[i]=colorList.get(i).getName();
+		}
+		colorCombo.setItems (colorString);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -284,18 +312,18 @@ public class SampleRibbonClass {
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (8,false);
+		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
 		//to add- search by origin country, age-range 
 		Button nameCheck = new Button(composite,SWT.CHECK);
 		nameCheck.setText("Person Name");
-		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		Label label = new Label(composite,SWT.CHECK);
-		label.setText("Person Age Range");
-		label = new Label(composite,SWT.CHECK);
-		label.setText("From");
+		label.setText("Age Range	From");
+		//label = new Label(composite,SWT.CHECK);
+		//label.setText("From");
 		Spinner ageFrom = new Spinner (composite, SWT.BORDER);
 		ageFrom.setMinimum(0);
 		ageFrom.setMaximum(100);
@@ -307,13 +335,21 @@ public class SampleRibbonClass {
 		Spinner ageTo = new Spinner (composite, SWT.BORDER);
 		ageTo.setMinimum(0);
 		ageTo.setMaximum(100);
-		ageTo.setSelection(0);
+		ageTo.setSelection(100);
 		ageTo.setPageIncrement(1);
 		ageTo.pack();
 		Button genreCheck = new Button(composite ,SWT.CHECK);
 		genreCheck.setText("Production Role");
-		Combo combo = new Combo (composite, SWT.READ_ONLY);
-		combo.setItems (new String [] {"Actor/Actress", "Writer", "Producer" , "Director"});
+		Combo rolsCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] rolsString= new String[rolesList.size()];
+		for (int i=0; i<rolesList.size(); i++){
+			rolsString[i]=rolesList.get(i).getName();
+		}
+		rolsCombo.setItems (rolsString);
+		Label country = new Label(composite, SWT.NONE);
+		country.setText("Origin Country");
+		Combo countryCombo = new Combo (composite, SWT.READ_ONLY);
+		countryCombo.setItems (new String [] {"Israel", "USA", "Australia" , "China"});
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
