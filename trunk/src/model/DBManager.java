@@ -53,8 +53,10 @@ public class DBManager {
 		pool = DBConnectionPool./*getInstance(
 				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
 				"oracle.jdbc.OracleDriver", 6);*/
-		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
-		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
+		  /*getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
+		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);*/
+			getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
+				  "checkflick", "oracle.jdbc.OracleDriver", 6);
 	}
 
 	/**

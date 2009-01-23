@@ -12,21 +12,27 @@ import controller.ListFilesEnum;
 
 public class DataImporter {
 
-	private Map listfilesMap;
-	public boolean importLists() {
-		
-		return true;
-	}
+	private Map<ListFilesEnum, String> listfilesMap;
 	
-	public DataImporter() {
-		listfilesMap = new HashMap();
-	}
+	// languagePattern explanation:
+	// [^\"] 							- ignore lines that start with '"' (since they are TV shows)
+	// .+[)}] 							- run along the line over all characters until you encounter ')' or '}'
+	// \\s+ 							- run along all the trailing whitespaces
+	// ([\\P{InGreek}\\-\\s',&&[^(]]+)	- group 1: run over all different UNICODE letters including '-', ',' (comma), ''' (single quote) and whitespaces
+	// 											not including '('
+	// (\\s+\\(.+\\)\\s*)* 				- check if this group appears zero or more times
+	//										the group contains whitespaces, then '(', different characters and whitespaces, and then ')'
+	//										(there can be more than one comments in parentheses)
+	static String languagePattern = "[^\"].+[)}]\\s+([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	
-/*	public boolean addListFile(String filename, DBListsEnum listname) {
-		
-		return true;
+	/**
+	 * DataImporter Constructor
+	 * Receives the map of filenames and adds it to its private listfilesMap field
+	 * @param listfilesMap
+	 */
+	public DataImporter(Map<ListFilesEnum, String> listfilesMap) {
+		this.listfilesMap = listfilesMap;
 	}
-	*/
 	
 	/**
 	 *  a test to see how things would work on the controller side
@@ -38,69 +44,49 @@ public class DataImporter {
 		// create new ImportHandler
 		ih = new ImportHandler();
 		// add the different list files given from the GUI
-		ih.addListFile(ListFilesEnum.ACTORS, "actors.list");
-		ih.addListFile(ListFilesEnum.AKA_NAMES, "aka_names.list");
+		ih.addListFile(ListFilesEnum.LANGUAGES, "language.list");
 		
 		// run the importing
 		ih.importIntoDB();
 		
 		return;
+	}
+	
+	public boolean getLanguages() {
+		
+		Parser languageParser = new Parser("language.list");
+		Set<String> languagesSet = new HashSet<String>();		// a dictionary to collect all the different languages
+		String line;
 		
 		
+		// Making sure we find the start of the language list
+		// Searching for "LANGUAGE LIST" & "============="
+		if (languageParser.findLine("LANGUAGE LIST") && languageParser.findLine("=============")) {
+				  
+			System.out.println("Found the start of the list!");
+			Pattern pattern = Pattern.compile(languagePattern);
+			Matcher matcher;
+			boolean matchFound;
+			
+			while (!languageParser.isEOF()) {
+				line = languageParser.readLine();
+				matcher = pattern.matcher(line);
+				matchFound = matcher.matches();
+				if (!matchFound) {
+					if (!(line.charAt(0) == '"')) {
+						System.out.println(line);
+						System.out.println("couldn't found a match on line " + languageParser.getLineNumber() + "!");
+					}
+				} else
+					  languagesSet.add(matcher.group(1));
+			}
+			
+			DBManager.getInstance().insertSetToDB(languagesSet, DBTablesEnum.LANGUAGES, DBFieldsEnum.LANGUAGES_LANGUAGE_NAME);
+		} else
+			return false;
 		
-/* 
-	 // Searching for "LANGUAGE LIST" & "============="
-	 Parser languageParser = new Parser("language.list");
-	 String line;
+		languageParser.closeFile();
+		return true;
+	}
 	 
-	 // Making sure we find the start of the language list
-	 if (languageParser.findLine("LANGUAGE LIST")) {
-		 if (languageParser.findLine("=============")) {
-			 // defining a dictionary to find all the different languages
-			 Set<String> languagesSet = new HashSet<String>();  
-			 
-			 System.out.println("Found the start of the list!");
-			 //Pattern p = Pattern.compile("[^\"].+[)}]\\s+([a-zA-Z_\\-\\s',0-9]+)(\\s+\\(.+\\)\\s*)*");
-			 // Pattern explanation:
-			 // [^\"] 							- ignore lines that start with '"' (since they are TV shows)
-			 // .+[)}] 							- run along the line over all characters until you encounter ')' or '}'
-			 // \\s+ 							- run along all the trailing whitespaces
-			 // ([\\P{InGreek}\\-\\s',&&[^(]]+)	- group 1: run over all different UNICODE letters including '-', ',' (comma), ''' (single quote) and whitespaces
-			 // 											not including '('
-			 // (\\s+\\(.+\\)\\s*)* 			- check if this group appears zero or more times
-			 //										the group contains whitespaces, then '(', different characters and whitespaces, and then ')'
-			 //										(there can be more than one comments in parentheses)
-			 //Pattern p = Pattern.compile("[^\"].+[)}]\\s+([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*");
-			 Pattern p = Pattern.compile("[^\"].+[)}]\\s+([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*");
-			 int i = 15;
-			 while (!languageParser.isEOF()) {
-				 line = languageParser.getNextLine();
-				 //System.out.println(line);
-				 Matcher m = p.matcher(line);
-				 boolean b = m.matches();
-				 if (!b) {
-					 if (!(line.charAt(0) == '"')) {
-						 System.out.println(line);
-						 System.out.println("couldn't found a match on line " + i + "!");
-					 }
-				 }
-//				 System.out.println(m.group(1));
-				 else {
-					 languagesSet.add(m.group(1));
-//					 if (m.group(1).equals("Language")) {
-//						 System.out.println(line);
-//					 }
-//					 System.out.println(m.group(1));
-//					 System.out.println("couldn't found a match!");
-				 }
-				 ++i;
-			 }
-			 DBManager.getInstance().insertSetToDB(languagesSet, DBTablesEnum.LANGUAGES, DBFieldsEnum.LANGUAGES_LANGUAGE_NAME);
-		 }
-	 }
-	 
-	 languageParser.closeFile();
-*/
- }
-
 }
