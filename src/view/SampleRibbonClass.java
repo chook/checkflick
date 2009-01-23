@@ -100,13 +100,13 @@ public class SampleRibbonClass {
 		new RibbonGroupSeparator(searching);
 		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		
-		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
+		searchByMovie = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
 		searchByMovie.setVisible(false);
-		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
+		searchByPerson = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
 		searchByPerson.setVisible(false);
-		resultsMovieTable = new Composite(shell.getShell(),SWT.BORDER);
+		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
 		resultsMovieTable.setVisible(false);
-		resultsPersonTable = new Composite(shell.getShell(),SWT.BORDER);
+		resultsPersonTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
 		resultsPersonTable.setVisible(false);
 		
 		// listeners for the buttons in the search tab
@@ -220,27 +220,26 @@ public class SampleRibbonClass {
 				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 				data.heightHint = 200;
 				table.setLayoutData(data);
-				String[] titles = {" ", "C", "!", "Description", "Resource", "In Folder", "Location"};
+				String[] titles = {" ", "Name", "Year", "Resource", "In Folder", "Location"};
 				for (int i=0; i<titles.length; i++) {
 					TableColumn column = new TableColumn (table, SWT.NONE);
 					column.setText (titles [i]);
 				}	
 				int count = 128;
-				for (int i=0; i<count; i++) {
+				for (int i=1; i<=count; i++) {
 					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, "x");
+					item.setText (0, ""+i+"");
 					item.setText (1, "y");
 					item.setText (2, "!");
 					item.setText (3, "this stuff behaves the way I expect");
 					item.setText (4, "almost everywhere");
 					item.setText (5, "some.folder");
-					item.setText (6, "line " + i + " in nowhere");
 				}
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
 				}	
 				resultsMovieTable.setLocation(0,  145+ monitor_bounds.height/4);
-				resultsMovieTable.setSize(monitor_bounds.width-5, monitor_bounds.height/2);
+				resultsMovieTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
 			}			
 		});
 	}
@@ -317,7 +316,7 @@ public class SampleRibbonClass {
 					table.getColumn (i).pack ();
 				}	
 				resultsPersonTable.setLocation(0,  145+ monitor_bounds.height/4);
-				resultsPersonTable.setSize(monitor_bounds.width-5, monitor_bounds.height/2);
+				resultsPersonTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
 				
 			}			
 		});
