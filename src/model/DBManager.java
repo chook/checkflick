@@ -30,6 +30,9 @@ public class DBManager {
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
 	
+	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
+	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+	
 	// Singleton instance
 	private static DBManager instance = null;
 	private DBConnectionPool pool = null;
@@ -53,8 +56,10 @@ public class DBManager {
 		pool = DBConnectionPool./*getInstance(
 				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
 				"oracle.jdbc.OracleDriver", 6);*/
-		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
+/*		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
 		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
+*/				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
+		  "checkflick", "oracle.jdbc.OracleDriver", 6);
 	}
 
 	/**
@@ -132,14 +137,54 @@ public class DBManager {
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
-		String INSERT_SINGLE_DATATYPE = "INSERT INTO " + table.getTableName()
-				+ " (" + field.getFieldName() + ") VALUES (?)";
+		String statementStr;
+		statementStr = String.format(INSERT_SINGLE_DATATYPE, table.getTableName(), field.getFieldName());
 
 		try {
-			pstmt = conn.prepareStatement(INSERT_SINGLE_DATATYPE);
+			pstmt = conn.prepareStatement(statementStr);
 
 			for (Object setObject : set) {
 				pstmt.setString(1, setObject.toString());
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
+	}
+	
+	/**
+	 * This function receives a set of values, and a definition of a table, and
+	 * adds all the values to the DB with one PreparedStatementBatch
+	 * 
+	 * @param set
+	 *            - The set of values to add to the DB
+	 * @param table
+	 *            - The name of the table
+	 * @param field
+	 *            - The name of the Value_name field
+	 * 
+	 **/
+	public boolean insertMoviesSetToDB(Set<MovieEntity> set) {
+
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr;
+		statementStr = String.format(INSERT_MOVIE_PSTMT_GOOD, 
+										DBTablesEnum.MOVIES.getTableName(), 
+										DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
+										DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
+
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (MovieEntity setMovie : set) {
+				pstmt.setString(1, setMovie.getName());
+				pstmt.setInt(2, setMovie.getYear());
 				pstmt.addBatch();
 			}
 		} catch (SQLException e) {
