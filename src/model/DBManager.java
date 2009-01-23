@@ -2,6 +2,8 @@ package model;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +20,7 @@ public class DBManager {
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
 	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE MOVIE_ID=?";
 	private static String DELETE_MOVIE_PSTMT = "DELETE FROM MOVIES WHERE MOVIE_ID=?";
-	private static String SEARCH_MOVIE_STMT = "SELECT MOVIE_ID, MOVIE_NAME, MOVIE_YEAR FROM MOVIES ";
+	private static String SEARCH_MOVIE_STMT = "SELECT MOVIE_ID, MOVIE_NAME, MOVIE_YEAR FROM MOVIES";
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 
 	// Singleton instance
@@ -213,6 +215,41 @@ public class DBManager {
 	}
 
 	/**
+	 * Private method to parse a where clause from the filters
+	 * 
+	 * @param arlFilters
+	 * @return a WHERE clause to use in SELECT statements
+	 */
+	private String parseWhereClauseFromFiltersNew(List<AbsFilter> arlFilters) {
+		StringBuilder stbFilter = new StringBuilder();
+		int filterCounter = 0;
+
+		// Get the tables names we need
+		Set<String> s = new HashSet<String>();
+
+		// Building the WHERE clause
+		if (arlFilters.size() > 0) {
+			stbFilter.append(" WHERE ");
+			for (AbsFilter filter : arlFilters) {
+				++filterCounter;
+				stbFilter.append(filter);
+				s.addAll(filter.toTablesSet());
+				
+				// Making sure the clause won't end with an AND
+				if (filterCounter < arlFilters.size()) {
+					stbFilter.append(" AND ");
+				}
+			}
+		}
+		String fromClause = "";
+		for(String t : s) {
+			fromClause += ", " + t;
+		}
+
+		return fromClause + stbFilter.toString();
+	}
+
+	/**
 	 * Search movies in the database
 	 * 
 	 * @param arlFilters
@@ -247,6 +284,35 @@ public class DBManager {
 		return arlSearchResults;
 	}
 
+	public List<BasicSearchEntity> searchMoviesNew(List<AbsFilter> arlFilters) {
+		// Variables Declaration
+		List<BasicSearchEntity> arlSearchResults = new ArrayList<BasicSearchEntity>();
+		BasicSearchEntity result = null;
+		ResultSet set = null;
+		Statement s = null;
+		Connection conn = pool.getConnection();
+
+		try {
+			s = conn.createStatement();
+
+			// Executing the query and building the movies array
+			set = s.executeQuery(SEARCH_MOVIE_STMT
+					+ parseWhereClauseFromFiltersNew(arlFilters));
+			while (set.next() == true) {
+				if ((result = fillSearchResult(set)) != null) {
+					arlSearchResults.add(result);
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println("Error in searchMovies " + e.toString());
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer in searchMovies");
+		}
+
+		return arlSearchResults;
+	}
+
+	
 	public Movie getMovieById(int id) {
 		Movie tempMovie = null;
 		ResultSet set = null;

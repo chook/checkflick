@@ -3,6 +3,9 @@
  */
 package model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import controller.filter.AbsJoinFilter;
 import controller.filter.AbsSingleFilter;
 
@@ -40,5 +43,19 @@ public class OracleJoinFilter extends AbsJoinFilter {
 		buffer.append('.');
 		buffer.append(rcolumn);
 		return buffer.toString();
+	}
+
+	@Override
+	public Set<String> toTablesSet() {
+		Set<String> s = new HashSet<String>(3);
+		if (single.getTable() != null && single.getTable() != "") {
+			
+			s.add(single.getTable());
+		}
+
+		s.add(getLtable());
+		s.add(getRtable());
+				
+		return s;
 	}
 }
