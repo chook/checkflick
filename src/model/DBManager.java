@@ -540,6 +540,35 @@ public class DBManager {
 														DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName());
 
 			break;
+		case MOVIE_LANGUAGES:
+			singleFilter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+					DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
+					value);
+
+			filter = new OracleJoinFilter(singleFilter, DBTablesEnum.MOVIES.getTableName(),
+														DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName(),
+														DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+														DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName());
+
+			break;
+		case MOVIE_COLOR_INFO:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIES.getTableName(),
+					DBFieldsEnum.MOVIES_MOVIE_COLOR_INFO_ID.getFieldName(),
+					value);
+			break;
+		case PERSON_PRODUCTION_ROLE:
+			singleFilter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
+					DBFieldsEnum.MOVIE_APPEARANCES_PRODUCTION_ROLE_ID.getFieldName(),
+					value);
+
+			filter = new OracleJoinFilter(singleFilter, DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_PERSON_ID.getFieldName(),
+														DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
+														DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName());
+			break;
 		}
 
 		return filter;
