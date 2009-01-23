@@ -72,6 +72,7 @@ public class SampleMainClass {
 		af = dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, "e");
 		list.add(af);
 		list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, "2009"));
+		list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE, "1"));
 		searched = dm.search(SearchEntitiesEnum.MOVIES, list);
 		System.out.println("movie " + searched.get(0));
 		
@@ -98,7 +99,6 @@ public class SampleMainClass {
 		/**
 		 * Try to find goofs
 		 */
-		
 		List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
 															 NamedRelationsEnum.GOOFS);
 		System.out.println("goofs count " + goofs.size());
