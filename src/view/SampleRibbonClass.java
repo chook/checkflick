@@ -2,6 +2,7 @@ package view;
 
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -20,7 +21,10 @@ import com.hexapixel.widgets.ribbon.*;
 
 import controller.DataManager;
 import controller.NamedEntitiesEnum;
+import controller.SearchEntitiesEnum;
+import controller.entity.BasicSearchEntity;
 import controller.entity.NamedEntity;
+import controller.filter.AbsFilter;
 
 public class SampleRibbonClass {
 	static RibbonShell shell;
@@ -98,6 +102,7 @@ public class SampleRibbonClass {
 		colorList = dm.getNamedEntity(NamedEntitiesEnum.COLOR_INFOS);
 		langList = dm.getNamedEntity(NamedEntitiesEnum.LANGUAGES);
 		rolesList =dm.getNamedEntity(NamedEntitiesEnum.PRODUCTION_ROLES);
+		countriesList = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES);
 		
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
@@ -194,10 +199,10 @@ public class SampleRibbonClass {
 		composite.setLayout(layout); 
 		Label label = new Label(composite,SWT.NONE);
 		label.setText("Movie Name");
-		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Year	From");
-		Spinner yearFrom = new Spinner (composite, SWT.BORDER);
+		final Spinner yearFrom = new Spinner (composite, SWT.BORDER);
 		yearFrom.setMinimum(1900);
 		yearFrom.setMaximum(year);
 		yearFrom.setSelection(year);
@@ -205,7 +210,7 @@ public class SampleRibbonClass {
 		yearFrom.pack();
 		label= new Label(composite,SWT.NONE);
 		label.setText("To");
-		Spinner yearTo = new Spinner (composite, SWT.BORDER);
+		final Spinner yearTo = new Spinner (composite, SWT.BORDER);
 		yearTo.setMinimum(1900);
 		yearTo.setMaximum(year);
 		yearTo.setSelection(year);
@@ -213,15 +218,15 @@ public class SampleRibbonClass {
 		yearTo.pack();
 		Label movieGenres = new Label(composite ,SWT.NONE);
 		movieGenres.setText("Movie Genre");
-		Combo combo = new Combo (composite, SWT.READ_ONLY);
+		final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
 		String[] genresString= new String[genresList.size()];
 		for (int i=0; i<genresList.size(); i++){
 			genresString[i]=genresList.get(i).getName();
 		}
-		combo.setItems (genresString);
+		genresCombo.setItems (genresString);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Language");
-		Combo langText = new Combo(composite ,SWT.READ_ONLY);
+		final Combo langText = new Combo(composite ,SWT.READ_ONLY);
 		String[] langString= new String[langList.size()];
 		for (int i=0; i<langList.size(); i++){
 			langString[i]=langList.get(i).getName();
@@ -229,7 +234,7 @@ public class SampleRibbonClass {
 		langText.setItems(langString);
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Color-Info");
-		Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
+		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
 		String[] colorString= new String[colorList.size()];
 		for (int i=0; i<colorList.size(); i++){
 			colorString[i]=colorList.get(i).getName();
@@ -255,26 +260,38 @@ public class SampleRibbonClass {
 				resultsPersonTable.setVisible(false);
 				resultsMovieTable.setVisible(true);
 				resultsMovieTable.setLayout(new GridLayout());
+				DataManager dm = DataManager.getInstance();
+				List<AbsFilter> list = new ArrayList<AbsFilter>();
+				//AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
+				//list.add(af);
+				//list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "ete"));
+
+				if (nameText.getText()!= null){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
+				}
+				if (genresCombo.getText() != null){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
+				}
+				//if ();
+				List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
 				table.setHeaderVisible (true);
 				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 				data.heightHint = 200;
 				table.setLayoutData(data);
-				String[] titles = {" ", "Name", "Year", "Resource", "In Folder", "Location"};
+				String[] titles = {" ", "Name", "Year", "ID"};
 				for (int i=0; i<titles.length; i++) {
 					TableColumn column = new TableColumn (table, SWT.NONE);
 					column.setText (titles [i]);
 				}	
-				final int count = 128;
+				final int count = searched.size();
 				for (int i=1; i<=count; i++) {
 					TableItem item = new TableItem (table, SWT.NONE);
 					item.setText (0, ""+i+"");
-					item.setText (1, "y");
-					item.setText (2, "!");
-					item.setText (3, "this stuff behaves the way I expect");
-					item.setText (4, "almost everywhere");
-					item.setText (5, "some.folder");
+					item.setText (1, ""+searched.get(i).getName()+"");
+					item.setText (2, ""+searched.get(i).getYear()+"");
+					item.setText (3, ""+searched.get(i).getId()+"");
 				}
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
@@ -349,7 +366,11 @@ public class SampleRibbonClass {
 		Label country = new Label(composite, SWT.NONE);
 		country.setText("Origin Country");
 		Combo countryCombo = new Combo (composite, SWT.READ_ONLY);
-		countryCombo.setItems (new String [] {"Israel", "USA", "Australia" , "China"});
+		String[] countryString= new String[countriesList.size()];
+		for (int i=0; i<countriesList.size(); i++){
+			countryString[i]=countriesList.get(i).getName();
+		}
+		countryCombo.setItems (countryString);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -763,5 +784,14 @@ public class SampleRibbonClass {
 		data.left = new FormAttachment(nameText, 0, SWT.LEFT);
 		genreCombo.setLayoutData(data);*/
 
+	}
+	
+	static private String getID(List<NamedEntity> list , String name){
+		String id=null;
+		for (int i=0; i<list.size(); i++){
+			if (list.get(i).getName() == name)
+				id = String.valueOf(list.get(i).getId());
+		}
+		return id;
 	}
 }
