@@ -8,7 +8,7 @@ package controller.entity;
  * @author Chook
  * 
  */
-public abstract class AbsEntity {
+public abstract class AbsDataType {
 	private int id;
 
 	/**
@@ -26,11 +26,17 @@ public abstract class AbsEntity {
 		this.id = id;
 	}
 
-	protected AbsEntity(int id) {
+	protected AbsDataType(int id) {
 		this.id = id;
 	}
 
-	protected AbsEntity() {
+	protected AbsDataType() {
 		id = 0;
+	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "id: " + getId();
 	}
 }

@@ -5,10 +5,11 @@ package controller.entity;
 
 /**
  * An abstract relation entity, has two id's
+ * 
  * @author Chook
  * 
  */
-public abstract class AbsRelation extends AbsEntity {
+public abstract class AbsRelation extends AbsDataType {
 	int secondaryId;
 
 	/**
@@ -20,5 +21,26 @@ public abstract class AbsRelation extends AbsEntity {
 	protected AbsRelation(int id, int secondaryId) {
 		super(id);
 		this.secondaryId = secondaryId;
+	}
+
+	/**
+	 * @return the secondaryId
+	 */
+	protected int getSecondaryId() {
+		return secondaryId;
+	}
+
+	/**
+	 * @param secondaryId
+	 *            the secondaryId to set
+	 */
+	protected void setSecondaryId(int secondaryId) {
+		this.secondaryId = secondaryId;
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString() + " second id: " + getSecondaryId();
 	}
 }

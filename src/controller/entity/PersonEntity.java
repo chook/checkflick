@@ -8,7 +8,7 @@ import java.util.Date;
  * @author Chook
  * 
  */
-public class Person extends NamedEntity {
+public class PersonEntity extends NamedEntity {
 	private String personRealName;
 	private String personNickNames;
 	private Date dateOfBirth;
@@ -186,15 +186,22 @@ public class Person extends NamedEntity {
 		this.biography = biography;
 	}
 
-	public Person(int id) {
+	/**
+	 * 
+	 */
+	public PersonEntity() {
+		super();
+	}
+	
+	public PersonEntity(int id) {
 		super(id);
 	}
 
-	public Person(int id, String name) {
+	public PersonEntity(int id, String name) {
 		super(id, name);
 	}
 
-	public Person(int id, String name, String personRealName,
+	public PersonEntity(int id, String name, String personRealName,
 			String personNickNames, Date dateOfBirth, int yearOfBirth,
 			String cityOfBirth, int countryOfBirth, Date dateOfDeath,
 			int yearOfDeath, int height, String trademark, String biography) {
@@ -211,5 +218,4 @@ public class Person extends NamedEntity {
 		this.trademark = trademark;
 		this.biography = biography;
 	}
-
 }

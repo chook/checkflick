@@ -48,13 +48,26 @@ public class SampleMainClass {
 		List<AbsFilter> list = new ArrayList<AbsFilter>();
 		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
 		list.add(af);
-		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "Har"));
+		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "ete"));
 		
 		List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 		System.out.println(searched.get(0));
 		
+		PersonEntity p = dm.getPersonById(searched.get(0).getId());
+		System.out.println(p);
+		System.out.println("Count:" + DBTablesEnum.getCounter());
 		// This is the way to get a named entity (id - name list)
-		List<NamedEntity> genres = dm.getNamedEntity(NamedEntitiesEnum.GENRES);
+		List<NamedEntity> genres = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES);
 		System.out.println(genres.size());
+		
+		//System.out.println(genres.toArray(a));
+		
+		// We will ask it to get all the named relations filtered by id=?
+		int movieId = 43;
+		List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
+															 NamedRelationsEnum.GOOFS);
+		System.out.println(goofs.size());
+		//List<NamedRelation> goofs = dm.getNamedRelationsById(movieId, NamedRelationsEnum.GOOFS);
+		
 	}
 }
