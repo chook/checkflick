@@ -1,9 +1,5 @@
 package model;
 
-/* ###################################### */
-/* WILL PROBABLY BE REMOVED IN THE FUTURE */
-/* ###################################### */
-
 import java.util.regex.*;
 import java.util.*;
 
@@ -25,6 +21,7 @@ public class DataImporter {
 	//										(there can be more than one comments in parentheses)
 	static String languagePattern = "[^\"].+[)}]\\s+([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String genresPattern = ".+[)}]\\s+(.+)";
+	static String countriesPattern = ".+[)}]\\s+(.+)";
 	
 	/**
 	 * DataImporter Constructor
@@ -112,7 +109,7 @@ public class DataImporter {
 		
 		// The same code is for 3 different data tables - Languages, Genres & Countries
 		// therefore, only minor changes would be made to the same code
-		for (int i = 1; i < 3; ++i) {
+		for (int i = 1; i < 4; ++i) {
 			switch (i) {
 			case 1:
 				parser.loadFile("lists\\language.list");
@@ -134,12 +131,16 @@ public class DataImporter {
 				
 			case 3:
 				parser.loadFile("lists\\countries.list");
+				listStartLine1 = "COUNTRIES LIST";
+				listStartLine2 = "==============";
+				patternRegExp = countriesPattern;
+				tablesEnum = DBTablesEnum.COUNTRIES;
+				fieldsEnum = DBFieldsEnum.COUNTRIES_COUNTRY_NAME;
 				break;
 			}
 		
 			
-			// Making sure we find the start of the language list
-			// Searching for "LANGUAGE LIST" & "============="
+			// Making sure we find the start of the list
 			if (parser.findLine(listStartLine1) && parser.findLine(listStartLine2)) {
 				System.out.println("Found the start of the list!");
 				
@@ -156,20 +157,16 @@ public class DataImporter {
 								System.out.println("couldn't found a match on line " + parser.getLineNumber() + "!");
 								System.out.println(line);
 							}
-					} else {
-	//					System.out.println("found the genre: " + matcher.group(2));
+					} else
 						elementsSet.add(matcher.group(1));
-					}
-	/*				if (parser.getLineNumber() % 1000 == 0)
-						System.out.println("reached line " + parser.getLineNumber());
-	*/			}
+				}
 				
 				for (Object object: elementsSet) {
 					System.out.println(object);
 				}
 				
 				System.out.println("Inserting " + elementsSet.size() + " elements to the DB");
-//				DBManager.getInstance().insertSetToDB(elementsSet, tablesEnum, fieldsEnum);
+				DBManager.getInstance().insertSetToDB(elementsSet, tablesEnum, fieldsEnum);
 			} else
 				return false;
 			
@@ -178,5 +175,4 @@ public class DataImporter {
 		
 		return true;
 	}
-	 
 }
