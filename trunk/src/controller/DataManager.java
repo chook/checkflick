@@ -143,4 +143,14 @@ public class DataManager {
 		}	
 		return null;
 	}
+
+	public List<GeoEntity> getGeoEntities(String movieId,
+										  SearchEntitiesEnum entity) {
+		AbsSingleFilter filter = db.getFilter(SearchRelationsEnum.GOOFS, movieId);
+		switch (entity){
+		case AKAS:
+			return db.getGeoEntities(filter);
+		}
+		return null;
+	}
 }

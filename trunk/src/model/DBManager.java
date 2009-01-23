@@ -10,6 +10,7 @@ import controller.NamedEntitiesEnum;
 import controller.NamedRelationsEnum;
 import controller.SearchEntitiesEnum;
 import controller.SearchRelationsEnum;
+import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
 import controller.entity.BasicSearchEntity;
 import controller.entity.NamedEntity;
@@ -521,8 +522,6 @@ public class DBManager {
 	public AbsSingleFilter getFilter(SearchRelationsEnum entity, String value) {
 		AbsSingleFilter filter = null;
 		switch (entity) {
-		case AKAS:
-			break;
 		case GOOFS:
 			filter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.MOVIE_GOOFS.getTableName(),
@@ -606,6 +605,38 @@ public class DBManager {
 			resultSet = stmt.executeQuery(sbQuery.toString());
 			while (resultSet.next() == true) {
 				retList.add(new NamedRelation(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		pool.returnConnection(conn);
+		return retList;
+	}
+
+	public List<GeoEntity> getGeoEntities(AbsSingleFilter filter) {
+		Connection conn = pool.getConnection();
+		List<GeoEntity> retList = new ArrayList<GeoEntity>();
+		Statement stmt;
+		ResultSet resultSet;
+		StringBuffer sbQuery = new StringBuffer();
+		sbQuery.append(SELECT_GENERIC_STMT);
+		
+		// Trying to get a connection statement
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		// Executing the query and building the movies array
+		try {
+			sbQuery.append(filter.getTable());
+			sbQuery.append(" WHERE ");
+			sbQuery.append(filter);
+			resultSet = stmt.executeQuery(sbQuery.toString());
+			while (resultSet.next() == true) {
+				//retList.add(new NamedRelation(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
