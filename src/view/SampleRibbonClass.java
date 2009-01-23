@@ -23,6 +23,8 @@ import controller.DataManager;
 import controller.NamedEntitiesEnum;
 import controller.SearchEntitiesEnum;
 import controller.entity.BasicSearchEntity;
+import controller.entity.GeoEntity;
+import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
 import controller.filter.AbsFilter;
 
@@ -41,6 +43,7 @@ public class SampleRibbonClass {
 	static List<NamedEntity> countriesList;
 	static List<NamedEntity> langList;
 	static List<NamedEntity> rolesList;
+	static DataManager dm = DataManager.getInstance();
 	
 	public static void main(String args []) {
 		display = new Display();
@@ -204,15 +207,15 @@ public class SampleRibbonClass {
 		label.setText("Movie Year	From");
 		final Spinner yearFrom = new Spinner (composite, SWT.BORDER);
 		yearFrom.setMinimum(1900);
-		yearFrom.setMaximum(year);
-		yearFrom.setSelection(year);
+		yearFrom.setMaximum(year+100);
+		yearFrom.setSelection(1900);
 		yearFrom.setPageIncrement(1);
 		yearFrom.pack();
 		label= new Label(composite,SWT.NONE);
 		label.setText("To");
 		final Spinner yearTo = new Spinner (composite, SWT.BORDER);
 		yearTo.setMinimum(1900);
-		yearTo.setMaximum(year);
+		yearTo.setMaximum(year+100);
 		yearTo.setSelection(year);
 		yearTo.setPageIncrement(1);
 		yearTo.pack();
@@ -226,12 +229,12 @@ public class SampleRibbonClass {
 		genresCombo.setItems (genresString);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Language");
-		final Combo langText = new Combo(composite ,SWT.READ_ONLY);
+		final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
 		String[] langString= new String[langList.size()];
 		for (int i=0; i<langList.size(); i++){
 			langString[i]=langList.get(i).getName();
 		}
-		langText.setItems(langString);
+		langCombo.setItems(langString);
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Color-Info");
 		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
@@ -261,23 +264,25 @@ public class SampleRibbonClass {
 				resultsMovieTable.setVisible(true);
 				resultsMovieTable.setLayout(new GridLayout());
 				DataManager dm = DataManager.getInstance();
-				List<AbsFilter> list = new ArrayList<AbsFilter>();
-				//AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
-				//list.add(af);
-				//list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "ete"));
+				//creating the filter to search for
+				List<AbsFilter> list = new ArrayList<AbsFilter>();;
 				System.out.println(nameText.getText());
-				if (nameText.getText()!= null){
+				if (nameText.getText()!= ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
 				}
-				System.out.println(genresCombo.getText());
-				if (genresCombo.getText() != null){
+				if (genresCombo.getText() != ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
 				}
-				System.out.println(langText.getText());
-				if (langText.getText() != null){
-					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
+				if (langCombo.getText() != ""){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_LANGUAGES,getID(langList , langCombo.getText()) ));
 				}
+				if (colorCombo.getText()!= ""){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_COLOR_INFO,getID(colorList , colorCombo.getText()) ));
+				}
+				//list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
+				//search for movies
 				List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
+				//creating the search results table
 				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
 				table.setHeaderVisible (true);
@@ -290,22 +295,21 @@ public class SampleRibbonClass {
 					column.setText (titles [i]);
 				}	
 				final int count = searched.size();
-				for (int i=1; i<=count; i++) {
+				System.out.println(count);
+				for (int i=0; i<count; i++) {
 					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, ""+i+"");
-					item.setText (1, ""+searched.get(i).getName()+"");
-					item.setText (2, ""+searched.get(i).getYear()+"");
-					item.setText (3, ""+searched.get(i).getId()+"");
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, searched.get(i).getName());
+					item.setText (2, String.valueOf(searched.get(i).getYear()));
+					item.setText (3, String.valueOf(searched.get(i).getId()));
 				}
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
 				}	
 				table.addListener(SWT.MouseDoubleClick, new Listener() {
 					public void handleEvent(Event event) {
-						RibbonTabFolder tabs = shell.getRibbonTabFolder();
-						movieTab = new RibbonTab(tabs, "Movie");
-						ShowMovieResult(movieTab);
-						tabs.selectTab(movieTab);
+						DataManager dm = DataManager.getInstance();
+						MovieEntity movie= null;
 						Point pt = new Point(event.x, event.y);
 						TableItem item = table.getItem(pt);
 						if (item == null)
@@ -314,9 +318,14 @@ public class SampleRibbonClass {
 							Rectangle rect = item.getBounds(i);
 							if (rect.contains(pt)) {
 								int index = table.indexOf(item);
-								System.out.println("Item " + index + "-" + i);
+								int id = Integer.parseInt(table.getItem(index).getText(3));
+								movie = dm.getMovieById(id);
 							}
 						}
+						RibbonTabFolder tabs = shell.getRibbonTabFolder();
+						movieTab = new RibbonTab(tabs, "Movie");
+						ShowMovieResult(movieTab , movie);
+						tabs.selectTab(movieTab);
 						resultsMovieTable.setVisible(false);
 					}
 				});
@@ -456,7 +465,7 @@ public class SampleRibbonClass {
 		shell.getShell().setEnabled(true);
 		return answer;		
 	}
-	public static void ShowMovieResult(RibbonTab tab){
+	public static void ShowMovieResult(RibbonTab tab, final MovieEntity movie){
 		searchByMovie.setVisible(false);
 		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
 		
@@ -499,26 +508,27 @@ public class SampleRibbonClass {
 		
 		// general information
 		Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (6,false);
+		GridLayout layout = new GridLayout (2,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
 		Label movieName = new Label(composite,SWT.NONE);
 		movieName.setText("Movie Name:");
 		Text nameText = new Text(composite ,SWT.FILL);
-		nameText.setText("Pulp Fiction");
+		nameText.setText(movie.getName());
 		Label movieYear = new Label(composite,SWT.NONE);
 		movieYear.setText("Movie Year:");
 		Text yearText = new Text(composite ,SWT.FILL);
-		yearText.setText("2009");
+		yearText.setText(String.valueOf(movie.getYear()));
 		Label runningTime = new Label(composite ,SWT.NONE);
 		runningTime.setText("Running Time:");
 		Text timeText = new Text(composite ,SWT.FILL);
-		timeText.setText("180 min");
+		timeText.setText(String.valueOf(movie.getRunningTime()));
 		Label plot = new Label(composite,SWT.NONE);
 		plot.setText("Plot: ");
 		Text plotText = new Text(composite ,SWT.FILL);
-		plotText.setText("bla bla bla bla");
+		plotText.setText(movie.getPlot());
+		
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Save");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -536,17 +546,36 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(true);
+				List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movie.getId()), SearchEntitiesEnum.MOVIE_AKAS);
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("book_48.png");
-				GridLayout layout = new GridLayout (6,false);
+				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "Name"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				final int count = akas.size();
+				System.out.println(count);
+				for (int i=0; i<count; i++) {
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, akas.get(i).getName());
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}
+				GridLayout layout = new GridLayout (3,false);
 				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 				layout.verticalSpacing = 10;
 				buttonsComp.setLayout(layout);
-				//result table goes here
-				Text text = new Text(buttonsComp ,SWT.None);
-				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("AKA Name For The Movie");
+				item1.setText("AKA Names For The Movie");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
@@ -558,15 +587,35 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
+				String.valueOf(movie.getId());
+				List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movie.getId()) );
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("globe_48.png");
-				GridLayout layout = new GridLayout (6,false);
+				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "Name"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				final int count = countries.size();
+				System.out.println(count);
+				for (int i=0; i<count; i++) {
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, getName(countriesList , countries.get(i).getName()));
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}
+				GridLayout layout = new GridLayout (3,false);
 				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 				layout.verticalSpacing = 10;
 				buttonsComp.setLayout(layout);
-				//result table goes here
-				Text text = new Text(buttonsComp ,SWT.None);
-				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
 				item1.setText("Movie's Countries");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -576,7 +625,7 @@ public class SampleRibbonClass {
 			}			
 		});
 		bar.setSpacing(8);
-		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height/3);
+		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height*2/3);
 		
 	}
 	
@@ -795,9 +844,21 @@ public class SampleRibbonClass {
 	static private String getID(List<NamedEntity> list , String name){
 		String id=null;
 		for (int i=0; i<list.size(); i++){
-			if (list.get(i).getName() == name)
+			if (name.compareTo(list.get(i).getName())==0){
 				id = String.valueOf(list.get(i).getId());
+				return id;
+			}
 		}
 		return id;
+	}
+	static private String getName(List<NamedEntity> list , String id){
+		String name=null;
+		for (int i=0; i<list.size(); i++){
+			if (id.compareTo(String.valueOf(list.get(i).getId())) ==0){
+				name = String.valueOf(list.get(i).getName());
+				return name;
+			}
+		}
+		return name;
 	}
 }
