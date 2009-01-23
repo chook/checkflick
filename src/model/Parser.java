@@ -6,12 +6,16 @@ public class Parser {
 	private BufferedReader listFile;
 	private int currentLine;
 	
+	public Parser() {
+		
+	}
+	
 	/**
-	 * Parser constructor
 	 * Opens the file and resets the line counter
-	 * @param filename
+	 * @param filename the file to be loaded
+	 * @return boolean if the loading succeeded
 	 */
-	public Parser(String filename) {
+	public boolean loadFile(String filename) {
 		try {
 			// Opening the file
 			FileInputStream fstream = new FileInputStream(filename);
@@ -23,7 +27,18 @@ public class Parser {
 		}
 		catch (Exception e) {
 			System.err.println("File input error");
-		}
+			return false;
+		}		
+		return true;
+	}
+	
+	/**
+	 * Parser constructor
+	 * Calls the loadFile method
+	 * @param filename the file to be loaded
+	 */
+	public Parser(String filename) {
+		loadFile(filename);
 	}
 	
 	/**

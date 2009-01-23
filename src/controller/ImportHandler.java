@@ -56,15 +56,17 @@ public class ImportHandler {
 		
 		DataImporter importer;
 		
+		// TODO: bring back the verification when testings are over
 		// check all files were given and that they exist 
 /*		if (!verifyFiles())
 			return false;
 */	
 		importer = new DataImporter(listfilesMap);
 		
-		importer.getLanguages();
-/*		importer.getGenres();
-		importer.getCountries();
+		importer.getLanguagesGenresCountries();
+//		importer.getLanguages();
+//		importer.getGenres();
+/*		importer.getCountries();
 		
 		importer.getMovies();
 		// ------------------ dependent only on Movies
