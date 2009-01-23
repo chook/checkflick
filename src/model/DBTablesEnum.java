@@ -24,7 +24,7 @@ public enum DBTablesEnum {
 	PERSONS("PERSONS"),
 	PRODUCTION_ROLES("PRODUCTION_ROLES");
 
-	static int counter;
+	private static int counter;
 	public static int getCounter() {
 		return counter;
 	}

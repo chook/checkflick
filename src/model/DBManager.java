@@ -170,8 +170,8 @@ public class DBManager {
 	}
 
 	/**
-	 * executes the executePreparedStatementBatch TODO: check the return values
-	 * of the executeBatch method (Nadav 23/01/09 0:30am)
+	 * executes the executePreparedStatementBatch
+	 * TODO: check the return values of the executeBatch method (Nadav 23/01/09 0:30am)
 	 */
 	private boolean executePreparedStatementBatch(PreparedStatement pstmt) {
 		int[] result;
