@@ -3,6 +3,8 @@ package controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import model.DataImporter;
+
 public class ImportHandler {
 	
 	private Map<ListFilesEnum, String> listfilesMap;
@@ -19,13 +21,11 @@ public class ImportHandler {
 	}
 	
 	/**
-	 * imports all the data that was given to the handler to the DB using the Parser
+	 * checks if all files needed for the import were given and if they all exist
 	 * @return true if there was no error
 	 */
-	
-	public synchronized boolean importIntoDB() {
+	private boolean verifyFiles() {
 		
-	
 		// preparing an error string
 		String errMsg = "The following error has occurred\n";
 		boolean isError = false;
@@ -45,6 +45,61 @@ public class ImportHandler {
 			System.out.println(errMsg);
 			
 		return isError;
+	}
+	
+	/**
+	 * imports all the data that was given to the handler to the DB using the Parser
+	 * @return true if there was no error
+	 */
+	
+	public synchronized boolean importIntoDB() {
+		
+		DataImporter importer;
+		
+		// check all files were given and that they exist 
+/*		if (!verifyFiles())
+			return false;
+*/	
+		importer = new DataImporter(listfilesMap);
+		
+		importer.getLanguages();
+/*		importer.getGenres();
+		importer.getCountries();
+		
+		importer.getMovies();
+		// ------------------ dependent only on Movies
+		importer.getMoviesLanguages();	// dependent on Languages
+		importer.getMoviesGenres();		// dependent on Genres
+		importer.getMoviesCountries();	// dependent on Countries
+		importer.getColorInfo();
+		importer.getAKATitles();
+		importer.getCrazyCredits();
+		importer.getGoofs();
+		importer.getLocations();
+		importer.getMovieConnections();
+		importer.getPlots();
+		importer.getMovieQuotes();
+		importer.getRunningTimes();
+		importer.getTaglines();
+		importer.getMovieTrivias();
+		
+		importer.getPersons();
+		// ------------------ dependent only on Persons
+		importer.getAKANames();
+		importer.getBiographies();
+		
+		// ------------------ dependent on both Persons and Movies
+		importer.getMovieAppearances();
+			
+		
+*/
+		
+		
+		
+
+		
+		return true;
+		
 	}
 	
 }
