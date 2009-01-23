@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import controller.NamedEntitiesEnum;
-import controller.NamedRelationsEnum;
 import controller.SearchEntitiesEnum;
-import controller.SearchRelationsEnum;
 import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
 import controller.entity.BasicSearchEntity;
@@ -31,9 +29,6 @@ public class DBManager {
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
-	
-	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
-	
 	
 	// Singleton instance
 	private static DBManager instance = null;
@@ -137,10 +132,11 @@ public class DBManager {
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
-		String statementStr = String.format(INSERT_SINGLE_DATATYPE, table.getTableName(), field.getFieldName());
-		
+		String INSERT_SINGLE_DATATYPE = "INSERT INTO " + table.getTableName()
+				+ " (" + field.getFieldName() + ") VALUES (?)";
+
 		try {
-			pstmt = conn.prepareStatement(statementStr);
+			pstmt = conn.prepareStatement(INSERT_SINGLE_DATATYPE);
 
 			for (Object setObject : set) {
 				pstmt.setString(1, setObject.toString());
@@ -481,12 +477,11 @@ public class DBManager {
 		AbsFilter filter = null;
 		AbsSingleFilter singleFilter = null;
 		switch (entity) {
-		case PERSON_NAME: {
+		case PERSON_NAME:
 			filter = new OracleSingleFilter(FilterOptionEnum.String,
 					DBTablesEnum.PERSONS.getTableName(), "PERSON_NAME", value);
 			break;
-		}
-		case PERSON_ORIGIN_COUNTRY: {
+		case PERSON_ORIGIN_COUNTRY:
 			singleFilter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_COUNTRY_OF_BIRTH_ID.getFieldName(),
@@ -498,8 +493,7 @@ public class DBManager {
 					DBFieldsEnum.COUNTRIES_COUNTRY_ID.getFieldName());
 
 			break;
-		}
-		case PERSON_AGE: {
+		case PERSON_AGE:
 			if (value2 == "") {
 				singleFilter = new OracleSingleFilter(FilterOptionEnum.Number,
 						DBTablesEnum.PERSONS.getTableName(),
@@ -514,25 +508,41 @@ public class DBManager {
 			}
 
 			break;
-		}
+		case MOVIE_NAME:
+			filter = new OracleSingleFilter(FilterOptionEnum.String,
+											DBTablesEnum.MOVIES.getTableName(), 
+											DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
+											value);
+			break;
+		case MOVIE_YEAR: 
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIES.getTableName(), 
+					DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
+					value);
+			break;
 		}
 
 		return filter;
 	}
 	
-	public AbsSingleFilter getFilter(SearchRelationsEnum entity, String value) {
+	public AbsSingleFilter getFilter(SearchEntitiesEnum entity, String value) {
 		AbsSingleFilter filter = null;
 		switch (entity) {
-		case GOOFS:
+		case MOVIE_GOOFS:
 			filter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.MOVIE_GOOFS.getTableName(),
 					DBFieldsEnum.MOVIE_GOOFS_MOVIE_ID.getFieldName(), value);
+			break;
+		case MOVIE_AKAS:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+					DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName(), value);
 			break;
 		}
 		return filter;
 	}
 
-	public List<NamedEntity> getNamedEntities(NamedEntitiesEnum entity) {
+	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum entity) {
 		Connection c = pool.getConnection();
 		List<NamedEntity> list = new ArrayList<NamedEntity>();
 		Statement s;
@@ -637,12 +647,57 @@ public class DBManager {
 			sbQuery.append(filter);
 			resultSet = stmt.executeQuery(sbQuery.toString());
 			while (resultSet.next() == true) {
-				//retList.add(new NamedRelation(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3)));
+				retList.add(new GeoEntity(resultSet.getInt(1), resultSet.getString(2),
+										  resultSet.getInt(3), resultSet.getInt(4)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		pool.returnConnection(conn);
 		return retList;
+	}
+
+	public List<NamedEntity> getNamedEntities(AbsSingleFilter filter) {
+		Connection conn = pool.getConnection();
+		List<NamedEntity> retList = new ArrayList<NamedEntity>();
+		Statement stmt;
+		ResultSet resultSet;
+		StringBuffer sbQuery = new StringBuffer();
+		sbQuery.append(SELECT_GENERIC_STMT);
+		
+		// Trying to get a connection statement
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		// Executing the query and building the movies array
+		try {
+			sbQuery.append(filter.getTable());
+			sbQuery.append(" WHERE ");
+			sbQuery.append(filter);
+			resultSet = stmt.executeQuery(sbQuery.toString());
+			while (resultSet.next() == true) {
+				retList.add(new NamedEntity(resultSet.getInt(1), resultSet.getString(2)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		pool.returnConnection(conn);
+		return retList;
+	}
+	
+	public AbsSingleFilter getFilter(NamedEntitiesEnum entity, String id) {
+		AbsSingleFilter filter = null;
+		switch(entity) {
+		case COUNTRIES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+					DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(), id);
+			break;
+		}
+		return filter;
 	}
 }
