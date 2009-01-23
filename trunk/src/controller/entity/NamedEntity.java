@@ -9,7 +9,7 @@ package controller.entity;
  * @author CHENH
  * 
  */
-public class NamedEntity extends AbsEntity {
+public class NamedEntity extends AbsDataType {
 	protected String name;
 
 	/**
@@ -43,5 +43,11 @@ public class NamedEntity extends AbsEntity {
 	public NamedEntity(int id, String name) {
 		super(id);
 		this.name = name;
+	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString() + " name: " + getName();
 	}
 }

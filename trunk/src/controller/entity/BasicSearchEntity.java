@@ -20,14 +20,20 @@ public class BasicSearchEntity extends NamedEntity {
 
 	public BasicSearchEntity() {
 		super();
-		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @param id
+	 */
+	public BasicSearchEntity(int id) {
+		super(id);
 	}
 
 	public BasicSearchEntity(int id, String name, int year) {
 		super(id, name);
 		this.year = year;
 	}
-	
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

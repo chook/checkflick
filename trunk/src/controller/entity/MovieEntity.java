@@ -6,7 +6,7 @@ package controller.entity;
  * @author Chook
  * 
  */
-public class Movie extends NamedEntity {
+public class MovieEntity extends NamedEntity {
 	private int year;
 	private int colorInfo;
 	private int runningTime;
@@ -17,7 +17,7 @@ public class Movie extends NamedEntity {
 	/**
 	 * Default Constructor
 	 */
-	public Movie() {
+	public MovieEntity() {
 		super();
 	}
 
@@ -26,7 +26,7 @@ public class Movie extends NamedEntity {
 	 * 
 	 * @param id
 	 */
-	public Movie(int id) {
+	public MovieEntity(int id) {
 		super(id);
 	}
 
@@ -132,7 +132,7 @@ public class Movie extends NamedEntity {
 	 * @param plot
 	 * @param filmingLocations
 	 */
-	public Movie(int id, String name, int year, int colorInfo, int runningTime,
+	public MovieEntity(int id, String name, int year, int colorInfo, int runningTime,
 			String taglines, String plot, String filmingLocations) {
 		super(id, name);
 
