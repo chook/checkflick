@@ -2,14 +2,15 @@ package model;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import controller.NamedEntitiesEnum;
 import controller.SearchEntitiesEnum;
 import controller.entity.Movie;
 import controller.entity.BasicSearchEntity;
+import controller.entity.NamedEntity;
 import controller.filter.AbsFilter;
 import controller.filter.AbsSingleFilter;
 import controller.filter.Filter;
@@ -236,7 +237,7 @@ public class DBManager {
 				++filterCounter;
 				stbFilter.append(filter);
 				s.addAll(filter.toTablesSet());
-				
+
 				// Making sure the clause won't end with an AND
 				if (filterCounter < arlFilters.size()) {
 					stbFilter.append(" AND ");
@@ -244,10 +245,10 @@ public class DBManager {
 			}
 		}
 		String fromClause = "";
-		for(String t : s) {
+		for (String t : s) {
 			fromClause += t + " ,";
 		}
-		fromClause = fromClause.substring(0, fromClause.length()-2);
+		fromClause = fromClause.substring(0, fromClause.length() - 2);
 
 		return fromClause + stbFilter.toString();
 	}
@@ -289,7 +290,7 @@ public class DBManager {
 	}
 
 	public List<BasicSearchEntity> search(List<AbsFilter> arlFilters,
-											DBTablesEnum tableToSearch) {
+			DBTablesEnum tableToSearch) {
 		// Variables Declaration
 		List<BasicSearchEntity> arlSearchResults = new ArrayList<BasicSearchEntity>();
 		BasicSearchEntity result = null;
@@ -299,21 +300,21 @@ public class DBManager {
 
 		try {
 			s = conn.createStatement();
-			
+
 			switch (tableToSearch) {
 			case MOVIES:
 				set = s.executeQuery(SEARCH_MOVIE_STMT
 						+ parseWhereClauseFromFiltersNew(arlFilters));
 				break;
-				
+
 			case PERSONS:
 				set = s.executeQuery(SEARCH_PERSON_STMT
 						+ parseWhereClauseFromFiltersNew(arlFilters));
 				break;
-				
+
 			}
 			// Executing the query and building the movies array
-			
+
 			while (set.next() == true) {
 				if ((result = fillSearchResult(set, tableToSearch)) != null) {
 					arlSearchResults.add(result);
@@ -328,7 +329,6 @@ public class DBManager {
 		return arlSearchResults;
 	}
 
-	
 	public Movie getMovieById(int id) {
 		Movie tempMovie = null;
 		ResultSet set = null;
@@ -376,33 +376,38 @@ public class DBManager {
 		}
 		return null;
 	}
-	
+
 	private BasicSearchEntity fillMovieSearchResult(ResultSet set) {
 		BasicSearchEntity res = null;
 		try {
 			res = new BasicSearchEntity();
 			res.setId(set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
-			res.setName(set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName()));
-			res.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName()));
-			return res;
-		} catch (SQLException e) {
-			return null;
-		}
-	}
-	
-	private BasicSearchEntity fillPersonSearchResult(ResultSet set) {
-		BasicSearchEntity res = null;
-		try {
-			res = new BasicSearchEntity();
-			res.setId(set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
-			res.setName(set.getString(DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName()));
-			res.setYear(set.getInt(DBFieldsEnum.PERSONS_YEAR_OF_BIRTH.getFieldName()));
+			res.setName(set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME
+					.getFieldName()));
+			res.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR
+					.getFieldName()));
 			return res;
 		} catch (SQLException e) {
 			return null;
 		}
 	}
 
+	private BasicSearchEntity fillPersonSearchResult(ResultSet set) {
+		BasicSearchEntity res = null;
+		try {
+			res = new BasicSearchEntity();
+			res
+					.setId(set.getInt(DBFieldsEnum.PERSONS_PERSON_ID
+							.getFieldName()));
+			res.setName(set.getString(DBFieldsEnum.PERSONS_PERSON_NAME
+					.getFieldName()));
+			res.setYear(set.getInt(DBFieldsEnum.PERSONS_YEAR_OF_BIRTH
+					.getFieldName()));
+			return res;
+		} catch (SQLException e) {
+			return null;
+		}
+	}
 
 	private Movie fillMovieFromSet(ResultSet set) {
 		Movie movie = null;
@@ -466,5 +471,50 @@ public class DBManager {
 		}
 
 		return filter;
+	}
+
+	public List<NamedEntity> getNamedEntities(NamedEntitiesEnum entity) {
+		Connection c = pool.getConnection();
+		List<NamedEntity> list = new ArrayList<NamedEntity>();
+		Statement s;
+		ResultSet set;
+		String query = "SELECT * FROM ";
+		
+		// Trying to get a connection statement
+		try {
+			s = c.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+		switch (entity) {
+		case GENRES:
+			query += DBTablesEnum.GENRES.getTableName();
+			break;
+		case COLOR_INFOS:
+			query += DBTablesEnum.COLOR_INFO.getTableName();
+			break;
+		case LANGUAGES:
+			query += DBTablesEnum.LANGUAGES.getTableName();
+			break;
+		case PRODUCTION_ROLES:
+			query += DBTablesEnum.PRODUCTION_ROLES.getTableName();
+			break;
+		}
+		
+		// Executing the query and building the movies array
+		try {
+			set = s.executeQuery(query);
+			while (set.next() == true) {
+				list.add(new NamedEntity(set.getInt(1), set.getString(2)));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		pool.returnConnection(c);
+		return list;
 	}
 }
