@@ -20,7 +20,8 @@ public class SampleRibbonClass {
 	static Display display;
 	static Composite searchByMovie;
 	static Composite searchByPerson;
-	static Composite resultsTable;
+	static Composite resultsMovieTable;
+	static Composite resultsPersonTable;
 	public static void main(String args []) {
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
@@ -103,6 +104,10 @@ public class SampleRibbonClass {
 		searchByMovie.setVisible(false);
 		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
 		searchByPerson.setVisible(false);
+		resultsMovieTable = new Composite(shell.getShell(),SWT.BORDER);
+		resultsMovieTable.setVisible(false);
+		resultsPersonTable = new Composite(shell.getShell(),SWT.BORDER);
+		resultsPersonTable.setVisible(false);
 		
 		// listeners for the buttons in the search tab
 		movieSearch.addSelectionListener(new SelectionListener() {
@@ -206,10 +211,10 @@ public class SampleRibbonClass {
 				ShowMovieResult(movieTab);
 				tabs.selectTab(movieTab);
 				*/
-				resultsTable.setVisible(true);
-				resultsTable = new Composite(shell.getShell(),SWT.BORDER);
-				resultsTable.setLayout(new GridLayout());
-				Table table = new Table (resultsTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				resultsPersonTable.setVisible(false);
+				resultsMovieTable.setVisible(true);
+				resultsMovieTable.setLayout(new GridLayout());
+				Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
 				table.setHeaderVisible (true);
 				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -234,15 +239,15 @@ public class SampleRibbonClass {
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
 				}	
-				resultsTable.setLocation(0,  145+ monitor_bounds.height/4);
-				resultsTable.setSize(monitor_bounds.width-5, monitor_bounds.height/2);
+				resultsMovieTable.setLocation(0,  145+ monitor_bounds.height/4);
+				resultsMovieTable.setSize(monitor_bounds.width-5, monitor_bounds.height/2);
 			}			
 		});
 	}
 	public static void searchByPerson(Composite search){
 		search.setLocation(0, 145);
 		search.setLayout(new FillLayout());
-		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
+		final Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		ExpandBar bar = new ExpandBar (search, SWT.V_SCROLL);
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
@@ -278,11 +283,42 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				RibbonTabFolder tabs = shell.getRibbonTabFolder();
+				/*RibbonTabFolder tabs = shell.getRibbonTabFolder();
 				RibbonTab personTab = new RibbonTab(tabs, "Person");
 				personTab.setSelected(true);
 				ShowPersonResult(personTab);
-				tabs.selectTab(personTab);
+				tabs.selectTab(personTab);*/
+				resultsPersonTable.setVisible(true);
+				resultsMovieTable.setVisible(false);
+				resultsPersonTable.setLayout(new GridLayout());
+				Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "P", "#", "Description", "Resource", "In Folder", "Location"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				int count = 128;
+				for (int i=0; i<count; i++) {
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, "x");
+					item.setText (1, "y");
+					item.setText (2, "!");
+					item.setText (3, "this stuff behaves the way I expect");
+					item.setText (4, "almost everywhere");
+					item.setText (5, "some.folder");
+					item.setText (6, "line " + i + " in nowhere");
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}	
+				resultsPersonTable.setLocation(0,  145+ monitor_bounds.height/4);
+				resultsPersonTable.setSize(monitor_bounds.width-5, monitor_bounds.height/2);
+				
 			}			
 		});
 
