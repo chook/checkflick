@@ -20,6 +20,7 @@ public class SampleRibbonClass {
 	static Display display;
 	static Composite searchByMovie;
 	static Composite searchByPerson;
+	static Composite resultsTable;
 	public static void main(String args []) {
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
@@ -153,27 +154,35 @@ public class SampleRibbonClass {
 	public static void searchByMovie(Composite search){
 		search.setLocation(0, 145);
 		search.setLayout(new FillLayout());
-		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
+		final Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		ExpandBar bar = new ExpandBar (search, SWT.V_SCROLL);
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
-		Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (2,false);
+		final Composite composite = new Composite (bar, SWT.FILL);
+		GridLayout layout = new GridLayout (4,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
-		composite.setLayout(layout);
-		//to add- search by languages, color-info 
-		Button nameCheck = new Button(composite,SWT.CHECK);
+		composite.setLayout(layout); 
+		Label nameCheck = new Label(composite,SWT.NONE);
 		nameCheck.setText("Movie Name");
 		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		Button yearCheck = new Button(composite,SWT.CHECK);
+		Label yearCheck = new Label(composite,SWT.NONE);
 		yearCheck.setText("Movie Year");
 		Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		Button genreCheck = new Button(composite ,SWT.CHECK);
+		Label genreCheck = new Label(composite ,SWT.NONE);
 		genreCheck.setText("Movie Genre");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
 		//get the genres list from a table
 		combo.setItems (new String [] {"Action", "Fiction", "Sheker"});
+		Label langCheck = new Label(composite,SWT.NONE);
+		langCheck.setText("Movie Language");
+		Combo langText = new Combo(composite ,SWT.READ_ONLY);
+		langText.setItems(new String [] {"Hebrew", "English", "SHEKER"});
+		Label colorCheck = new Label(composite ,SWT.NONE);
+		colorCheck.setText("Color-Info");
+		Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
+		//get the genres list from a table
+		colorCombo.setItems (new String [] {"Black&White", "Colors", "SHEKER"});
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -191,11 +200,42 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				RibbonTabFolder tabs = shell.getRibbonTabFolder();
+				/*RibbonTabFolder tabs = shell.getRibbonTabFolder();
 				RibbonTab movieTab = new RibbonTab(tabs, "Movie");
 				movieTab.setSelected(true);
 				ShowMovieResult(movieTab);
 				tabs.selectTab(movieTab);
+				*/
+				resultsTable.setVisible(true);
+				resultsTable = new Composite(shell.getShell(),SWT.BORDER);
+				resultsTable.setLayout(new GridLayout());
+				Table table = new Table (resultsTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "C", "!", "Description", "Resource", "In Folder", "Location"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				int count = 128;
+				for (int i=0; i<count; i++) {
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, "x");
+					item.setText (1, "y");
+					item.setText (2, "!");
+					item.setText (3, "this stuff behaves the way I expect");
+					item.setText (4, "almost everywhere");
+					item.setText (5, "some.folder");
+					item.setText (6, "line " + i + " in nowhere");
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}	
+				resultsTable.setLocation(0,  145+ monitor_bounds.height/4);
+				resultsTable.setSize(monitor_bounds.width-5, monitor_bounds.height/2);
 			}			
 		});
 	}
