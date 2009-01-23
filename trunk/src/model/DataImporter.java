@@ -1,11 +1,54 @@
 package model;
+
+/* ###################################### */
+/* WILL PROBABLY BE REMOVED IN THE FUTURE */
+/* ###################################### */
+
 import java.util.regex.*;
 import java.util.*;
 
+import controller.ImportHandler;
+import controller.ListFilesEnum;
+
 public class DataImporter {
 
- public static void main(String argv[]) {
+	private Map listfilesMap;
+	public boolean importLists() {
+		
+		return true;
+	}
+	
+	public DataImporter() {
+		listfilesMap = new HashMap();
+	}
+	
+/*	public boolean addListFile(String filename, DBListsEnum listname) {
+		
+		return true;
+	}
+	*/
+	
+	/**
+	 *  a test to see how things would work on the controller side
+	 **/
+	public static void main(String argv[]) {
 	 
+		ImportHandler ih;
+		
+		// create new ImportHandler
+		ih = new ImportHandler();
+		// add the different list files given from the GUI
+		ih.addListFile(ListFilesEnum.ACTORS, "actors.list");
+		ih.addListFile(ListFilesEnum.AKA_NAMES, "aka_names.list");
+		
+		// run the importing
+		ih.importIntoDB();
+		
+		return;
+		
+		
+		
+/* 
 	 // Searching for "LANGUAGE LIST" & "============="
 	 Parser languageParser = new Parser("language.list");
 	 String line;
@@ -57,6 +100,7 @@ public class DataImporter {
 	 }
 	 
 	 languageParser.closeFile();
+*/
  }
 
 }
