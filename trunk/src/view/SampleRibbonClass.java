@@ -205,16 +205,10 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				/*RibbonTabFolder tabs = shell.getRibbonTabFolder();
-				RibbonTab movieTab = new RibbonTab(tabs, "Movie");
-				movieTab.setSelected(true);
-				ShowMovieResult(movieTab);
-				tabs.selectTab(movieTab);
-				*/
 				resultsPersonTable.setVisible(false);
 				resultsMovieTable.setVisible(true);
 				resultsMovieTable.setLayout(new GridLayout());
-				Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
 				table.setHeaderVisible (true);
 				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -225,7 +219,7 @@ public class SampleRibbonClass {
 					TableColumn column = new TableColumn (table, SWT.NONE);
 					column.setText (titles [i]);
 				}	
-				int count = 128;
+				final int count = 128;
 				for (int i=1; i<=count; i++) {
 					TableItem item = new TableItem (table, SWT.NONE);
 					item.setText (0, ""+i+"");
@@ -238,6 +232,27 @@ public class SampleRibbonClass {
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
 				}	
+				table.addListener(SWT.MouseDoubleClick, new Listener() {
+					public void handleEvent(Event event) {
+						RibbonTabFolder tabs = shell.getRibbonTabFolder();
+						RibbonTab movieTab = new RibbonTab(tabs, "Movie");
+						movieTab.setSelected(true);
+						ShowMovieResult(movieTab);
+						tabs.selectTab(movieTab);
+						Point pt = new Point(event.x, event.y);
+						TableItem item = table.getItem(pt);
+						if (item == null)
+							return;
+						for (int i = 0; i < count; i++) {
+							Rectangle rect = item.getBounds(i);
+							if (rect.contains(pt)) {
+								int index = table.indexOf(item);
+								System.out.println("Item " + index + "-" + i);
+							}
+						}
+						resultsMovieTable.setVisible(false);
+					}
+				});
 				resultsMovieTable.setLocation(0,  145+ monitor_bounds.height/4);
 				resultsMovieTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
 			}			
@@ -282,15 +297,10 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				/*RibbonTabFolder tabs = shell.getRibbonTabFolder();
-				RibbonTab personTab = new RibbonTab(tabs, "Person");
-				personTab.setSelected(true);
-				ShowPersonResult(personTab);
-				tabs.selectTab(personTab);*/
 				resultsPersonTable.setVisible(true);
 				resultsMovieTable.setVisible(false);
 				resultsPersonTable.setLayout(new GridLayout());
-				Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				final Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
 				table.setHeaderVisible (true);
 				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -301,7 +311,7 @@ public class SampleRibbonClass {
 					TableColumn column = new TableColumn (table, SWT.NONE);
 					column.setText (titles [i]);
 				}	
-				int count = 128;
+				final int count = 128;
 				for (int i=0; i<count; i++) {
 					TableItem item = new TableItem (table, SWT.NONE);
 					item.setText (0, "x");
@@ -315,6 +325,28 @@ public class SampleRibbonClass {
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
 				}	
+				table.addListener(SWT.MouseDoubleClick, new Listener() {
+					public void handleEvent(Event event) {
+						RibbonTabFolder tabs = shell.getRibbonTabFolder();
+						RibbonTab personTab = new RibbonTab(tabs, "Person");
+						personTab.setSelected(true);
+						ShowPersonResult(personTab);
+						tabs.selectTab(personTab);
+						Point pt = new Point(event.x, event.y);
+						TableItem item = table.getItem(pt);
+						if (item == null)
+							return;
+						for (int i = 0; i < count; i++) {
+							Rectangle rect = item.getBounds(i);
+							if (rect.contains(pt)) {
+								int index = table.indexOf(item);
+								System.out.println("Item " + index + "-" + i);
+							}
+						}
+						resultsPersonTable.setVisible(false);
+					}
+				});
+
 				resultsPersonTable.setLocation(0,  145+ monitor_bounds.height/4);
 				resultsPersonTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
 				
