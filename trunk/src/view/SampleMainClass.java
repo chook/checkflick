@@ -1,7 +1,9 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import controller.*;
 import controller.entity.*;
@@ -23,6 +25,7 @@ public class SampleMainClass {
 	public static void main(String[] args) {
 		// Creates a GUI thread
 		//testDBManager();
+		
 		testDataManager();
 		Thread guiThread = new SampleRibbonThread();
 		guiThread.start();
@@ -46,6 +49,9 @@ public class SampleMainClass {
 		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "2");
 		list.add(af);
 		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "will"));
+		
+		List<BasicSearchEntity> searched = dm.search(DBTablesEnum.MOVIES, list);
+		System.out.println(searched.get(0));
 	}
 	
 	/**

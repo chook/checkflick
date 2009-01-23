@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.*;
+
 import controller.entity.*;
 import controller.filter.AbsFilter;
 import controller.filter.Filter;
@@ -64,28 +65,28 @@ public class DataManager {
 	 * @param arlFilters - List of filters for WHERE clause
 	 * @return List of movies
 	 */
-	private List<BasicSearchEntity> getMoviesBySearch(List<Filter> arlFilters) {
-		return DBManager.getInstance().searchMovies(arlFilters);
+	private List<BasicSearchEntity> getMoviesBySearch(List<AbsFilter> arlFilters) {
+		return DBManager.getInstance().searchMoviesNew(arlFilters);
 	}
 	
-	private List<BasicSearchEntity> getPersonsBySearch(List<Filter> arlFilters) {
-		return DBManager.getInstance().searchPersons(arlFilters);
+	private List<BasicSearchEntity> getPersonsBySearch(List<AbsFilter> arlFilters) {
+		return null; //DBManager.getInstance().searchPersons(arlFilters);
 	}
 	
 	private Movie getMovieById(int id) {
 		return DBManager.getInstance().getMovieById(id);
 	}
 	
-	public List<BasicSearchEntity> search(DBTablesEnum table, List<Filter> arlFilters) {
+	public List<BasicSearchEntity> search(DBTablesEnum table, List<AbsFilter> list) {
 		switch(table)
 		{
 			case MOVIES:
 			{
-				return getMoviesBySearch(arlFilters);
+				return getMoviesBySearch(list);
 			}
 			case PERSONS:
 			{
-				return getPersonsBySearch(arlFilters);
+				return getPersonsBySearch(list);
 			}
 			default:
 				return null;
