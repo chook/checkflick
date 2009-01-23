@@ -24,8 +24,8 @@ public class DBManager {
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
 	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE MOVIE_ID=?";
 	private static String DELETE_MOVIE_PSTMT = "DELETE FROM MOVIES WHERE MOVIE_ID=?";
-	private static String SEARCH_MOVIE_STMT = "SELECT MOVIE_ID, MOVIE_NAME, MOVIE_YEAR FROM ";
-	private static String SEARCH_PERSON_STMT = "SELECT PERSON_ID, PERSON_NAME, YEAR_OF_BIRTH FROM ";
+	private static String SEARCH_MOVIE_STMT = "SELECT MOVIES.MOVIE_ID, MOVIES.MOVIE_NAME, MOVIES.MOVIE_YEAR FROM ";
+	private static String SEARCH_PERSON_STMT = "SELECT PERSONS.PERSON_ID, PERSONS.PERSON_NAME, PERSONS.YEAR_OF_BIRTH FROM ";
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
@@ -307,13 +307,20 @@ public class DBManager {
 
 			switch (tableToSearch) {
 			case MOVIES:
-				set = s.executeQuery(SEARCH_MOVIE_STMT
-						+ parseWhereClauseFromFiltersNew(arlFilters));
+				if(arlFilters.size() == 0)
+					set = s.executeQuery(SEARCH_MOVIE_STMT + DBTablesEnum.MOVIES);
+				else
+					set = s.executeQuery(SEARCH_MOVIE_STMT
+							+ parseWhereClauseFromFiltersNew(arlFilters));
+				
 				break;
 
 			case PERSONS:
-				set = s.executeQuery(SEARCH_PERSON_STMT
-						+ parseWhereClauseFromFiltersNew(arlFilters));
+				if(arlFilters.size() == 0)
+					set = s.executeQuery(SEARCH_PERSON_STMT + DBTablesEnum.PERSONS);
+				else
+					set = s.executeQuery(SEARCH_PERSON_STMT
+							+ parseWhereClauseFromFiltersNew(arlFilters));
 				break;
 
 			}
@@ -522,6 +529,18 @@ public class DBManager {
 					DBTablesEnum.MOVIES.getTableName(), 
 					DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
 					value);
+			break;
+		case MOVIE_GENRE:
+			singleFilter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_GENRES.getTableName(),
+					DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName(),
+					value);
+
+			filter = new OracleJoinFilter(singleFilter, DBTablesEnum.MOVIES.getTableName(),
+														DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName(),
+														DBTablesEnum.MOVIE_GENRES.getTableName(),
+														DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName());
+
 			break;
 		}
 
