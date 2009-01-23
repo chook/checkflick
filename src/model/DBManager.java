@@ -32,6 +32,8 @@ public class DBManager {
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
 	
+	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
+	
 	
 	// Singleton instance
 	private static DBManager instance = null;
@@ -135,11 +137,10 @@ public class DBManager {
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
-		String INSERT_SINGLE_DATATYPE = "INSERT INTO " + table.getTableName()
-				+ " (" + field.getFieldName() + ") VALUES (?)";
-
+		String statementStr = String.format(INSERT_SINGLE_DATATYPE, table.getTableName(), field.getFieldName());
+		
 		try {
-			pstmt = conn.prepareStatement(INSERT_SINGLE_DATATYPE);
+			pstmt = conn.prepareStatement(statementStr);
 
 			for (Object setObject : set) {
 				pstmt.setString(1, setObject.toString());
