@@ -103,4 +103,11 @@ public enum DBFieldsEnum {
 		return fieldName;
 		
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return getFieldName();
+	}
+	
 }
