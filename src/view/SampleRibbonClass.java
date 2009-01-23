@@ -265,17 +265,19 @@ public class SampleRibbonClass {
 				//AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
 				//list.add(af);
 				//list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "ete"));
-
+				System.out.println(nameText.getText());
 				if (nameText.getText()!= null){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
 				}
+				System.out.println(genresCombo.getText());
 				if (genresCombo.getText() != null){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
 				}
+				System.out.println(langText.getText());
 				if (langText.getText() != null){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
 				}
-				List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
+				List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
 				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
 				table.setHeaderVisible (true);
@@ -475,7 +477,8 @@ public class SampleRibbonClass {
 		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton locations = new RibbonButton(results, ImageCache.getImage("image_48.png"), " \nLocations", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		
+		RibbonGroup personsGroup = new RibbonGroup(tab, "Movie Apearances" , toolTip);
+		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		ButtonSelectGroup group = new ButtonSelectGroup();
 		aka.setButtonSelectGroup(group);
 		countries.setButtonSelectGroup(group);
@@ -484,6 +487,7 @@ public class SampleRibbonClass {
 		languages.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
 		locations.setButtonSelectGroup(group);
+		persons.setButtonSelectGroup(group);
 
 		final Composite movieDetails = new Composite(shell.getShell(),SWT.BORDER);
 		movieDetails.setVisible(true);
