@@ -80,9 +80,9 @@ public class DataManager {
 	 * @param name
 	 * @return
 	 */
-	public List<NamedEntity> getNamedEntity(NamedEntitiesEnum name) {
+	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
 		if(!namedEntities.containsKey(name))
-			namedEntities.put(name, db.getNamedEntities(name));
+			namedEntities.put(name, db.getAllNamedEntities(name));
 		return namedEntities.get(name);
 	}
 	
@@ -136,7 +136,7 @@ public class DataManager {
 	}
 
 	public List<NamedRelation> getNamedRelationsById(String movieId, NamedRelationsEnum rel) {
-		AbsSingleFilter filter = db.getFilter(SearchRelationsEnum.GOOFS, movieId);
+		AbsSingleFilter filter = db.getFilter(SearchEntitiesEnum.MOVIE_GOOFS, movieId);
 		switch (rel){
 		case GOOFS:
 			return db.getNamedRalations(filter);
@@ -146,11 +146,17 @@ public class DataManager {
 
 	public List<GeoEntity> getGeoEntities(String movieId,
 										  SearchEntitiesEnum entity) {
-		AbsSingleFilter filter = db.getFilter(SearchRelationsEnum.GOOFS, movieId);
+		AbsSingleFilter filter = db.getFilter(SearchEntitiesEnum.MOVIE_AKAS, movieId);
 		switch (entity){
-		case AKAS:
+		case MOVIE_AKAS:
 			return db.getGeoEntities(filter);
 		}
 		return null;
+	}
+
+	public List<NamedEntity> getNamedEntity(NamedEntitiesEnum entity,
+										    String id) {
+		AbsSingleFilter filter = db.getFilter(entity, id);
+		return db.getNamedEntities(filter);
 	}
 }

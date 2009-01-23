@@ -98,10 +98,10 @@ public class SampleRibbonClass {
 		});		
 		//getting the lists from the DB
 		DataManager dm = DataManager.getInstance();
-		genresList = dm.getNamedEntity(NamedEntitiesEnum.GENRES);
-		colorList = dm.getNamedEntity(NamedEntitiesEnum.COLOR_INFOS);
-		langList = dm.getNamedEntity(NamedEntitiesEnum.LANGUAGES);
-		rolesList =dm.getNamedEntity(NamedEntitiesEnum.PRODUCTION_ROLES);
+		genresList = dm.getAllNamedEntities(NamedEntitiesEnum.GENRES);
+		colorList = dm.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS);
+		langList = dm.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES);
+		rolesList =dm.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES);
 		countriesList = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES);
 		
 		// Tab folder
