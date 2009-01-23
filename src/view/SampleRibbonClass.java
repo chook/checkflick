@@ -102,7 +102,7 @@ public class SampleRibbonClass {
 		colorList = dm.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS);
 		langList = dm.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES);
 		rolesList =dm.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES);
-		countriesList = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES);
+		countriesList = dm.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES);
 		
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
