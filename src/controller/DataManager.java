@@ -2,6 +2,8 @@ package controller;
 
 import java.util.*;
 
+import com.sun.jmx.remote.util.OrderClassLoaders;
+
 import controller.entity.*;
 import controller.filter.AbsFilter;
 import controller.filter.Filter;
@@ -12,6 +14,7 @@ import model.DBTablesEnum;
 public class DataManager {
 	private static DataManager manager = null;
 	private DBManager db = null;
+	private Map<NamedEntitiesEnum, List<NamedEntity>> namedEntities;
 	
 	/**
 	 * This function retrieves the database object
@@ -29,6 +32,7 @@ public class DataManager {
 	 */
 	protected DataManager() {
 		db = DBManager.getInstance();
+		namedEntities = new TreeMap<NamedEntitiesEnum, List<NamedEntity>>();
 	}
 
 	/**
@@ -122,5 +126,11 @@ public class DataManager {
 	
 	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
 		return db.getFilter(entity, value, value2);
+	}
+	
+	public List<NamedEntity> getNamedEntity(NamedEntitiesEnum name) {
+		if(!namedEntities.containsKey(name))
+			namedEntities.put(name,db.getNamedEntities(name));
+		return namedEntities.get(name);
 	}
 }

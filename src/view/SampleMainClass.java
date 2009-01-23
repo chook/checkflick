@@ -52,5 +52,9 @@ public class SampleMainClass {
 		
 		List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 		System.out.println(searched.get(0));
+		
+		// This is the way to get a named entity (id - name list)
+		List<NamedEntity> genres = dm.getNamedEntity(NamedEntitiesEnum.GENRES);
+		System.out.println(genres.size());
 	}
 }
