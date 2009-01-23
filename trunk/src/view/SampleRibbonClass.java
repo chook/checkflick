@@ -2,11 +2,13 @@ package view;
 
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
+import java.util.Calendar;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.internal.win32.CREATESTRUCT;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
@@ -22,6 +24,8 @@ public class SampleRibbonClass {
 	static Composite searchByPerson;
 	static Composite resultsMovieTable;
 	static Composite resultsPersonTable;
+	static RibbonTab movieTab;
+	static RibbonTab personTab;
 	public static void main(String args []) {
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
@@ -39,7 +43,6 @@ public class SampleRibbonClass {
 		shell = new RibbonShell(display);
 		shell.setButtonImage(ImageCache.getImage("selection_recycle_24.png"));
 		//Shell shell = new Shell(display);
-		
 		shell.setText("DB Project, TAU 2009");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		shell.setSize(new Point(monitor_bounds.width,monitor_bounds.height));
@@ -157,6 +160,8 @@ public class SampleRibbonClass {
 	}
 	
 	public static void searchByMovie(Composite search){
+		Calendar toDay = Calendar.getInstance();
+		int year = toDay.get(Calendar.YEAR);
 		search.setLocation(0, 145);
 		search.setLayout(new FillLayout());
 		final Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
@@ -164,27 +169,41 @@ public class SampleRibbonClass {
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
 		final Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (4,false);
+		//createMovieForm(composite);
+		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout); 
-		Label nameCheck = new Label(composite,SWT.NONE);
-		nameCheck.setText("Movie Name");
+		Label label = new Label(composite,SWT.NONE);
+		label.setText("Movie Name");
 		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		Label yearCheck = new Label(composite,SWT.NONE);
-		yearCheck.setText("Movie Year");
-		Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		Label genreCheck = new Label(composite ,SWT.NONE);
-		genreCheck.setText("Movie Genre");
+		label = new Label(composite,SWT.NONE);
+		label.setText("Movie Year	From");
+		Spinner yearFrom = new Spinner (composite, SWT.BORDER);
+		yearFrom.setMinimum(1900);
+		yearFrom.setMaximum(year);
+		yearFrom.setSelection(year);
+		yearFrom.setPageIncrement(1);
+		yearFrom.pack();
+		label= new Label(composite,SWT.NONE);
+		label.setText("To");
+		Spinner yearTo = new Spinner (composite, SWT.BORDER);
+		yearTo.setMinimum(1900);
+		yearTo.setMaximum(year);
+		yearTo.setSelection(year);
+		yearTo.setPageIncrement(1);
+		yearTo.pack();
+		label = new Label(composite ,SWT.NONE);
+		label.setText("Movie Genre");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
 		//get the genres list from a table
 		combo.setItems (new String [] {"Action", "Fiction", "Sheker"});
-		Label langCheck = new Label(composite,SWT.NONE);
-		langCheck.setText("Movie Language");
+		label = new Label(composite,SWT.NONE);
+		label.setText("Movie Language");
 		Combo langText = new Combo(composite ,SWT.READ_ONLY);
 		langText.setItems(new String [] {"Hebrew", "English", "SHEKER"});
-		Label colorCheck = new Label(composite ,SWT.NONE);
-		colorCheck.setText("Color-Info");
+		label = new Label(composite ,SWT.NONE);
+		label.setText("Color-Info");
 		Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
 		//get the genres list from a table
 		colorCombo.setItems (new String [] {"Black&White", "Colors", "SHEKER"});
@@ -235,8 +254,7 @@ public class SampleRibbonClass {
 				table.addListener(SWT.MouseDoubleClick, new Listener() {
 					public void handleEvent(Event event) {
 						RibbonTabFolder tabs = shell.getRibbonTabFolder();
-						RibbonTab movieTab = new RibbonTab(tabs, "Movie");
-						movieTab.setSelected(true);
+						movieTab = new RibbonTab(tabs, "Movie");
 						ShowMovieResult(movieTab);
 						tabs.selectTab(movieTab);
 						Point pt = new Point(event.x, event.y);
@@ -266,7 +284,7 @@ public class SampleRibbonClass {
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (2,false);
+		GridLayout layout = new GridLayout (8,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
@@ -274,9 +292,24 @@ public class SampleRibbonClass {
 		Button nameCheck = new Button(composite,SWT.CHECK);
 		nameCheck.setText("Person Name");
 		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		Button YearCheck = new Button(composite,SWT.CHECK);
-		YearCheck.setText("Person Age");
-		Text YearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		Label label = new Label(composite,SWT.CHECK);
+		label.setText("Person Age Range");
+		label = new Label(composite,SWT.CHECK);
+		label.setText("From");
+		Spinner ageFrom = new Spinner (composite, SWT.BORDER);
+		ageFrom.setMinimum(0);
+		ageFrom.setMaximum(100);
+		ageFrom.setSelection(0);
+		ageFrom.setPageIncrement(1);
+		ageFrom.pack();
+		label = new Label(composite , SWT.NONE);
+		label.setText("To");
+		Spinner ageTo = new Spinner (composite, SWT.BORDER);
+		ageTo.setMinimum(0);
+		ageTo.setMaximum(100);
+		ageTo.setSelection(0);
+		ageTo.setPageIncrement(1);
+		ageTo.pack();
 		Button genreCheck = new Button(composite ,SWT.CHECK);
 		genreCheck.setText("Production Role");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
@@ -328,8 +361,7 @@ public class SampleRibbonClass {
 				table.addListener(SWT.MouseDoubleClick, new Listener() {
 					public void handleEvent(Event event) {
 						RibbonTabFolder tabs = shell.getRibbonTabFolder();
-						RibbonTab personTab = new RibbonTab(tabs, "Person");
-						personTab.setSelected(true);
+						personTab = new RibbonTab(tabs, "Person");
 						ShowPersonResult(personTab);
 						tabs.selectTab(personTab);
 						Point pt = new Point(event.x, event.y);
@@ -615,5 +647,85 @@ public class SampleRibbonClass {
 		bar.setSpacing(8);
 		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height/3);
 		
+	}
+	static public void createMovieForm(Composite composite){
+		Calendar toDay = Calendar.getInstance();
+		int year = toDay.get(Calendar.YEAR);
+		FormLayout layout = new FormLayout();
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.spacing = 10;
+		composite.setLayout(layout);
+		
+		Label movieName = new Label(composite,SWT.NONE);
+		movieName.setText("Movie Name");
+		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		Label movieYear = new Label(composite,SWT.NONE);
+		movieYear.setText("Movie Year");
+		Label from = new Label(composite, SWT.NONE);
+		from.setText("From");
+		Spinner yearFrom = new Spinner (composite, SWT.BORDER);
+		yearFrom.setMinimum(1900);
+		yearFrom.setMaximum(year);
+		yearFrom.setSelection(year);
+		yearFrom.setPageIncrement(1);
+		yearFrom.pack();
+		/*Label to= new Label(composite,SWT.NONE);
+		to.setText("To");
+		Spinner yearTo = new Spinner (composite, SWT.BORDER);
+		yearTo.setMinimum(1900);
+		yearTo.setMaximum(year);
+		yearTo.setSelection(year);
+		yearTo.setPageIncrement(1);
+		yearTo.pack();*/
+		/*Label genre = new Label(composite ,SWT.NONE);
+		genre.setText("Movie Genre");
+		Combo genreCombo = new Combo (composite, SWT.READ_ONLY);
+		//get the genres list from a table
+		genreCombo.setItems (new String [] {"Action", "Fiction", "Sheker"});
+		Label lang = new Label(composite,SWT.NONE);
+		lang.setText("Movie Language");
+		Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
+		langCombo.setItems(new String [] {"Hebrew", "English", "SHEKER"});
+		Label color = new Label(composite ,SWT.NONE);
+		color.setText("Color-Info");
+		Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
+		//get the genres list from a table
+		colorCombo.setItems (new String [] {"Black&White", "Colors", "SHEKER"});
+		Button button = new Button (composite, SWT.PUSH);
+		button.setText("Search");*/
+		
+		FormData data= new FormData();
+		
+		data.top = new FormAttachment(nameText, 0, SWT.CENTER);
+		movieName.setLayoutData(data);
+		data = new FormData();
+		data.left = new FormAttachment(movieName, 5);
+		data.right = new FormAttachment(100, 0);
+		nameText.setLayoutData(data);
+		
+		data = new FormData();
+		data.top = new FormAttachment(from , 0 , SWT.CENTER);
+		movieYear.setLayoutData(data);
+		data = new FormData();
+		data.top = new FormAttachment(nameText, 5);
+		data.left = new FormAttachment(nameText, 0, SWT.LEFT);
+		data.right = new FormAttachment(yearFrom, -5 );
+		from.setLayoutData(data);
+		data = new FormData();
+		data.top = new FormAttachment(nameText, 5);
+		data.left = new FormAttachment(from, 0, SWT.LEFT);
+		//data.right = new FormAttachment(yearFrom, -5 );
+		yearFrom.setLayoutData(data);
+
+		
+	/*	
+		data = new FormData();
+		data.top = new FormAttachment(genreCombo, 0, SWT.CENTER);
+		genre.setLayoutData(data);
+		data = new FormData();
+		data.top = new FormAttachment(nameText, 5);
+		data.left = new FormAttachment(nameText, 0, SWT.LEFT);
+		genreCombo.setLayoutData(data);*/
+
 	}
 }
