@@ -235,13 +235,14 @@ public class DBManager {
 		if (arlFilters.size() > 0) {
 			stbFilter.append(" WHERE ");
 			for (AbsFilter filter : arlFilters) {
-				++filterCounter;
-				stbFilter.append(filter);
-				s.addAll(filter.toTablesSet());
-
-				// Making sure the clause won't end with an AND
-				if (filterCounter < arlFilters.size()) {
-					stbFilter.append(" AND ");
+				if(filter != null) {
+					++filterCounter;
+					// Making sure the clause won't end with an AND
+					if (filterCounter != 1) {
+						stbFilter.append(" AND ");
+					}
+					stbFilter.append(filter);
+					s.addAll(filter.toTablesSet());
 				}
 			}
 		}
