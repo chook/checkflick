@@ -23,16 +23,30 @@ public enum DBTablesEnum {
 	PERSON_TRIVIA("PERSON_TRIVIA"),
 	PERSONS("PERSONS"),
 	PRODUCTION_ROLES("PRODUCTION_ROLES");
-	
+
+	static int counter;
+	public static int getCounter() {
+		return counter;
+	}
 	
 	private final String tableName;
-	
+
 	private DBTablesEnum(String value) {
 		tableName = value;
+		inc();
 	}
 	
 	public String getTableName() {
 		return tableName;
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return getTableName();
+	}
+	
+	private void inc() {
+		counter++;
+	}
 }
