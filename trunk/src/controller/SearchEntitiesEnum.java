@@ -18,5 +18,6 @@ public enum SearchEntitiesEnum {
 	PERSON_PRODUCTION_ROLE,
 	MOVIES,
 	PERSONS,
-	AKAS
+	MOVIE_AKAS,
+	MOVIE_GOOFS, // TODO: This is not an entity, need to think how to represent it
 }

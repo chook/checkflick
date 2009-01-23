@@ -1,15 +1,10 @@
 package view;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import controller.*;
 import controller.entity.*;
 import controller.filter.AbsFilter;
-import controller.filter.Filter;
-import controller.filter.FilterOptionEnum;
 import model.*;
 
 /**
@@ -62,20 +57,51 @@ public class SampleMainClass {
 		PersonEntity p = dm.getPersonById(searched.get(0).getId());
 		System.out.println(p);
 		System.out.println("Count:" + DBTablesEnum.getCounter());
-		// This is the way to get a named entity (id - name list)
-		List<NamedEntity> genres = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES);
+		
+		/**
+		 * Get all genres
+		 */
+		List<NamedEntity> genres = dm.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES);
 		System.out.println("genres count " + genres.size());
+		
+		int movieId = 43;
+		/**
+		 * Searching for a movie
+		 */
+		list = new ArrayList<AbsFilter>();
+		af = dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, "e");
+		list.add(af);
+		list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, "2009"));
+		searched = dm.search(SearchEntitiesEnum.MOVIES, list);
+		System.out.println("movie " + searched.get(0));
+		
+		/**
+		 * Get Movie entity
+		 */
+		MovieEntity m = dm.getMovieById(searched.get(0).getId());
+		System.out.println(p);
+
+		/**
+		 * Getting movie aka names
+		 */
+		List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movieId),
+											 	 SearchEntitiesEnum.MOVIE_AKAS);	
+		
+		System.out.println("akas count " + akas.size());
+		
+		/**
+		 * Getting movie countries 
+		 */
+		List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movieId));
+		System.out.println("countries count " + countries.size());
 		
 		/**
 		 * Try to find goofs
 		 */
-		int movieId = 43;
+		
 		List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
 															 NamedRelationsEnum.GOOFS);
 		System.out.println("goofs count " + goofs.size());
-		
-		List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movieId),
-											 	 SearchEntitiesEnum.AKAS);	
-		
+
 	}
 }
