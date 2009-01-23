@@ -26,7 +26,6 @@ public class SampleRibbonClass {
 		app.createShell();
 		
 		Utils.centerDialogOnScreen(shell.getShell());
-
 		app.shell.open();
 		
 		while (!app.shell.isDisposed ()) {
@@ -41,7 +40,8 @@ public class SampleRibbonClass {
 		
 		shell.setText("DB Project, TAU 2009");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
-		shell.setSize(new Point(monitor_bounds.width,monitor_bounds.height-25));
+		shell.setSize(new Point(monitor_bounds.width,monitor_bounds.height));
+		//shell.setMaximized(true);
 		//shell.setSize(570, 550);
 		
 		//closing the program.
@@ -94,9 +94,9 @@ public class SampleRibbonClass {
 
 		// Search tab
 		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , toolTip);
-		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(searching);
-		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		
 		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
 		searchByMovie.setVisible(false);
@@ -131,11 +131,11 @@ public class SampleRibbonClass {
 		// The Insert Tab
 		// Insert Tab
 		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , toolTip);
-		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", SWT.NONE);
+		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(inserting);
-		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", SWT.NONE);
+		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
 		RibbonGroup importing = new RibbonGroup(insertTab, "Import", toolTip);
-		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", SWT.NONE);
+		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", RibbonButton.STYLE_TWO_LINE_TEXT);
 
 
 
@@ -165,10 +165,10 @@ public class SampleRibbonClass {
 		//to add- search by languages, color-info 
 		Button nameCheck = new Button(composite,SWT.CHECK);
 		nameCheck.setText("Movie Name");
-		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL);
+		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		Button yearCheck = new Button(composite,SWT.CHECK);
 		yearCheck.setText("Movie Year");
-		Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL);
+		Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		Button genreCheck = new Button(composite ,SWT.CHECK);
 		genreCheck.setText("Movie Genre");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
@@ -217,7 +217,7 @@ public class SampleRibbonClass {
 		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		Button YearCheck = new Button(composite,SWT.CHECK);
 		YearCheck.setText("Person Age");
-		Text YearText = new Text(composite ,SWT.SINGLE|SWT.FILL);
+		Text YearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		Button genreCheck = new Button(composite ,SWT.CHECK);
 		genreCheck.setText("Production Role");
 		Combo combo = new Combo (composite, SWT.READ_ONLY);
@@ -233,7 +233,7 @@ public class SampleRibbonClass {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		//searchByActor.setVisible(checked);
-		search.setSize(568, monitor_bounds.height/4);
+		search.setSize(monitor_bounds.width-5, monitor_bounds.height/4);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -264,19 +264,19 @@ public class SampleRibbonClass {
 
 		// Seach tab
 		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
-		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton goofs = new RibbonButton(results, ImageCache.getImage("smile_grin_48.png"), " \nGoofs", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton goofs = new RibbonButton(results, ImageCache.getImage("smile_grin_48.png"), " \nGoofs", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton locations = new RibbonButton(results, ImageCache.getImage("image_48.png"), " \nLocations", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton locations = new RibbonButton(results, ImageCache.getImage("image_48.png"), " \nLocations", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		
 		ButtonSelectGroup group = new ButtonSelectGroup();
 		aka.setButtonSelectGroup(group);
@@ -374,7 +374,7 @@ public class SampleRibbonClass {
 			}			
 		});
 		bar.setSpacing(8);
-		movieDetails.setSize(568, monitor_bounds.height/3);
+		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height/3);
 		
 	}
 	
@@ -506,7 +506,7 @@ public class SampleRibbonClass {
 			}			
 		});
 		bar.setSpacing(8);
-		movieDetails.setSize(568, monitor_bounds.height/3);
+		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height/3);
 		
 	}
 }
