@@ -272,7 +272,9 @@ public class SampleRibbonClass {
 				if (genresCombo.getText() != null){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
 				}
-				//if ();
+				if (langText.getText() != null){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
+				}
 				List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
