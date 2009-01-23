@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<student>
+	<student-name>
+		<firstname>Anusmita</firstname>
+		<lastname>Singh</lastname>
+	</student-name>
+
+    <student-address>
+         <address>Rohini</address>
+		 <city>Delhi</city>
+    </student-address>
+</student>
+
