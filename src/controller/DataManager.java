@@ -65,28 +65,26 @@ public class DataManager {
 	 * @param arlFilters - List of filters for WHERE clause
 	 * @return List of movies
 	 */
-	private List<BasicSearchEntity> getMoviesBySearch(List<AbsFilter> arlFilters) {
-		return DBManager.getInstance().searchMoviesNew(arlFilters);
+	private List<BasicSearchEntity> getEntitiesBySearch(List<AbsFilter> arlFilters,
+													  DBTablesEnum table) {
+		return DBManager.getInstance().search(arlFilters, table);
 	}
-	
-	private List<BasicSearchEntity> getPersonsBySearch(List<AbsFilter> arlFilters) {
-		return null; //DBManager.getInstance().searchPersons(arlFilters);
-	}
-	
+
 	private Movie getMovieById(int id) {
 		return DBManager.getInstance().getMovieById(id);
 	}
 	
-	public List<BasicSearchEntity> search(DBTablesEnum table, List<AbsFilter> list) {
+	public List<BasicSearchEntity> search(SearchEntitiesEnum table, List<AbsFilter> list) {
+		//return db.search(list, table);
 		switch(table)
 		{
 			case MOVIES:
 			{
-				return getMoviesBySearch(list);
+				return getEntitiesBySearch(list, DBTablesEnum.MOVIES);
 			}
 			case PERSONS:
 			{
-				return getPersonsBySearch(list);
+				return getEntitiesBySearch(list, DBTablesEnum.PERSONS);
 			}
 			default:
 				return null;

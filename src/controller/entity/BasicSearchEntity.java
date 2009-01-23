@@ -27,4 +27,10 @@ public class BasicSearchEntity extends NamedEntity {
 		super(id, name);
 		this.year = year;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "id: " + getId() + " name: " + getName() + " year: " + getYear();
+	}
 }

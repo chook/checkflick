@@ -36,7 +36,7 @@ public class OracleSingleFilter extends AbsSingleFilter {
 			break;
 		}
 		case String: {
-			strFilter = table + "." + column + " LIKE '" + value + "'";
+			strFilter = table + "." + column + " LIKE '%" + value + "%'";
 			break;
 		}
 		case StringArray: {
