@@ -46,35 +46,11 @@ public class SampleMainClass {
 	public static void testDataManager() {
 		DataManager dm = DataManager.getInstance();
 		List<AbsFilter> list = new ArrayList<AbsFilter>();
-		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "2");
+		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
 		list.add(af);
-		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "will"));
+		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "Har"));
 		
-		List<BasicSearchEntity> searched = dm.search(DBTablesEnum.MOVIES, list);
+		List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 		System.out.println(searched.get(0));
-	}
-	
-	/**
-	 * @deprecated
-	 */
-	public static void testDBManager() {
-		DataManager dm = DataManager.getInstance();
-		List<Filter> list = new ArrayList<Filter>();
-		try{
-			Filter filter = new Filter(FilterOptionEnum.Number, "MOVIE_YEAR", "2010");
-			list.add(filter);
-			list.add(new Filter(FilterOptionEnum.String, "MOVIE_NAME", "%o%"));
-			
-		} catch(Exception e) {
-			System.out.println("bla bla");
-		}
-		
-		List<BasicSearchEntity> searched = dm.search(DBTablesEnum.MOVIES, list);
-		
-		Movie mo = (Movie)dm.getEntityById(DBTablesEnum.MOVIES, searched.get(0).getId());
-		
-		System.out.println(mo);
-		//searched = db.searchMovies(list);
-		//System.out.println(searched.size());
 	}
 }

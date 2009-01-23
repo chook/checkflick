@@ -20,7 +20,8 @@ public class DBManager {
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
 	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE MOVIE_ID=?";
 	private static String DELETE_MOVIE_PSTMT = "DELETE FROM MOVIES WHERE MOVIE_ID=?";
-	private static String SEARCH_MOVIE_STMT = "SELECT MOVIE_ID, MOVIE_NAME, MOVIE_YEAR FROM MOVIES";
+	private static String SEARCH_MOVIE_STMT = "SELECT MOVIE_ID, MOVIE_NAME, MOVIE_YEAR FROM ";
+	private static String SEARCH_PERSON_STMT = "SELECT PERSON_ID, PERSON_NAME, YEAR_OF_BIRTH FROM ";
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 
 	// Singleton instance
@@ -192,6 +193,7 @@ public class DBManager {
 	 * 
 	 * @param arlFilters
 	 * @return a WHERE clause to use in SELECT statements
+	 * @deprecated
 	 */
 	private String parseWhereClauseFromFilters(List<Filter> arlFilters) {
 		StringBuilder stbFilter = new StringBuilder();
@@ -243,8 +245,9 @@ public class DBManager {
 		}
 		String fromClause = "";
 		for(String t : s) {
-			fromClause += ", " + t;
+			fromClause += t + " ,";
 		}
+		fromClause = fromClause.substring(0, fromClause.length()-2);
 
 		return fromClause + stbFilter.toString();
 	}
@@ -255,6 +258,7 @@ public class DBManager {
 	 * @param arlFilters
 	 *            - A list of filters to prepare the WHERE clause
 	 * @return - An array of movies that were fetched from the select
+	 * @deprecated
 	 */
 	public List<BasicSearchEntity> searchMovies(List<Filter> arlFilters) {
 		// Variables Declaration
@@ -271,7 +275,7 @@ public class DBManager {
 			set = s.executeQuery(SEARCH_MOVIE_STMT
 					+ parseWhereClauseFromFilters(arlFilters));
 			while (set.next() == true) {
-				if ((result = fillSearchResult(set)) != null) {
+				if ((result = fillMovieSearchResult(set)) != null) {
 					arlSearchResults.add(result);
 				}
 			}
@@ -284,7 +288,8 @@ public class DBManager {
 		return arlSearchResults;
 	}
 
-	public List<BasicSearchEntity> searchMoviesNew(List<AbsFilter> arlFilters) {
+	public List<BasicSearchEntity> search(List<AbsFilter> arlFilters,
+											DBTablesEnum tableToSearch) {
 		// Variables Declaration
 		List<BasicSearchEntity> arlSearchResults = new ArrayList<BasicSearchEntity>();
 		BasicSearchEntity result = null;
@@ -294,12 +299,23 @@ public class DBManager {
 
 		try {
 			s = conn.createStatement();
-
+			
+			switch (tableToSearch) {
+			case MOVIES:
+				set = s.executeQuery(SEARCH_MOVIE_STMT
+						+ parseWhereClauseFromFiltersNew(arlFilters));
+				break;
+				
+			case PERSONS:
+				set = s.executeQuery(SEARCH_PERSON_STMT
+						+ parseWhereClauseFromFiltersNew(arlFilters));
+				break;
+				
+			}
 			// Executing the query and building the movies array
-			set = s.executeQuery(SEARCH_MOVIE_STMT
-					+ parseWhereClauseFromFiltersNew(arlFilters));
+			
 			while (set.next() == true) {
-				if ((result = fillSearchResult(set)) != null) {
+				if ((result = fillSearchResult(set, tableToSearch)) != null) {
 					arlSearchResults.add(result);
 				}
 			}
@@ -345,23 +361,48 @@ public class DBManager {
 	 * 
 	 * @param arlFilters
 	 * @return List of persons
+	 * @deprecated
 	 */
 	public List<BasicSearchEntity> searchPersons(List<Filter> arlFilters) {
 		return null;
 	}
 
-	private BasicSearchEntity fillSearchResult(ResultSet set) {
+	private BasicSearchEntity fillSearchResult(ResultSet set, DBTablesEnum table) {
+		switch (table) {
+		case MOVIES:
+			return fillMovieSearchResult(set);
+		case PERSONS:
+			return fillPersonSearchResult(set);
+		}
+		return null;
+	}
+	
+	private BasicSearchEntity fillMovieSearchResult(ResultSet set) {
 		BasicSearchEntity res = null;
 		try {
 			res = new BasicSearchEntity();
-			res.setId(set.getInt("MOVIE_ID"));
-			res.setName(set.getString("MOVIE_NAME"));
-			res.setYear(set.getInt("MOVIE_YEAR"));
+			res.setId(set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+			res.setName(set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName()));
+			res.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName()));
 			return res;
 		} catch (SQLException e) {
 			return null;
 		}
 	}
+	
+	private BasicSearchEntity fillPersonSearchResult(ResultSet set) {
+		BasicSearchEntity res = null;
+		try {
+			res = new BasicSearchEntity();
+			res.setId(set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+			res.setName(set.getString(DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName()));
+			res.setYear(set.getInt(DBFieldsEnum.PERSONS_YEAR_OF_BIRTH.getFieldName()));
+			return res;
+		} catch (SQLException e) {
+			return null;
+		}
+	}
+
 
 	private Movie fillMovieFromSet(ResultSet set) {
 		Movie movie = null;
