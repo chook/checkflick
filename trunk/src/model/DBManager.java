@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
+
 import controller.NamedEntitiesEnum;
 import controller.SearchEntitiesEnum;
 import controller.entity.GeoEntity;
@@ -450,8 +452,7 @@ public class DBManager {
 	 * @param bottomLimit the end of the limit
 	 * @return
 	 */
-	public Map<Integer, String> getAllMovies(int topLimit, int bottomLimit) {
-		MovieEntity tempMovie = null;
+	public ResultSet getAllMovies(int topLimit, int bottomLimit) {
 		ResultSet set = null;
 
 		PreparedStatement pstmt = null;
@@ -459,25 +460,17 @@ public class DBManager {
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
 		System.out.println(pstmtStr);
-		Map<Integer, String> moviesMap = new HashMap<Integer, String>();
 		
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
-
-			// Executing the query and building the movies map
 			set = pstmt.executeQuery();
-			while (set.next()) {
-				tempMovie = fillMovieFromSet(set);
-				moviesMap.put(tempMovie.getId(), tempMovie.getName());
-			}
-			
 		} catch (SQLException e) {
 			System.out.println("Error in searchMovies");
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
 		pool.returnConnection(conn);
-		return moviesMap;
+		return set;
 	}
 	
 	/**
