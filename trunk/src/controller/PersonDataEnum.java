@@ -3,5 +3,6 @@ package controller;
 public enum PersonDataEnum {
 	PERSON_AKAS,
 	PERSON_QUOTES,
-	PERSON_TRIVIA
+	PERSON_TRIVIA,
+	MOVIE_APPEARANCES
 }
