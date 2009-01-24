@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import controller.MovieDataEnum;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
-
 import controller.NamedEntitiesEnum;
+import controller.PersonDataEnum;
 import controller.SearchEntitiesEnum;
+import controller.entity.AbsDataType;
+import controller.entity.CategorizedRelation;
+import controller.entity.EntityEnum;
 import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
 import controller.entity.BasicSearchEntity;
@@ -37,7 +41,6 @@ public class DBManager {
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
-	
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
 	// Singleton instance
@@ -63,14 +66,10 @@ public class DBManager {
 		pool = DBConnectionPool./*getInstance(
 				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
 				"oracle.jdbc.OracleDriver", 6);*/
-/*		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
+		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
 		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
-				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
-		  "checkflick", "oracle.jdbc.OracleDriver", 6);
-*/				getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
-		  "nadavsh2", "oracle.jdbc.OracleDriver", 6);
-		
-	
+/*				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
+		  "checkflick", "oracle.jdbc.OracleDriver", 6); */
 	}
 
 	/**
@@ -566,7 +565,7 @@ public class DBManager {
 		return person;
 	}
 
-	public AbsFilter getFilter(SearchEntitiesEnum entity, String value,
+	public AbsFilter getSearchFilter(SearchEntitiesEnum entity, String value,
 			String value2) {
 		AbsFilter filter = null;
 		AbsSingleFilter singleFilter = null;
@@ -609,10 +608,10 @@ public class DBManager {
 											value);
 			break;
 		case MOVIE_YEAR: 
-			filter = new OracleSingleFilter(FilterOptionEnum.Number,
-					DBTablesEnum.MOVIES.getTableName(), 
-					DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
-					value);
+			filter = new OracleSingleFilter((value2 == "") ? FilterOptionEnum.Number : FilterOptionEnum.NumberRange,
+											DBTablesEnum.MOVIES.getTableName(), 
+											DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
+											(value2 == "") ? value : value + " AND " + value2 );
 			break;
 		case MOVIE_GENRE:
 			singleFilter = new OracleSingleFilter(FilterOptionEnum.Number,
@@ -660,7 +659,7 @@ public class DBManager {
 		return filter;
 	}
 	
-	public AbsSingleFilter getFilter(SearchEntitiesEnum entity, String value) {
+	public AbsSingleFilter getSearchFilter(SearchEntitiesEnum entity, String value) {
 		AbsSingleFilter filter = null;
 		switch (entity) {
 		case MOVIE_GOOFS:
@@ -673,10 +672,20 @@ public class DBManager {
 					DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
 					DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName(), value);
 			break;
+		case MOVIE_COUNTRIES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+					DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(), value);
+			break;
 		}
 		return filter;
 	}
 
+	/**
+	 * This function retrieves named entities from enum
+	 * @param entity - The entity to retrieve 
+	 * @return a list of named entities
+	 */
 	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum entity) {
 		Connection c = pool.getConnection();
 		List<NamedEntity> list = new ArrayList<NamedEntity>();
@@ -727,6 +736,7 @@ public class DBManager {
 		return list;
 	}
 
+	@Deprecated
 	public List<NamedRelation> getNamedRalations(AbsSingleFilter filter) {
 		Connection conn = pool.getConnection();
 		List<NamedRelation> retList = new ArrayList<NamedRelation>();
@@ -750,7 +760,8 @@ public class DBManager {
 			sbQuery.append(filter);
 			resultSet = stmt.executeQuery(sbQuery.toString());
 			while (resultSet.next() == true) {
-				retList.add(new NamedRelation(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3)));
+				retList.add(new NamedRelation(resultSet.getInt(1), resultSet.getInt(2),
+												resultSet.getString(3)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -759,9 +770,10 @@ public class DBManager {
 		return retList;
 	}
 
-	public List<GeoEntity> getGeoEntities(AbsSingleFilter filter) {
+	@Deprecated
+	public List<AbsDataType> getGeoEntities(AbsSingleFilter filter) {
 		Connection conn = pool.getConnection();
-		List<GeoEntity> retList = new ArrayList<GeoEntity>();
+		List<AbsDataType> retList = new ArrayList<AbsDataType>();
 		Statement stmt;
 		ResultSet resultSet;
 		StringBuffer sbQuery = new StringBuffer();
@@ -792,6 +804,7 @@ public class DBManager {
 		return retList;
 	}
 
+	@Deprecated
 	public List<NamedEntity> getNamedEntities(AbsSingleFilter filter) {
 		Connection conn = pool.getConnection();
 		List<NamedEntity> retList = new ArrayList<NamedEntity>();
@@ -824,6 +837,70 @@ public class DBManager {
 		return retList;
 	}
 	
+	/**
+	 * This is the only function for getting information on the persons/movies
+	 * @param data - Which type of entity do we want
+	 * @param filter - The single filter to build the query
+	 * @return a list of data types of data (encapsulated)
+	 */
+	public List<AbsDataType> getAbsDataType(EntityEnum data, AbsSingleFilter filter) {
+		Connection conn = pool.getConnection();
+		List<AbsDataType> retList = new ArrayList<AbsDataType>();
+		Statement stmt;
+		ResultSet resultSet;
+		StringBuffer sbQuery = new StringBuffer();
+		sbQuery.append(SELECT_GENERIC_STMT);
+		
+		// Trying to get a connection statement
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		// Executing the query and building the movies array
+		try {
+			sbQuery.append(filter.getTable());
+			sbQuery.append(" WHERE ");
+			sbQuery.append(filter);
+			resultSet = stmt.executeQuery(sbQuery.toString());
+			while (resultSet.next() == true) {
+				retList.add(resultSetToAbsEntity(resultSet, data));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		pool.returnConnection(conn);
+		return retList;
+	}
+	
+	/**
+	 * This function is a factory for data types
+	 * @param rs - The tuple to parse
+	 * @param entity - The type of tuple
+	 * @return - The data type
+	 */
+	private AbsDataType resultSetToAbsEntity(ResultSet rs, EntityEnum entity) {
+		try {
+			switch(entity) {
+			case NAMED_ENTITY:
+				return new NamedEntity(rs.getInt(1), rs.getString(2));
+			case GEO_ENTITY:
+				return new GeoEntity(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4));
+			case NAMED_RELATION:
+				return new NamedRelation(rs.getInt(1), rs.getInt(2), rs.getString(3));
+			case CATEGORIZED_RELATION:
+				return new CategorizedRelation(rs.getInt(1), rs.getInt(2), rs.getInt(3));
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("Error in resultSetToAbsEntity");
+		}
+		return null;
+	}
+	
+	@Deprecated
 	public AbsSingleFilter getFilter(NamedEntitiesEnum entity, String id) {
 		AbsSingleFilter filter = null;
 		switch(entity) {
@@ -834,5 +911,94 @@ public class DBManager {
 			break;
 		}
 		return filter;
+	}
+
+	public AbsSingleFilter getMovieDataFilter(MovieDataEnum entity, String value) {
+		AbsSingleFilter filter = null;
+		switch (entity) {
+		case MOVIE_GOOFS:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_GOOFS.getTableName(),
+					DBFieldsEnum.MOVIE_GOOFS_MOVIE_ID.getFieldName(), value);
+			break;
+		case MOVIE_AKAS:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+					DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName(), value);
+			break;
+		case MOVIE_COUNTRIES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+					DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(), value);
+			break;
+		case MOVIE_GENRES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_GENRES.getTableName(),
+					DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(), value);
+			break;
+		case MOVIE_QUOTES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_QUOTES.getTableName(),
+					DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(), value);
+			break;
+		}
+		
+		return filter;
+	}
+
+	private AbsSingleFilter getPersonDataFilter(PersonDataEnum data, String id) {
+		AbsSingleFilter filter = null;
+		switch (data) {
+		case PERSON_AKAS:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
+					DBFieldsEnum.PERSON_AKA_NAMES_PERSON_ID.getFieldName(), id);
+			break;
+		case PERSON_QUOTES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.PERSON_QUOTES.getTableName(),
+					DBFieldsEnum.PERSON_QUOTES_PERSON_ID.getFieldName(), id);
+			break;
+		case PERSON_TRIVIA:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.PERSON_TRIVIA.getTableName(),
+					DBFieldsEnum.PERSON_TRIVIA_PERSON_ID.getFieldName(), id);
+			break;
+		}
+		
+		return filter;
+	}
+	
+	public List<AbsDataType> getMovieData(MovieDataEnum data, String id) {
+		AbsSingleFilter filter = getMovieDataFilter(data, id);
+		List<AbsDataType> list = null;
+		switch(data) {
+		case MOVIE_AKAS:
+			list = getAbsDataType(EntityEnum.GEO_ENTITY, filter);
+			break;
+		case MOVIE_COUNTRIES:
+		case MOVIE_GENRES:
+		case MOVIE_LOCATIONS:
+		case MOVIE_QUOTES:
+			list = getAbsDataType(EntityEnum.NAMED_ENTITY, filter);
+			break;
+		case MOVIE_GOOFS:
+			list = getAbsDataType(EntityEnum.NAMED_RELATION, filter);
+			break;
+		}
+		return list;
+	}
+
+	public List<AbsDataType> getPersonData(PersonDataEnum data, String id) {
+		AbsSingleFilter filter = getPersonDataFilter(data, id);
+		List<AbsDataType> list = null;
+		switch(data) {
+		case PERSON_AKAS:
+		case PERSON_QUOTES:
+		case PERSON_TRIVIA:
+			list = getAbsDataType(EntityEnum.NAMED_ENTITY, filter);
+			break;
+		}
+		return list;
 	}
 }
