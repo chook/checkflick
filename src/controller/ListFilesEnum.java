@@ -5,10 +5,7 @@ package controller;
 
 /**
  * @author Nadav Shamgar
- *
- *	Note: 	any additions of elements to the ListFilesEnum
- *			must also be updated in the numberOfElements field!
- */
+  */
 public enum ListFilesEnum {
 	ACTORS,
 	ACTRESSES,

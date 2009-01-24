@@ -1,10 +1,24 @@
 package model;
 import java.io.*;
 
+import controller.ListFilesEnum;
+
 public class Parser {
 
+	// The strings that are at the beginning of each list
+	static String languagesListStartLine1 = "LANGUAGE LIST";
+	static String languagesListStartLine2 = "=============";
+	static String genresListStartLine1 = "8: THE GENRES LIST";
+	static String genresListStartLine2 = "==================";
+	static String countriesListStartLine1 = "COUNTRIES LIST";
+	static String countriesListStartLine2 = "==============";
+	static String moviesListStartLine1 = "MOVIES LIST";
+	static String moviesListStartLine2 = "===========";
+	
 	private BufferedReader listFile;
 	private int currentLine;
+	private String listStartLine1;
+	private String listStartLine2;
 	
 	public Parser() {
 		
@@ -15,7 +29,7 @@ public class Parser {
 	 * @param filename the file to be loaded
 	 * @return boolean if the loading succeeded
 	 */
-	public boolean loadFile(String filename) {
+	public boolean loadFile(String filename, ListFilesEnum listType) {
 		try {
 			// Opening the file
 			FileInputStream fstream = new FileInputStream(filename);
@@ -24,6 +38,26 @@ public class Parser {
 			InputStreamReader insr = new InputStreamReader(fstream);
 			listFile =  new BufferedReader(insr);
 			currentLine = 0;
+			
+			switch (listType) {
+			
+			case LANGUAGES:
+				listStartLine1 = languagesListStartLine1;
+				listStartLine2 = languagesListStartLine2;
+				break;
+			case GENRES:
+				listStartLine1 = genresListStartLine1;
+				listStartLine2 = genresListStartLine2;
+				break;
+			case COUNTRIES:
+				listStartLine1 = countriesListStartLine1;
+				listStartLine2 = countriesListStartLine2;
+				break;
+			case MOVIES:
+				listStartLine1 = moviesListStartLine1;
+				listStartLine2 = moviesListStartLine2;
+				break;
+			}
 		}
 		catch (Exception e) {
 			System.err.println("File input error");
@@ -37,10 +71,20 @@ public class Parser {
 	 * Calls the loadFile method
 	 * @param filename the file to be loaded
 	 */
-	public Parser(String filename) {
-		loadFile(filename);
+	public Parser(String filename, ListFilesEnum listType) {
+		loadFile(filename, listType);
 	}
 	
+	/**
+	 * runs to the start of the list in the file (after all the comments in the beginning)
+	 * @return boolean if the start of the list was found
+	 */
+	public boolean findStartOfList() {
+		if (findLine(listStartLine1) && findLine(listStartLine2))
+			return true;
+		else
+			return false;
+	}
 	/**
 	 * reading the next line from the file if possible
 	 * @return String the line that was read
@@ -140,5 +184,13 @@ public class Parser {
 			System.err.println("File input error");
 		}
 	}
+	
+	@Override
+    protected void finalize() throws Throwable {
+			if (listFile != null)
+				closeFile();
+			
+            super.finalize();
+    }
 	
 }

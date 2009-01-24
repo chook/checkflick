@@ -64,24 +64,23 @@ public class ImportHandler {
 		importer = new DataImporter(listfilesMap);
 		
 //		importer.getLanguagesGenresCountries();
-		importer.getMovies();
-/*
+//		importer.getMovies();
 		
 		// ------------------ dependent only on Movies
 		importer.getMoviesLanguages();	// dependent on Languages
-		importer.getMoviesGenres();		// dependent on Genres
+/*		importer.getMoviesGenres();		// dependent on Genres
 		importer.getMoviesCountries();	// dependent on Countries
-		importer.getColorInfo();
-		importer.getAKATitles();
-		importer.getCrazyCredits();
-		importer.getGoofs();
-		importer.getLocations();
-		importer.getMovieConnections();
-		importer.getPlots();
-		importer.getMovieQuotes();
-		importer.getRunningTimes();
-		importer.getTaglines();
-		importer.getMovieTrivias();
+		importer.getMoviesColorInfo();
+		importer.getMoviesAKATitles();
+		importer.getMoviesCrazyCredits();
+		importer.getMoviesGoofs();
+		importer.getMoviesLocations();
+		importer.getMoviesConnections();
+		importer.getMoviesQuotes();
+		importer.getMoviesPlots();
+		importer.getMoviesRunningTimes();
+		importer.getMoviesTaglines();
+		importer.getMoviesTrivias();
 		
 		importer.getPersons();
 		// ------------------ dependent only on Persons
