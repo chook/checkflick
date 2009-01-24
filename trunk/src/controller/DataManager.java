@@ -191,4 +191,8 @@ public class DataManager {
 		else 
 			return null;
 	}
+	
+	public boolean savePersonData(PersonDataEnum data, AbsDataType type) {
+			return db.insertAbsDataType(data, type);
+	}
 }

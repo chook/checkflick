@@ -130,9 +130,13 @@ public class SampleMainClass {
 		List<AbsDataType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
 		System.out.println("good makas " + makas.toString());
 		
-		
 		List<AbsDataType> mconnections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movieId);
 		System.out.println("good connections :" + mconnections.toString());
+		
+		
+		List<AbsDataType> mquotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, 43);
+		System.out.println("good quotes :" + mquotes.toString());
+		
 		
 		List<AbsDataType> mappear = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movieId);
 		System.out.println("good cast :" + mappear.toString());
@@ -143,5 +147,9 @@ public class SampleMainClass {
 		List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
 															 NamedRelationsEnum.GOOFS);
 		System.out.println("goofs count " + goofs.size());
+		
+		AbsDataType t = new NamedEntity(7, "Chen test for insert from code");
+		dm.savePersonData(PersonDataEnum.PERSON_QUOTES, t);
+		
 	}
 }
