@@ -76,7 +76,6 @@ public class DataManager {
 	 * This function gets a list of named entities
 	 * It doesn't go to the db for every call, just one time 
 	 * TODO: In the future we might want to put a timeout on the data
-	 * TODO: Change function name to plural
 	 * @param name
 	 * @return
 	 */
@@ -84,6 +83,13 @@ public class DataManager {
 		if(!namedEntities.containsKey(name))
 			namedEntities.put(name, db.getAllNamedEntities(name));
 		return namedEntities.get(name);
+	}
+	
+	/**
+	 * Clears all named entities, forces the data manager to query them again
+	 */
+	public void clearAllNamedEntities() {
+		namedEntities.clear();
 	}
 	
 	/**
@@ -106,7 +112,6 @@ public class DataManager {
 	}
 
 	public List<BasicSearchEntity> search(SearchEntitiesEnum table, List<AbsFilter> list) {
-		//return db.search(list, table);
 		switch(table)
 		{
 			case MOVIES:
@@ -132,11 +137,12 @@ public class DataManager {
 	}
 	
 	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
-		return db.getFilter(entity, value, value2);
+		return db.getSearchFilter(entity, value, value2);
 	}
 
+	@ Deprecated
 	public List<NamedRelation> getNamedRelationsById(String movieId, NamedRelationsEnum rel) {
-		AbsSingleFilter filter = db.getFilter(SearchEntitiesEnum.MOVIE_GOOFS, movieId);
+		AbsSingleFilter filter = db.getSearchFilter(SearchEntitiesEnum.MOVIE_GOOFS, movieId);
 		switch (rel){
 		case GOOFS:
 			return db.getNamedRalations(filter);
@@ -144,19 +150,41 @@ public class DataManager {
 		return null;
 	}
 
+	@ Deprecated
 	public List<GeoEntity> getGeoEntities(String movieId,
 										  SearchEntitiesEnum entity) {
-		AbsSingleFilter filter = db.getFilter(SearchEntitiesEnum.MOVIE_AKAS, movieId);
+		AbsSingleFilter filter = db.getSearchFilter(SearchEntitiesEnum.MOVIE_AKAS, movieId);
 		switch (entity){
 		case MOVIE_AKAS:
-			return db.getGeoEntities(filter);
+			//return db.getGeoEntities(filter);
 		}
 		return null;
 	}
 
+	@ Deprecated
 	public List<NamedEntity> getNamedEntity(NamedEntitiesEnum entity,
 										    String id) {
 		AbsSingleFilter filter = db.getFilter(entity, id);
 		return db.getNamedEntities(filter);
+	}
+	
+	/**
+	 * This function gets various data about a movie
+	 * @param data - Which data to get
+	 * @param id - The movie id
+	 * @return A list of objects that are NamedEntity or its children
+	 */
+	public List<AbsDataType> getMovieData(MovieDataEnum data, int id) {
+		if (id != 0)
+			return db.getMovieData(data, String.valueOf(id));
+		else 
+			return null;
+	}
+	
+	public List<AbsDataType> getPersonData(PersonDataEnum data, int id) {
+		if (id != 0)
+			return db.getPersonData(data, String.valueOf(id));
+		else 
+			return null;
 	}
 }

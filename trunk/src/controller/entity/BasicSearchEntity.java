@@ -1,5 +1,7 @@
 package controller.entity;
 
+import java.util.Map;
+
 public class BasicSearchEntity extends NamedEntity {
 	protected int year;
 
@@ -36,7 +38,13 @@ public class BasicSearchEntity extends NamedEntity {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "id: " + getId() + " name: " + getName() + " year: " + getYear();
+	}
+	
+	@Override
+	public Map<String, String> toStringMap() {
+		Map<String, String> map = super.toStringMap();
+		map.put("year", String.valueOf(getYear()));
+		return map;
 	}
 }
