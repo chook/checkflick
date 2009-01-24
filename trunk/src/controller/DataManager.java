@@ -65,11 +65,16 @@ public class DataManager {
 	public AbsFilter getFilter(SearchEntitiesEnum entity, String value) {
 		return getFilterFromDB(entity, value, "");
 	}
+	
 
 	public AbsFilter getFilter(SearchEntitiesEnum entity, String value, String value2) {
 		return getFilterFromDB(entity, value, value2);
 	}
 	
+	/*public AbsSingleFilter getInsertFilter(InsertEntitiesEnum entity, String value) {
+		return getInsertFilterFromDB(entity, value);
+	}*/
+
 	/**
 	 * This function gets a list of named entities
 	 * It doesn't go to the db for every call, just one time 
@@ -144,6 +149,10 @@ public class DataManager {
 		return db.getSearchFilter(entity, value, value2);
 	}
 
+	/*private AbsSingleFilter getFilterFromDB(InsertEntitiesEnum entity, String value) {
+		return db.getSearchFilter(entity, value);
+	}
+	
 	@ Deprecated
 	public List<NamedRelation> getNamedRelationsById(String movieId, NamedRelationsEnum rel) {
 		AbsSingleFilter filter = db.getSearchFilter(SearchEntitiesEnum.MOVIE_GOOFS, movieId);
@@ -171,6 +180,7 @@ public class DataManager {
 		AbsSingleFilter filter = db.getFilter(entity, id);
 		return db.getNamedEntities(filter);
 	}
+	*/
 	
 	/**
 	 * This function gets various data about a movie
@@ -194,5 +204,9 @@ public class DataManager {
 	
 	public boolean savePersonData(PersonDataEnum data, AbsDataType type) {
 			return db.insertAbsDataType(data, type);
+	}
+
+	public void sendMovieData(MovieDataEnum movie_genres, AbsDataType t) {
+		db.sendMovieData(movie_genres, t);
 	}
 }

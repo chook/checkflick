@@ -57,4 +57,8 @@ public abstract class AbsDataType {
 		map.put("id", String.valueOf(getId()));
 		return map;
 	}
+	
+	public String toInsertString() {
+		return String.valueOf(getId());
+	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import controller.InsertEntitiesEnum;
 import controller.MovieDataEnum;
 import controller.NamedEntitiesEnum;
 import controller.PersonDataEnum;
@@ -40,7 +41,7 @@ public class DBManager {
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)";
-	private static String INSERT_DOUBLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?, ?)";
+	private static String INSERT_DOUBLE_DATATYPE = "INSERT INTO %s (%s) VALUES %s";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
 	// Singleton instance
@@ -66,12 +67,12 @@ public class DBManager {
 		pool = DBConnectionPool./*getInstance(
 				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
 				"oracle.jdbc.OracleDriver", 6);*/
-//		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
-//		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
+		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
+		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
 //				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
 //		  "checkflick", "oracle.jdbc.OracleDriver", 6);
-		getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
-				  "nadavsh2", "oracle.jdbc.OracleDriver", 6);
+//		getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
+//				  "nadavsh2", "oracle.jdbc.OracleDriver", 6);
 	}
 
 	/**
@@ -104,6 +105,8 @@ public class DBManager {
 			resultSet = stmt.executeQuery(sbQuery.toString());
 			while (resultSet.next() == true) {
 				retList.add(resultSetToAbsEntity(resultSet, data));
+				if(retList.size() > 100)
+					break;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -188,6 +191,8 @@ public class DBManager {
 			set = s.executeQuery(query);
 			while (set.next() == true) {
 				list.add(new NamedEntity(set.getInt(1), set.getString(2)));
+				if(list.size() > 1000)
+					break;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -473,24 +478,15 @@ public class DBManager {
 		return list;
 	}
 	
-	@Deprecated
-	public AbsSingleFilter getSearchFilter(SearchEntitiesEnum entity, String value) {
-		AbsSingleFilter filter = null;
+	public List<AbsSingleFilter> getSearchFilter(InsertEntitiesEnum entity, String value) {
+		List<AbsSingleFilter> filter = new ArrayList<AbsSingleFilter>();
 		switch (entity) {
-		case MOVIE_GOOFS:
-			filter = new OracleSingleFilter(FilterOptionEnum.Number,
-					DBTablesEnum.MOVIE_GOOFS.getTableName(),
-					DBFieldsEnum.MOVIE_GOOFS_MOVIE_ID.getFieldName(), value);
-			break;
-		case MOVIE_AKAS:
-			filter = new OracleSingleFilter(FilterOptionEnum.Number,
-					DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
-					DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName(), value);
-			break;
-		case MOVIE_COUNTRIES:
-			filter = new OracleSingleFilter(FilterOptionEnum.Number,
-					DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
-					DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(), value);
+		case MOVIE_QUOTE:
+			filter.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_QUOTES.getTableName(),
+											DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(), value));
+			filter.add(new OracleInsertFilter(FilterOptionEnum.String, DBTablesEnum.MOVIE_QUOTES.getTableName(),
+					DBFieldsEnum.MOVIE_QUOTES_QUOTE_TEXT.getFieldName(), value));
+
 			break;
 		}
 		return filter;
@@ -713,6 +709,8 @@ public class DBManager {
 			while (set.next() == true) {
 				if ((result = fillSearchResult(set, tableToSearch)) != null) {
 					arlSearchResults.add(result);
+					if(arlSearchResults.size() > 100)
+						break;
 				}
 			}
 		} catch (SQLException e) {
@@ -1073,21 +1071,86 @@ public class DBManager {
 		return null;
 	}
 
+	/**
+	 * This insert function inserts a person data
+	 * @param data - A person data
+	 * @param type - The type
+	 * @return If the insert was successful or not
+	 */
 	public boolean insertAbsDataType(PersonDataEnum data, AbsDataType type) {
+		List<String> list = null;
 		switch(data) {
 		case PERSON_QUOTES:
-			List<String> list = new ArrayList<String>();
+			list = new ArrayList<String>();
 			list.add(DBFieldsEnum.PERSON_QUOTES_PERSON_ID.getFieldName());
 			list.add(DBFieldsEnum.PERSON_QUOTES_QUOTE_TEXT.getFieldName());
 			sendAbsDataTypeToDb(DBTablesEnum.PERSON_QUOTES.getTableName(),
+								list, type);
+			break;
+		case PERSON_AKAS:
+			list = new ArrayList<String>();
+			list.add(DBFieldsEnum.PERSON_AKA_NAMES_PERSON_ID.getFieldName());
+			list.add(DBFieldsEnum.PERSON_AKA_NAMES_PERSON_AKA_NAME.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
+								list, type);
+			break;
+		case PERSON_TRIVIA:
+			list = new ArrayList<String>();
+			list.add(DBFieldsEnum.PERSON_TRIVIA_PERSON_ID.getFieldName());
+			list.add(DBFieldsEnum.PERSON_TRIVIA_TRIVIA_TEXT.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.PERSON_TRIVIA.getTableName(),
 								list, type);
 			break;
 		}
 		return false;
 	}
 	
+	public boolean insertAbsDataType(MovieDataEnum data, AbsDataType type) {
+		List<String> list = null;
+		switch(data) {
+		case MOVIE_COUNTRIES:
+			list = new ArrayList<String>();
+			list.add(DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName());
+			list.add(DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+								list, type);
+			break;
+		case MOVIE_GENRES:
+			list = new ArrayList<String>();
+			list.add(DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName());
+			list.add(DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.MOVIE_GENRES.getTableName(),
+								list, type);
+			break;
+		case MOVIE_QUOTES:
+			list = new ArrayList<String>();
+			list.add(DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName());
+			list.add(DBFieldsEnum.MOVIE_QUOTES_QUOTE_TEXT.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.MOVIE_QUOTES.getTableName(),
+								list, type);
+			break;
+		case MOVIE_AKAS:
+			list = new ArrayList<String>();
+			list.add(DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName());
+			list.add(DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_AKA_NAME.getFieldName());
+			list.add(DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_AKA_NAME_YEAR.getFieldName());
+			list.add(DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_AKA_NAME_COUNTRY.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+								list, type);
+		}
+		return false;
+	}
+	
+	/**
+	 * Sends a data type to the db
+	 * @param table
+	 * @param fields
+	 * @param type
+	 * TODO: Needs to make this GENERIC :)
+	 * @return
+	 */
 	private boolean sendAbsDataTypeToDb(String table, List<String> fields, AbsDataType type) {
-		PreparedStatement s = null;
+		Statement s = null;
 		Connection conn = pool.getConnection();
 		Map<String, String> map = null;
 		try {
@@ -1100,15 +1163,10 @@ public class DBManager {
 				parsedFields = parsedFields.substring(0, parsedFields.length() - 2);
 			
 			map = type.toStringMap();
-			s = conn.prepareStatement(String.format(INSERT_DOUBLE_DATATYPE,
-									  table, parsedFields, map.get("name")),
-									  Statement.RETURN_GENERATED_KEYS);
+			s = conn.createStatement();
 			
-			s.setInt(1, type.getId());
-			s.setString(2, map.get("name"));
-			
-			// Executing the query and building the movies array
-			s.executeUpdate();
+			s.executeUpdate(String.format(INSERT_DOUBLE_DATATYPE,
+							table, parsedFields, type));
 			return true;
 		} catch (SQLException e) {
 			System.out.println("Error in searchMovies " + e.toString());
@@ -1116,6 +1174,86 @@ public class DBManager {
 			System.out.println("Null pointer in searchMovies");
 		}
 		return false;
+	}
+
+	public void sendMovieData(MovieDataEnum data, AbsDataType t) {
+		List<AbsSingleFilter> filterList = null;
+		switch(data) {
+		case MOVIE_COUNTRIES:
+		case MOVIE_QUOTES:
+		case MOVIE_GENRES:
+			filterList = getMovieInsertFilter(data, t);
+			sendAbsDataType(EntityEnum.NAMED_ENTITY, filterList);
+			  
+			break;
+		}
+	}
+	
+	private void sendAbsDataType(EntityEnum named_entity,
+			List<AbsSingleFilter> filterList) {
+		Connection conn = pool.getConnection();
+		Statement stmt = null;
+		String str = "insert into %s (%s) values (%s)";
+		String strFields = "";
+		String strValues = "";
+		String strTable = "";
+		
+		// Trying to get a connection statement
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	
+		// Executing the query and building the movies array
+		try {
+			for (AbsSingleFilter filter : filterList) {
+				strTable = filter.getTable();
+				strFields += filter.getColumn() + " ,";
+				strValues += filter.getValue() + " ,";
+			}
+			strFields = strFields.substring(0, strFields.length()-2);
+			strValues = strValues.substring(0, strValues.length()-2);
+
+			stmt.executeUpdate(String.format(str, strTable, strFields, strValues));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		pool.returnConnection(conn);
+	}
+
+	private List<AbsSingleFilter> getMovieInsertFilter(MovieDataEnum data, AbsDataType t) {
+		List<AbsSingleFilter> filterList = new ArrayList<AbsSingleFilter>();
+		List<String> ls = null;
+		switch (data) {
+		case MOVIE_COUNTRIES:
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+							DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(), String.valueOf(t.getId())));
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+					DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID.getFieldName(), String.valueOf(t.toStringList().get(1))));
+			break;
+		case MOVIE_AKAS:
+			ls = t.toStringList();
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+							DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName(), ls.get(0)));
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.String, DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+							DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_AKA_NAME.getFieldName(), ls.get(1)));
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+					DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_AKA_NAME_YEAR.getFieldName(), ls.get(2)));
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
+					DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_AKA_NAME_COUNTRY.getFieldName(), ls.get(3)));
+			break;
+		case MOVIE_QUOTES:
+			ls = t.toStringList();
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.Number, DBTablesEnum.MOVIE_QUOTES.getTableName(),
+							DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(), ls.get(0)));
+			filterList.add(new OracleInsertFilter(FilterOptionEnum.String, DBTablesEnum.MOVIE_QUOTES.getTableName(),
+							DBFieldsEnum.MOVIE_QUOTES_QUOTE_TEXT.getFieldName(), ls.get(1)));
+			break;
+		default:
+			break;
+		}
+		return filterList;
 	}
 }
 
