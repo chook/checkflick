@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,12 +24,14 @@ import com.hexapixel.widgets.ribbon.*;
 import controller.DataManager;
 import controller.MovieDataEnum;
 import controller.NamedEntitiesEnum;
+import controller.NamedRelationsEnum;
 import controller.SearchEntitiesEnum;
 import controller.entity.AbsDataType;
 import controller.entity.DatedEntity;
 import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
+import controller.entity.NamedRelation;
 import controller.filter.AbsFilter;
 
 public class SampleRibbonClass {
@@ -74,7 +77,7 @@ public class SampleRibbonClass {
 		//closing the program.
 		shell.getShell().addListener(SWT.Close, new Listener(){
 			public void handleEvent(Event e){    			
-    			switch(yesNoCancelMessageBox("Are you sure you want to exit?")){
+    			switch(yesNoMessageBox("Are you sure you want to exit?")){
     				case(SWT.YES):{shell.getShell().dispose();}
     				case(SWT.NO):{e.doit = false;}
     			}
@@ -150,9 +153,8 @@ public class SampleRibbonClass {
 					if (searchByPerson.isVisible())
 						searchByPerson.setVisible(false);
 					searchByMovie(searchByMovie);
-				}
-			}			
-		);
+			}
+		});
 		
 		personSearch.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -162,7 +164,7 @@ public class SampleRibbonClass {
 				if (searchByMovie.isVisible())
 					searchByMovie.setVisible(false);
 				searchByPerson(searchByPerson);
-			}			
+			}	
 		});
 		
 	
@@ -185,12 +187,11 @@ public class SampleRibbonClass {
 		movieSearch.setButtonSelectGroup(group);
 		personSearch.setButtonSelectGroup(group);
 		importButton.setButtonSelectGroup(group);
-					
-	}
+	}				
 	
 	public static void searchByMovie(Composite search){
 		Calendar toDay = Calendar.getInstance();
-		int year = toDay.get(Calendar.YEAR);
+		final int year = toDay.get(Calendar.YEAR);
 		search.setLocation(0, 145);
 		search.setLayout(new FillLayout());
 		final Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
@@ -209,17 +210,17 @@ public class SampleRibbonClass {
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Year	From");
 		final Spinner yearFrom = new Spinner (composite, SWT.BORDER);
-		yearFrom.setMinimum(1900);
+		yearFrom.setMinimum(1880);
 		yearFrom.setMaximum(year+100);
-		yearFrom.setSelection(1900);
+		yearFrom.setSelection(1880);
 		yearFrom.setPageIncrement(1);
 		yearFrom.pack();
 		label= new Label(composite,SWT.NONE);
 		label.setText("To");
 		final Spinner yearTo = new Spinner (composite, SWT.BORDER);
-		yearTo.setMinimum(1900);
+		yearTo.setMinimum(1880);
 		yearTo.setMaximum(year+100);
-		yearTo.setSelection(year);
+		yearTo.setSelection(year+100);
 		yearTo.setPageIncrement(1);
 		yearTo.pack();
 		Label movieGenres = new Label(composite ,SWT.NONE);
@@ -263,11 +264,13 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				resultsMovieTable.dispose();
+				resultsMovieTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
 				resultsPersonTable.setVisible(false);
 				resultsMovieTable.setVisible(true);
 				resultsMovieTable.setLayout(new GridLayout());
 				DataManager dm = DataManager.getInstance();
-				//creating the filter to search for
+				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();;
 				System.out.println(nameText.getText());
 				if (nameText.getText()!= ""){
@@ -282,61 +285,70 @@ public class SampleRibbonClass {
 				if (colorCombo.getText()!= ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_COLOR_INFO,getID(colorList , colorCombo.getText()) ));
 				}
-				//list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
+				//search by year only if the years parameters were changed
+				if ((Integer.parseInt(yearFrom.getText())!= 1880) || ((Integer.parseInt(yearTo.getText())!= (year+100))))
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
+				System.out.println(list.toString());
 				//search for movies
 				List<DatedEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
 				//creating the search results table
-				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name", "Year", "ID"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
 				final int count = searched.size();
 				System.out.println(count);
-				
-				for (int i=0; i<count; i++) {
-					TableItem item = new TableItem (table, SWT.NONE);
-					
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, searched.get(i).getName());
-					item.setText (2, String.valueOf(searched.get(i).getYear()));
-					item.setText (3, String.valueOf(searched.get(i).getId()));
-				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
-				}	
-				table.addListener(SWT.MouseDoubleClick, new Listener() {
-					public void handleEvent(Event event) {
-						DataManager dm = DataManager.getInstance();
-						MovieEntity movie= null;
-						Point pt = new Point(event.x, event.y);
-						TableItem item = table.getItem(pt);
-						if (item == null)
-							return;
-						for (int i = 0; i < count; i++) {
-							Rectangle rect = item.getBounds(i);
-							if (rect.contains(pt)) {
-								int index = table.indexOf(item);
-								int id = Integer.parseInt(table.getItem(index).getText(3));
-								movie = dm.getMovieById(id);
-							}
-						}
-						RibbonTabFolder tabs = shell.getRibbonTabFolder();
-						movieTab = new RibbonTab(tabs, "Movie");
-						ShowMovieResult(movieTab , movie);
-						tabs.selectTab(movieTab);
-						resultsMovieTable.setVisible(false);
+				if (count > 0){
+					final Table table = new Table (resultsMovieTable, SWT.MULTI| SWT.BORDER|SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name", "Year", "ID"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					for (int i=0; i<count; i++) {
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, searched.get(i).getName());
+						item.setText (2, String.valueOf(searched.get(i).getYear()));
+						item.setText (3, String.valueOf(searched.get(i).getId()));
 					}
-				});
-				resultsMovieTable.setLocation(0,  145+ monitor_bounds.height/4);
-				resultsMovieTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
-			}			
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+				
+					table.addListener(SWT.MouseDoubleClick, new Listener() {
+						public void handleEvent(Event event) {
+							DataManager dm = DataManager.getInstance();
+							MovieEntity movie= null;
+							Point pt = new Point(event.x, event.y);
+							TableItem item = table.getItem(pt);
+							if (item == null)
+								return;
+							for (int i = 0; i < count; i++) {
+								Rectangle rect = item.getBounds(i);
+								if (rect.contains(pt)) {
+									int index = table.indexOf(item);
+									int id = Integer.parseInt(table.getItem(index).getText(3));
+									movie = dm.getMovieById(id);
+								}
+							}
+								final RibbonTabFolder tabs = shell.getRibbonTabFolder();
+								movieTab = new RibbonTab(tabs, "Movie");
+								ShowMovieResult(movieTab , movie);
+								tabs.selectTab(movieTab);
+								resultsMovieTable.setVisible(false);
+						}
+					});
+					resultsMovieTable.setLocation(0,  145+ monitor_bounds.height/4);
+					resultsMovieTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
+				}
+				else{ // if there were no results
+					switch(okMessageBox("No results. Please change your choises and try again.")){
+    				case(SWT.OK):{}
+					}
+				}
+			}
 		});
 	}
 	public static void searchByPerson(Composite search){
@@ -462,9 +474,18 @@ public class SampleRibbonClass {
 
 	}
 	//message box that is opened whenever Yes/No/Cancel question is asked
-	public int yesNoCancelMessageBox(String q){	
+	public int yesNoMessageBox(String q){	
 		shell.getShell().setEnabled(false);
 		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
+		mb.setMessage(q);
+		int answer = mb.open();	
+		shell.getShell().setEnabled(true);
+		return answer;		
+	}
+	//message box that is opened whenever OK statement is asked
+	static public int okMessageBox(String q){	
+		shell.getShell().setEnabled(false);
+		MessageBox mb = new MessageBox(shell.getShell(), SWT.OK); 
 		mb.setMessage(q);
 		int answer = mb.open();	
 		shell.getShell().setEnabled(true);
@@ -476,7 +497,7 @@ public class SampleRibbonClass {
 		
 		// Groups
 
-		// Seach tab
+		// Movie tab
 		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
 		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
@@ -520,19 +541,23 @@ public class SampleRibbonClass {
 		Label movieName = new Label(composite,SWT.NONE);
 		movieName.setText("Movie Name:");
 		Text nameText = new Text(composite ,SWT.FILL);
-		nameText.setText(movie.getName());
+		if (movie.getName() != null)
+			nameText.setText(movie.getName());
 		Label movieYear = new Label(composite,SWT.NONE);
 		movieYear.setText("Movie Year:");
 		Text yearText = new Text(composite ,SWT.FILL);
-		yearText.setText(String.valueOf(movie.getYear()));
+		if (movie.getYear()!= 0)
+			yearText.setText(String.valueOf(movie.getYear()));
 		Label runningTime = new Label(composite ,SWT.NONE);
 		runningTime.setText("Running Time:");
 		Text timeText = new Text(composite ,SWT.FILL);
-		timeText.setText(String.valueOf(movie.getRunningTime()));
+		if (movie.getRunningTime()!=0)
+			timeText.setText(String.valueOf(movie.getRunningTime()));
 		Label plot = new Label(composite,SWT.NONE);
 		plot.setText("Plot: ");
 		Text plotText = new Text(composite ,SWT.WRAP);
-		plotText.setText(movie.getPlot());
+		if (movie.getPlot()!= null)
+			plotText.setText(movie.getPlot());
 		
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Save");
@@ -635,11 +660,59 @@ public class SampleRibbonClass {
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
 				item1.setExpanded(true);
+			}
+		});
+		goofs.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//buttonsComp.setVisible(false);
+				List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movie.getId()),NamedRelationsEnum.GOOFS);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Image image = ImageCache.getImage("smile_grin_48.png");
+				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "Goofs"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				final int count = goofs.size();
+				System.out.println(count);
+				for (int i=0; i<count; i++) {
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, goofs.get(i).getName());
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}
+				GridLayout layout = new GridLayout (3,false);
+				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+				layout.verticalSpacing = 10;
+				buttonsComp.setLayout(layout);
+				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+				item1.setText("Movie's Goofs");
+				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+				item1.setControl(buttonsComp);
+				item1.setImage(image);
+				item1.setExpanded(true);
 			}			
 		});
+		
 		bar.setSpacing(8);
 		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height*2/3);
 		
+	/*	tab.getTabFolder().addListener(SWT.MouseDown, new Listener(){
+			public void handleEvent(Event e){
+				if (tab.isSelected())
+					tab.dispose();
+			}
+		});*/
 	}
 	
 	public static void ShowPersonResult(RibbonTab tab){
@@ -773,7 +846,7 @@ public class SampleRibbonClass {
 		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height/3);
 		
 	}
-	static public void createMovieForm(Composite composite){
+	public void createMovieForm(Composite composite){
 		Calendar toDay = Calendar.getInstance();
 		int year = toDay.get(Calendar.YEAR);
 		FormLayout layout = new FormLayout();
@@ -851,7 +924,6 @@ public class SampleRibbonClass {
 		data.top = new FormAttachment(nameText, 5);
 		data.left = new FormAttachment(nameText, 0, SWT.LEFT);
 		genreCombo.setLayoutData(data);*/
-
 	}
 	
 	static private String getID(List<NamedEntity> list , String name){
