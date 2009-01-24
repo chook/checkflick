@@ -31,17 +31,17 @@ public class DataImporter {
 	static String countriesPattern = ".+[)}]\\s+(.+)";
 	
 	// moviePattern explanation:
-	// ([^\"].+)						- group 1: movie name, excluding names that start with '"' (TV shows)
-	// \\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\) 	- the parentheses after the movie name that contains the movie year (or '????')
-	//											and sometimes '/I' or other greek numbers
-	//                   (?:/((?:[IVX])+))		- group 2: the added part '/I' with a greek numbering to differentiate between movies with the same name and year
+	// ([^\"].*)						- group 1: movie name, excluding names that start with '"' (TV shows)
+	// \\s\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\) 	- the parentheses after the movie name that contains the movie year (or '????')
+	//												and sometimes '/I' or other greek numbers
+	//                      (?:/((?:[IVX])+))	- group 2: the added part '/I' with a roman numbering to differentiate between movies with the same name and year
 	//											this group would be added to the movie name
-	// \\s?(\\(..*\\))?					- an optional whitespace and then an optional parentheses with TV / V / VG
-	//     (\\(..*\\))					- group 3: the added part '(TV)' / '(V)' / '(VG') that would be added to the movie name
+	// \\s?(?:\\((..*)\\))?				- an optional whitespace and then an optional parentheses with TV / V / VG
+	//           (..*)					- group 3: the added part '(TV)' / '(V)' / '(VG)' that would be added to the movie name
 	// \\s*(?:\\{\\{SUSPENDED\\}\\})?	- an optional whitespace and then an optional '{{SUSPENDED}}' notation
 	// \\s*((?:[\\d\\?]){4}).*			- an optional whitespace and then the year of the movie (the same as the one written after the movie name)
 	//     ((?:[\\d\\?]){4})			- group 4: the year of the movie
-	static String moviesPattern = "([^\"].+)\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*((?:[\\d\\?]){4}).*";
+	static String moviesPattern = "([^\"].*)\\s\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(?:\\((..*)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*((?:[\\d\\?]){4}).*";
 	static String moviesLanguagesPattern = "([^\"].+)\\(([\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesNameDBPattern = "([^\"](.)+)(?:\\(((?:[IVX])+)\\))?\\s?(\\(..*\\))?";
 	
@@ -169,7 +169,9 @@ public class DataImporter {
 		Set<MovieEntity> moviesSet = new HashSet<MovieEntity>();
 		String lineFromFile;
 		String patternRegExp = null;
-		StringBuilder movieName;
+		String movieName;
+		String movieRomanNotation;
+		String movieMadeFor;
 		int movieYear;
 		Pattern pattern;
 		Matcher matcher;
@@ -185,7 +187,6 @@ public class DataImporter {
 			
 			pattern = Pattern.compile(patternRegExp);
 			
-
 			while (!parser.isEOF()) {
 				lineFromFile = parser.readLine();
 				matcher = pattern.matcher(lineFromFile);
@@ -197,11 +198,9 @@ public class DataImporter {
 							System.out.println(lineFromFile);
 						}
 				} else {
-					movieName = new StringBuilder(matcher.group(1));
-					if (matcher.group(2) != null)
-						movieName.append(" (").append(matcher.group(2)).append(")");
-					if (matcher.group(3) != null)
-						movieName.append(" ").append(matcher.group(3));
+					movieName = matcher.group(1);
+					movieRomanNotation = matcher.group(2);
+					movieMadeFor = matcher.group(3);
 					try {
 						movieYear = Integer.parseInt(matcher.group(4));
 					} catch (Exception e) {
@@ -211,7 +210,7 @@ public class DataImporter {
 						} else
 							movieYear = 1900;
 					}
-					moviesSet.add(new MovieEntity(0, movieName.toString(), movieYear, 0, 0, null, null, null));
+					moviesSet.add(new MovieEntity(0, movieName, movieYear, movieRomanNotation, movieMadeFor, 0, 0, null, null, null));
 				}
 				// every 10,000 movies, flush the results via one prepared statement batch to the DB 
 				if (parser.getLineNumber() % PSTMT_BATCH_SIZE == 0) {

@@ -39,7 +39,7 @@ public class DBManager {
 	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT * FROM %s ORDER BY %s";
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
-	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)";
 	private static String INSERT_DOUBLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?, ?)";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
@@ -66,10 +66,12 @@ public class DBManager {
 		pool = DBConnectionPool./*getInstance(
 				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
 				"oracle.jdbc.OracleDriver", 6);*/
-		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
-		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
-/*				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
-		  "checkflick", "oracle.jdbc.OracleDriver", 6); */
+//		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
+//		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
+//				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
+//		  "checkflick", "oracle.jdbc.OracleDriver", 6);
+		getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
+				  "nadavsh2", "oracle.jdbc.OracleDriver", 6);
 	}
 
 	/**
@@ -607,14 +609,18 @@ public class DBManager {
 		statementStr = String.format(INSERT_MOVIE_PSTMT_GOOD, 
 										DBTablesEnum.MOVIES.getTableName(), 
 										DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
-										DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
+										DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
+										DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName(),
+										DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
 
 		try {
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (MovieEntity setMovie : set) {
-				pstmt.setString(1, setMovie.getName());
+				pstmt.setString(1, setMovie.getRawName());
 				pstmt.setInt(2, setMovie.getYear());
+				pstmt.setString(3, setMovie.getRomanNotation());
+				pstmt.setString(4, setMovie.getMadeFor());
 				pstmt.addBatch();
 			}
 		} catch (SQLException e) {

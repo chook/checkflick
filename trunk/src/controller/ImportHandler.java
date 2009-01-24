@@ -64,10 +64,10 @@ public class ImportHandler {
 		importer = new DataImporter(listfilesMap);
 		
 //		importer.getLanguagesGenresCountries();
-//		importer.getMovies();
+		importer.getMovies();
 		
 		// ------------------ dependent only on Movies
-		importer.getMoviesLanguages();	// dependent on Languages
+//		importer.getMoviesLanguages();	// dependent on Languages
 /*		importer.getMoviesGenres();		// dependent on Genres
 		importer.getMoviesCountries();	// dependent on Countries
 		importer.getMoviesColorInfo();
