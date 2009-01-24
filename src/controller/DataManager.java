@@ -1,8 +1,6 @@
 package controller;
 
 import java.util.*;
-
-
 import controller.entity.*;
 import controller.filter.AbsFilter;
 import controller.filter.AbsSingleFilter;
@@ -111,8 +109,14 @@ public class DataManager {
 		return false;
 	}
 
-	public List<BasicSearchEntity> search(SearchEntitiesEnum table, List<AbsFilter> list) {
-		switch(table)
+	/**
+	 * Search function - Gets a list of filters and an entity
+	 * @param entity - The entity to search on
+	 * @param list - filters
+	 * @return a named list
+	 */
+	public List<BasicSearchEntity> search(SearchEntitiesEnum entity, List<AbsFilter> list) {
+		switch(entity)
 		{
 			case MOVIES:
 			{
