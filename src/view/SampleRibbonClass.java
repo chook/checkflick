@@ -670,9 +670,9 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> languages = dm.getMovieData(MovieDataEnum, movie.getId());
+				List<AbsDataType> languages = dm.getMovieData(MovieDataEnum., movie.getId());
 
-		});*/
+		}});*/
 		goofs.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
