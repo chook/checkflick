@@ -15,7 +15,7 @@ import controller.entity.CategorizedRelation;
 import controller.entity.EntityEnum;
 import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
-import controller.entity.BasicSearchEntity;
+import controller.entity.DatedEntity;
 import controller.entity.NamedEntity;
 import controller.entity.NamedRelation;
 import controller.entity.PersonEntity;
@@ -650,11 +650,11 @@ public class DBManager {
 	 * no need to send it as an extra parameter (Chen 24.01.09)
 	 * @return List of search objects (TODO: DatedEntity in the future)
 	 */
-	public List<BasicSearchEntity> search(List<AbsFilter> arlFilters,
+	public List<DatedEntity> search(List<AbsFilter> arlFilters,
 			DBTablesEnum tableToSearch) {
 		// Variables Declaration
-		List<BasicSearchEntity> arlSearchResults = new ArrayList<BasicSearchEntity>();
-		BasicSearchEntity result = null;
+		List<DatedEntity> arlSearchResults = new ArrayList<DatedEntity>();
+		DatedEntity result = null;
 		ResultSet set = null;
 		Statement s = null;
 		Connection conn = pool.getConnection();
@@ -706,10 +706,10 @@ public class DBManager {
 	 * @deprecated
 	 */
 	@Deprecated
-	public List<BasicSearchEntity> searchMovies(List<Filter> arlFilters) {
+	public List<DatedEntity> searchMovies(List<Filter> arlFilters) {
 		// Variables Declaration
-		List<BasicSearchEntity> arlSearchResults = new ArrayList<BasicSearchEntity>();
-		BasicSearchEntity result = null;
+		List<DatedEntity> arlSearchResults = new ArrayList<DatedEntity>();
+		DatedEntity result = null;
 		ResultSet set = null;
 		Statement s = null;
 		Connection conn = pool.getConnection();
@@ -742,7 +742,7 @@ public class DBManager {
 	 * @deprecated
 	 */
 	@Deprecated
-	public List<BasicSearchEntity> searchPersons(List<Filter> arlFilters) {
+	public List<DatedEntity> searchPersons(List<Filter> arlFilters) {
 		return null;
 	}
 	
@@ -862,10 +862,10 @@ public class DBManager {
 		return movie;
 	}
 
-	private BasicSearchEntity fillMovieSearchResult(ResultSet set) {
-		BasicSearchEntity res = null;
+	private DatedEntity fillMovieSearchResult(ResultSet set) {
+		DatedEntity res = null;
 		try {
-			res = new BasicSearchEntity(set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+			res = new DatedEntity(set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 			res.setName(set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME
 					.getFieldName()));
 			res.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR
@@ -900,10 +900,10 @@ public class DBManager {
 		return person;
 	}
 	
-	private BasicSearchEntity fillPersonSearchResult(ResultSet set) {
-		BasicSearchEntity res = null;
+	private DatedEntity fillPersonSearchResult(ResultSet set) {
+		DatedEntity res = null;
 		try {
-			res = new BasicSearchEntity(set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+			res = new DatedEntity(set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 			res.setName(set.getString(DBFieldsEnum.PERSONS_PERSON_NAME
 					.getFieldName()));
 			res.setYear(set.getInt(DBFieldsEnum.PERSONS_YEAR_OF_BIRTH
@@ -914,7 +914,7 @@ public class DBManager {
 		}
 	}
 	
-	private BasicSearchEntity fillSearchResult(ResultSet set, DBTablesEnum table) {
+	private DatedEntity fillSearchResult(ResultSet set, DBTablesEnum table) {
 		switch (table) {
 		case MOVIES:
 			return fillMovieSearchResult(set);

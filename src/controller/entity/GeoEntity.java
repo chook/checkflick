@@ -3,7 +3,7 @@ package controller.entity;
 import java.util.List;
 import java.util.Map;
 
-public class GeoEntity extends BasicSearchEntity {
+public class GeoEntity extends DatedEntity {
 	protected int country;
 
 	/**

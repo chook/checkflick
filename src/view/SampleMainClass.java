@@ -50,7 +50,7 @@ public class SampleMainClass {
 		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
 		list.add(af);
 		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "ete"));
-		List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
+		List<DatedEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 		System.out.println(searched.get(0));
 		
 		/**
