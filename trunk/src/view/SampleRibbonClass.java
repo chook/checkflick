@@ -576,7 +576,6 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(true);
-				//List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movie.getId()), SearchEntitiesEnum.MOVIE_AKAS);
 				List<AbsDataType> akas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movie.getId());
 				
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
@@ -667,7 +666,8 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movie.getId()),NamedRelationsEnum.GOOFS);
+				List<AbsDataType> goofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movie.getId());
+
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("smile_grin_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -682,11 +682,13 @@ public class SampleRibbonClass {
 					column.setText (titles [i]);
 				}	
 				final int count = goofs.size();
+				Map<String, String> map = null;
 				System.out.println(count);
 				for (int i=0; i<count; i++) {
+					map = goofs.get(i).toStringMap();
 					TableItem item = new TableItem (table, SWT.NONE);
 					item.setText (0, String.valueOf(i+1));
-					item.setText (1, goofs.get(i).getName());
+					item.setText (1, map.get("name"));
 				}
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
