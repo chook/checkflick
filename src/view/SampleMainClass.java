@@ -60,13 +60,19 @@ public class SampleMainClass {
 		System.out.println(p);
 		System.out.println("Count:" + DBTablesEnum.getCounter());
 		
+		List<AbsDataType> pmovies = dm.getPersonData(PersonDataEnum.MOVIE_APPEARANCES, 7);
+		System.out.println("person movies " + pmovies.toString());
+		
+		List<AbsDataType> ptrivia = dm.getPersonData(PersonDataEnum.PERSON_TRIVIA, 5);
+		System.out.println("person trivia " + ptrivia.toString());
+		
 		/**
 		 * Get all genres
 		 */
 		List<NamedEntity> genres = dm.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES);
 		System.out.println("genres count " + genres.size());
 		
-		int movieId = 43;
+		int movieId = 42;
 		/**
 		 * Searching for a movie
 		 */
@@ -123,6 +129,13 @@ public class SampleMainClass {
 		
 		List<AbsDataType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
 		System.out.println("good makas " + makas.toString());
+		
+		
+		List<AbsDataType> mconnections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movieId);
+		System.out.println("good connections :" + mconnections.toString());
+		
+		List<AbsDataType> mappear = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movieId);
+		System.out.println("good cast :" + mappear.toString());
 		
 		/**
 		 * Try to find goofs

@@ -34,6 +34,11 @@ public class CategorizedRelation extends AbsRelation {
 	}
 
 	@Override
+	public String toString() {
+		return super.toString() + " type: " + getType();
+	}
+	
+	@Override
 	public List<String> toStringList() {
 		List<String> list = super.toStringList();
 		list.add(String.valueOf(getType()));

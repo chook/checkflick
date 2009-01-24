@@ -45,7 +45,7 @@ public abstract class AbsRelation extends AbsDataType {
 
 	@Override
 	public String toString() {
-		return super.toString() + " second id: " + getSecondaryId();
+		return super.toString() + " secondery id: " + getSecondaryId();
 	}
 	
 	@Override
@@ -58,7 +58,7 @@ public abstract class AbsRelation extends AbsDataType {
 	@Override
 	public Map<String, String> toStringMap() {
 		Map<String, String> map = super.toStringMap();
-		map.put("secondId", String.valueOf(getSecondaryId()));
+		map.put("seconderyId", String.valueOf(getSecondaryId()));
 		return map;
 	}
 }

@@ -14,6 +14,7 @@ import controller.entity.AbsDataType;
 import controller.entity.CategorizedRelation;
 import controller.entity.EntityEnum;
 import controller.entity.GeoEntity;
+import controller.entity.MovieAppearance;
 import controller.entity.MovieEntity;
 import controller.entity.DatedEntity;
 import controller.entity.NamedEntity;
@@ -291,10 +292,14 @@ public class DBManager {
 		case MOVIE_GOOFS:
 			list = getAbsDataType(EntityEnum.NAMED_RELATION, filter);
 			break;
+		case MOVIE_CONNECTIONS:
+			list = getAbsDataType(EntityEnum.CATEGORIZED_RELATION, filter);
+			break;
+		case MOVIE_CAST:
+			list = getAbsDataType(EntityEnum.MOVIE_APPEARANCE, filter);
 		}
 		return list;
 	}
-
 	
 	/**
 	 * Get movie data filter
@@ -329,6 +334,14 @@ public class DBManager {
 			filter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.MOVIE_QUOTES.getTableName(),
 					DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(), id);
+		case MOVIE_CONNECTIONS:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_CONNECTIONS.getTableName(),
+					DBFieldsEnum.MOVIE_CONNECTIONS_MOVIE_ID.getFieldName(), id);
+		case MOVIE_CAST:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
+					DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(), id);
 			break;
 		}
 		
@@ -445,6 +458,9 @@ public class DBManager {
 		case PERSON_QUOTES:
 		case PERSON_TRIVIA:
 			list = getAbsDataType(EntityEnum.NAMED_ENTITY, filter);
+			break;
+		case MOVIE_APPEARANCES:
+			list = getAbsDataType(EntityEnum.MOVIE_APPEARANCE, filter);
 			break;
 		}
 		return list;
@@ -942,6 +958,11 @@ public class DBManager {
 					DBTablesEnum.PERSON_TRIVIA.getTableName(),
 					DBFieldsEnum.PERSON_TRIVIA_PERSON_ID.getFieldName(), id);
 			break;
+		case MOVIE_APPEARANCES:
+			filter = new OracleSingleFilter(FilterOptionEnum.Number,
+					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
+					DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(), id);
+			break;
 		}
 		
 		return filter;
@@ -1030,6 +1051,9 @@ public class DBManager {
 				return new NamedRelation(rs.getInt(1), rs.getInt(2), rs.getString(3));
 			case CATEGORIZED_RELATION:
 				return new CategorizedRelation(rs.getInt(1), rs.getInt(2), rs.getInt(3));
+			case MOVIE_APPEARANCE:
+				return new MovieAppearance(rs.getInt(1), rs.getInt(2), rs.getInt(3),
+										   (rs.getString(4).equals("Y") ? true : false), rs.getInt(5), rs.getInt(6));
 			}
 		}
 		catch (SQLException e) {

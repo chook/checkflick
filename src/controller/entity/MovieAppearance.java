@@ -1,25 +1,12 @@
 package controller.entity;
 
-public class MovieAppearance extends AbsRelation {
-	private int productionRole;
+import java.util.List;
+import java.util.Map;
+
+public class MovieAppearance extends CategorizedRelation {
 	private boolean actor;
 	private int actorRole;
 	private int actorCreditRank;
-
-	/**
-	 * @return the productionRole
-	 */
-	public int getProductionRole() {
-		return productionRole;
-	}
-
-	/**
-	 * @param productionRole
-	 *            the productionRole to set
-	 */
-	public void setProductionRole(int productionRole) {
-		this.productionRole = productionRole;
-	}
 
 	/**
 	 * @return the actor
@@ -72,8 +59,7 @@ public class MovieAppearance extends AbsRelation {
 	 * @param productionRole
 	 */
 	public MovieAppearance(int id, int secondaryId, int productionRole) {
-		super(id, secondaryId);
-		this.productionRole = productionRole;
+		super(id, secondaryId, productionRole);
 	}
 
 	/**
@@ -86,10 +72,33 @@ public class MovieAppearance extends AbsRelation {
 	 */
 	public MovieAppearance(int id, int secondaryId, int productionRole,
 			boolean actor, int actorRole, int actorCreditRank) {
-		super(id, secondaryId);
-		this.productionRole = productionRole;
+		super(id, secondaryId, productionRole);
 		this.actor = actor;
 		this.actorRole = actorRole;
 		this.actorCreditRank = actorCreditRank;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " actor: " + actor + " actorRole: " +
+								  actorRole + " actorCreditRank: " + actorCreditRank; 
+	}
+
+	@Override
+	public List<String> toStringList() {
+		List<String> list = super.toStringList();
+		list.add(String.valueOf(actor));
+		list.add(String.valueOf(actorRole));
+		list.add(String.valueOf(actorCreditRank));
+		return list;
+	}
+
+	@Override
+	public Map<String, String> toStringMap() {
+		Map<String, String> map = super.toStringMap();
+		map.put("actor", String.valueOf(actor));
+		map.put("role", String.valueOf(actorRole));
+		map.put("creditRank", String.valueOf(actorCreditRank));
+		return map;
 	}
 }
