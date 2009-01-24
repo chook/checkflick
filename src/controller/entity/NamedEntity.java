@@ -3,6 +3,9 @@
  */
 package controller.entity;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * A named entity
  * 
@@ -47,7 +50,20 @@ public class NamedEntity extends AbsDataType {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return super.toString() + " name: " + getName();
+	}
+	
+	@Override
+	public List<String> toStringList() {
+		List<String> list = super.toStringList();
+		list.add(String.valueOf(getName()));
+		return list;
+	}
+	
+	@Override
+	public Map<String, String> toStringMap() {
+		Map<String, String> map = super.toStringMap();
+		map.put("name", getName());
+		return map;
 	}
 }

@@ -2,6 +2,8 @@ package view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import controller.*;
 import controller.entity.*;
 import controller.filter.AbsFilter;
@@ -80,21 +82,48 @@ public class SampleMainClass {
 		 * Get Movie entity
 		 */
 		MovieEntity m = dm.getMovieById(searched.get(0).getId());
-		System.out.println(p);
+		System.out.println(m);
 
 		/**
-		 * Getting movie aka names
+		 * Getting movie aka names - it returns always null for now
 		 */
-		List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movieId),
+		/*List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movieId),
 											 	 SearchEntitiesEnum.MOVIE_AKAS);	
 		
 		System.out.println("akas count " + akas.size());
-		
+		*/
 		/**
 		 * Getting movie countries 
 		 */
 		List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movieId));
 		System.out.println("countries count " + countries.size());
+		
+		/**
+		 * Getting movie countries revised
+		 */
+		//List<? extends NamedEntity> countriesRevised = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movieId);
+		//System.out.println("countries revised count " + countriesRevised.size());
+		
+		/**
+		 * Getting movie countries revised 2
+		 */
+		List<AbsDataType> countriesGood = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movieId);
+		System.out.println("countries revised count " + countriesGood.toString());
+		
+		List<AbsDataType> mgenres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movieId);
+		System.out.println("countries revised count " + mgenres.toString());
+		
+		List<AbsDataType> mgoofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movieId);
+		System.out.println("good goofs " + mgoofs.toString());
+		
+		for (AbsDataType t: mgoofs) {
+			Map<String, String> mgoofsmap = t.toStringMap();
+			System.out.println("name of goof is " + mgoofsmap.get("nam2e"));
+		}
+		
+		List<AbsDataType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
+		System.out.println("good makas " + makas.toString());
+		
 		
 		/**
 		 * Try to find goofs
