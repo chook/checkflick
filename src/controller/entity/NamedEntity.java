@@ -66,4 +66,9 @@ public class NamedEntity extends AbsDataType {
 		map.put("name", getName());
 		return map;
 	}
+	
+	@Override
+	public String toInsertString() {
+		return super.toInsertString() + ", '" + getName() + "'";
+	}
 }

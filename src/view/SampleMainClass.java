@@ -7,6 +7,8 @@ import java.util.Map;
 import controller.*;
 import controller.entity.*;
 import controller.filter.AbsFilter;
+import controller.filter.AbsSingleFilter;
+import controller.filter.FilterOptionEnum;
 import model.*;
 
 /**
@@ -101,8 +103,8 @@ public class SampleMainClass {
 		/**
 		 * Getting movie countries 
 		 */
-		List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movieId));
-		System.out.println("countries count " + countries.size());
+		//List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movieId));
+		//System.out.println("countries count " + countries.size());
 		
 		/**
 		 * Getting movie countries revised
@@ -144,12 +146,17 @@ public class SampleMainClass {
 		/**
 		 * Try to find goofs
 		 */
-		List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
-															 NamedRelationsEnum.GOOFS);
-		System.out.println("goofs count " + goofs.size());
+		//List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
+		//													 NamedRelationsEnum.GOOFS);
+		//System.out.println("goofs count " + goofs.size());
 		
-		AbsDataType t = new NamedEntity(7, "Chen test for insert from code");
-		dm.savePersonData(PersonDataEnum.PERSON_QUOTES, t);
 		
+		//AbsFilter f = dm.getFilter(SearchEntitiesEnum.MOVIE_AKAS, "");
+		
+		//dm.savePersonData(PersonDataEnum.PERSON_QUOTES, t);
+		
+		//dm.getInsertFilter(InsertEntitiesEnum.MOVIE_QUOTE, value)
+		AbsDataType t = new NamedEntity(43, "Trying to insert a movie generic way!");
+		dm.sendMovieData(MovieDataEnum.MOVIE_QUOTES, t);
 	}
 }

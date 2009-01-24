@@ -47,4 +47,9 @@ public class DatedEntity extends NamedEntity {
 		map.put("year", String.valueOf(getYear()));
 		return map;
 	}
+	
+	@Override
+	public String toInsertString() {
+		return super.toInsertString() + ", " + getYear();
+	}
 }
