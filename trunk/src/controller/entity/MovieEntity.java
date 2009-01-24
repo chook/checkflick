@@ -8,6 +8,8 @@ package controller.entity;
  */
 public class MovieEntity extends NamedEntity {
 	private int year;
+	private String romanNotation;
+	private String madeFor;
 	private int colorInfo;
 	private int runningTime;
 	private String taglines;
@@ -132,11 +134,13 @@ public class MovieEntity extends NamedEntity {
 	 * @param plot
 	 * @param filmingLocations
 	 */
-	public MovieEntity(int id, String name, int year, int colorInfo, int runningTime,
+	public MovieEntity(int id, String name, int year, String romanNotation, String madeFor, int colorInfo, int runningTime,
 			String taglines, String plot, String filmingLocations) {
 		super(id, name);
 
 		this.year = year;
+		this.romanNotation = romanNotation;
+		this.madeFor = madeFor;
 		this.colorInfo = colorInfo;
 		this.runningTime = runningTime;
 		this.taglines = taglines;
@@ -144,6 +148,23 @@ public class MovieEntity extends NamedEntity {
 		this.filmingLocations = filmingLocations;
 	}
 
+	/**
+	 * an overriding of NamedEntity.getName(), since the name here includes also roman notation and madeFor info
+	 * @return String the name of the movie, concatenated with roman notation if present, and madeFor info 
+	 */
+	@Override
+	public String getName() {
+		StringBuilder movieName;
+		
+		movieName = new StringBuilder(name);
+		if (romanNotation != null)
+			movieName.append(" (").append(romanNotation).append(")");
+		if (madeFor != null)
+			movieName.append(" (").append(madeFor).append(")");
+		
+		return movieName.toString();
+	}
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
