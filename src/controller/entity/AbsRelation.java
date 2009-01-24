@@ -31,7 +31,7 @@ public abstract class AbsRelation extends AbsDataType {
 	/**
 	 * @return the secondaryId
 	 */
-	protected int getSecondaryId() {
+	public int getSecondaryId() {
 		return secondaryId;
 	}
 
