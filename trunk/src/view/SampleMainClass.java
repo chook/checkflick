@@ -118,12 +118,11 @@ public class SampleMainClass {
 		
 		for (AbsDataType t: mgoofs) {
 			Map<String, String> mgoofsmap = t.toStringMap();
-			System.out.println("name of goof is " + mgoofsmap.get("nam2e"));
+			System.out.println("name of goof is " + mgoofsmap.get("name"));
 		}
 		
 		List<AbsDataType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
 		System.out.println("good makas " + makas.toString());
-		
 		
 		/**
 		 * Try to find goofs
@@ -131,6 +130,5 @@ public class SampleMainClass {
 		List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
 															 NamedRelationsEnum.GOOFS);
 		System.out.println("goofs count " + goofs.size());
-
 	}
 }

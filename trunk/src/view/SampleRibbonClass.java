@@ -5,6 +5,7 @@ import java.awt.CheckboxGroup;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -20,8 +21,10 @@ import com.hexapixel.widgets.generic.Utils;
 import com.hexapixel.widgets.ribbon.*;
 
 import controller.DataManager;
+import controller.MovieDataEnum;
 import controller.NamedEntitiesEnum;
 import controller.SearchEntitiesEnum;
+import controller.entity.AbsDataType;
 import controller.entity.BasicSearchEntity;
 import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
@@ -546,7 +549,9 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(true);
-				List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movie.getId()), SearchEntitiesEnum.MOVIE_AKAS);
+				//List<GeoEntity> akas = dm.getGeoEntities(String.valueOf(movie.getId()), SearchEntitiesEnum.MOVIE_AKAS);
+				List<AbsDataType> akas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movie.getId());
+				
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("book_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -562,10 +567,12 @@ public class SampleRibbonClass {
 				}	
 				final int count = akas.size();
 				System.out.println(count);
+				Map<String, String> map = null;
 				for (int i=0; i<count; i++) {
+					map = akas.get(i).toStringMap();
 					TableItem item = new TableItem (table, SWT.NONE);
 					item.setText (0, String.valueOf(i+1));
-					item.setText (1, akas.get(i).getName());
+					item.setText (1, map.get("name"));
 				}
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
@@ -588,7 +595,9 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
 				String.valueOf(movie.getId());
-				List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movie.getId()) );
+				//List<NamedEntity> countries = dm.getNamedEntity(NamedEntitiesEnum.COUNTRIES, String.valueOf(movie.getId()) );
+				List<AbsDataType> countries = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movie.getId());
+				
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("globe_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -604,10 +613,12 @@ public class SampleRibbonClass {
 				}	
 				final int count = countries.size();
 				System.out.println(count);
+				Map<String, String> map = null;
 				for (int i=0; i<count; i++) {
+					map = countries.get(i).toStringMap();
 					TableItem item = new TableItem (table, SWT.NONE);
 					item.setText (0, String.valueOf(i+1));
-					item.setText (1, getName(countriesList , countries.get(i).getName()));
+					item.setText (1, getName(countriesList , map.get("name")));
 				}
 				for (int i=0; i<titles.length; i++) {
 					table.getColumn (i).pack ();
