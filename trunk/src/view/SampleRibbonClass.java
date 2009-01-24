@@ -70,7 +70,7 @@ public class SampleRibbonClass {
 		//Shell shell = new Shell(display);
 		shell.setText("DB Project, TAU 2009");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
-		shell.setSize(new Point(monitor_bounds.width,monitor_bounds.height));
+		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
 		//shell.setMaximized(true);
 		//shell.setSize(570, 550);
 		
@@ -197,12 +197,11 @@ public class SampleRibbonClass {
 		final int year = toDay.get(Calendar.YEAR);
 		search.setLocation(0,145);
 		search.setLayout(new FillLayout());
-		final Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		ExpandBar bar = new ExpandBar (search, SWT.V_SCROLL);
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
 		final Composite composite = new Composite (bar, SWT.NONE);
-		composite.setSize(search.getSize());
+		//composite.setSize(search.getSize());
 		//createMovieForm(composite);
 		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
@@ -261,7 +260,7 @@ public class SampleRibbonClass {
 		
 		item0.setExpanded(true);
 		bar.setSpacing(8);
-		bar.setSize(shell.getShell().getSize());
+		//bar.setSize(shell.getShell().getSize());
 		//searchByActor.setVisible(checked);
 		//composite.setSize(shell.getShell().getSize().x-5, (shell.getShell().getSize().y/4));
 		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/4);
@@ -273,7 +272,7 @@ public class SampleRibbonClass {
 				resultsMovieTable.dispose();
 				resultsMovieTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
 				resultsPersonTable.setVisible(false);
-				resultsMovieTable.setVisible(true);
+				//resultsMovieTable.setVisible(true);
 				resultsMovieTable.setLayout(new GridLayout());
 				DataManager dm = DataManager.getInstance();
 				//creating the filter to search by
@@ -346,8 +345,8 @@ public class SampleRibbonClass {
 								resultsMovieTable.setVisible(false);
 						}
 					});
-					resultsMovieTable.setLocation(0,  145+ monitor_bounds.height/4);
-					resultsMovieTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
+					resultsMovieTable.setLocation(0,  145+ shell.getShell().getSize().y/4);
+					resultsMovieTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
 				}
 				else{ // if there were no results
 					switch(okMessageBox("No results. Please change your choises and try again.")){
@@ -472,8 +471,8 @@ public class SampleRibbonClass {
 					}
 				});
 
-				resultsPersonTable.setLocation(0,  145+ monitor_bounds.height/4);
-				resultsPersonTable.setSize(monitor_bounds.width, monitor_bounds.height/2);
+				resultsPersonTable.setLocation(0,  145+ shell.getShell().getSize().y/4);
+				resultsPersonTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
 				
 			}			
 		});
@@ -763,7 +762,7 @@ public class SampleRibbonClass {
 		
 		
 		bar.setSpacing(8);
-		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height*2/3);
+		movieDetails.setSize(shell.getShell().getSize().x, (shell.getShell().getSize().y)*(2/3));
 		
 	/*	tab.getTabFolder().addListener(SWT.MouseDown, new Listener(){
 			public void handleEvent(Event e){
@@ -901,7 +900,7 @@ public class SampleRibbonClass {
 			}			
 		});
 		bar.setSpacing(8);
-		movieDetails.setSize(monitor_bounds.width-5, monitor_bounds.height/3);
+		movieDetails.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/3);
 		
 	}
 	public void createMovieForm(Composite composite){
