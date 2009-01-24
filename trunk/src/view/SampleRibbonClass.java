@@ -25,7 +25,7 @@ import controller.MovieDataEnum;
 import controller.NamedEntitiesEnum;
 import controller.SearchEntitiesEnum;
 import controller.entity.AbsDataType;
-import controller.entity.BasicSearchEntity;
+import controller.entity.DatedEntity;
 import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
@@ -284,7 +284,7 @@ public class SampleRibbonClass {
 				}
 				//list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
 				//search for movies
-				List<BasicSearchEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
+				List<DatedEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
 				//creating the search results table
 				final Table table = new Table (resultsMovieTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
@@ -299,8 +299,10 @@ public class SampleRibbonClass {
 				}	
 				final int count = searched.size();
 				System.out.println(count);
+				
 				for (int i=0; i<count; i++) {
 					TableItem item = new TableItem (table, SWT.NONE);
+					
 					item.setText (0, String.valueOf(i+1));
 					item.setText (1, searched.get(i).getName());
 					item.setText (2, String.valueOf(searched.get(i).getYear()));

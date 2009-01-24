@@ -115,7 +115,7 @@ public class DataManager {
 	 * @param list - filters
 	 * @return a named list
 	 */
-	public List<BasicSearchEntity> search(SearchEntitiesEnum entity, List<AbsFilter> list) {
+	public List<DatedEntity> search(SearchEntitiesEnum entity, List<AbsFilter> list) {
 		switch(entity)
 		{
 			case MOVIES:
@@ -135,7 +135,7 @@ public class DataManager {
 	 * @param arlFilters - List of filters for WHERE clause
 	 * @return List of movies
 	 */
-	private List<BasicSearchEntity> getEntitiesBySearch(List<AbsFilter> arlFilters,
+	private List<DatedEntity> getEntitiesBySearch(List<AbsFilter> arlFilters,
 													   DBTablesEnum table) {
 		return DBManager.getInstance().search(arlFilters, table);
 	}
