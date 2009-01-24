@@ -526,7 +526,7 @@ public class SampleRibbonClass {
 		timeText.setText(String.valueOf(movie.getRunningTime()));
 		Label plot = new Label(composite,SWT.NONE);
 		plot.setText("Plot: ");
-		Text plotText = new Text(composite ,SWT.FILL);
+		Text plotText = new Text(composite ,SWT.WRAP);
 		plotText.setText(movie.getPlot());
 		
 		Button button = new Button (composite, SWT.PUSH);
