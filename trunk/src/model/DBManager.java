@@ -40,6 +40,7 @@ public class DBManager {
 	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT * FROM %s ORDER BY %s";
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
+	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)";
 	private static String INSERT_DOUBLE_DATATYPE = "INSERT INTO %s (%s) VALUES %s";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
@@ -131,7 +132,6 @@ public class DBManager {
 		Connection conn = pool.getConnection();
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
-		System.out.println(pstmtStr);
 		
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
@@ -629,8 +629,9 @@ public class DBManager {
 	}
 
 	/**
-	 * This function receives a set of values, and a definition of a table, and
+	 * This function receives a set of NamedEntities, and a definition of a table, and
 	 * adds all the values to the DB with one PreparedStatementBatch
+	 * This refers to the MOVIE_LANGUAGES, MOVIE_COUNTRIES & MOVIE_GENRES tables
 	 * 
 	 * @param set
 	 *            - The set of values to add to the DB
@@ -640,7 +641,49 @@ public class DBManager {
 	 *            - The name of the Value_name field
 	 * 
 	 **/
-	public boolean insertSetToDB(Set<String> set, DBTablesEnum table,
+	public boolean insertMovieSingleDataTypeSetToDB(Set<NamedRelation> set, DBTablesEnum table,
+			DBFieldsEnum field1, DBFieldsEnum field2) {
+
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr;
+		statementStr = String.format(INSERT_MOVIE_SINGLE_DATATYPE, 
+										DBTablesEnum.MOVIE_LANGUAGES.getTableName(), 
+										DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
+										DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName());
+
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (NamedRelation setNamedRelation : set) {
+				pstmt.setInt(1, setNamedRelation.getId());
+				pstmt.setInt(2, setNamedRelation.getSecondaryId());
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
+	}
+	
+	/**
+	 * This function receives a set of values, and a definition of a table, and
+	 * adds all the values to the DB with one PreparedStatementBatch
+	 * This refers to the LANGUAGES, COUNTRIES & GENRES tables
+	 * 
+	 * @param set
+	 *            - The set of values to add to the DB
+	 * @param table
+	 *            - The name of the table
+	 * @param field
+	 *            - The name of the Value_name field
+	 * 
+	 **/
+	public boolean insertSingleDataTypeSetToDB(Set<String> set, DBTablesEnum table,
 			DBFieldsEnum field) {
 
 		PreparedStatement pstmt = null;
