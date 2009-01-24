@@ -48,6 +48,35 @@ public class MovieEntity extends NamedEntity {
 	}
 
 	/**
+	 * @return the romanNotation
+	 */
+	public String getRomanNotation() {
+		return romanNotation;
+	}
+
+	/**
+	 * @param romanNotation
+	 *            the romanNotation to set
+	 */
+	public void setRomanNotation(String romanNotation) {
+		this.romanNotation = romanNotation;
+	}
+	/**
+	 * @return the madeFor info
+	 */
+	public String getMadeFor() {
+		return madeFor;
+	}
+
+	/**
+	 * @param madeFor
+	 *            the madeFor info to set
+	 */
+	public void setMadeFor(String madeFor) {
+		this.madeFor = madeFor;
+	}
+	
+	/**
 	 * @return the colorInfo
 	 */
 	public int getColorInfo() {
@@ -149,6 +178,14 @@ public class MovieEntity extends NamedEntity {
 	}
 
 	/**
+	 * used to get the raw name of the movie, stripped from its roman notations and madeFor info
+	 * @return String the movie name without roman notations and madeFor info
+	 */
+	public String getRawName() {
+		return name;
+	}
+	
+	/**
 	 * an overriding of NamedEntity.getName(), since the name here includes also roman notation and madeFor info
 	 * @return String the name of the movie, concatenated with roman notation if present, and madeFor info 
 	 */
@@ -164,6 +201,8 @@ public class MovieEntity extends NamedEntity {
 		
 		return movieName.toString();
 	}
+	
+
 	
 	@Override
 	public String toString() {
