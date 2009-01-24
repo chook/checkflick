@@ -136,9 +136,12 @@ public class SampleRibbonClass {
 		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		
 		searchByMovie = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
+		searchByMovie.setBackground(shell.getShell().getBackground());
+		searchByMovie.setLocation(0, 145);
 		searchByMovie.setVisible(false);
 		searchByPerson = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
 		//searchByPerson.setSize((shell.getShell().getSize().x)-5,(shell.getShell().getSize().y)/4);
+		searchByPerson.setBackground(shell.getShell().getBackground());
 		searchByPerson.setVisible(false);
 		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
 		resultsMovieTable.setVisible(false);
@@ -150,11 +153,12 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {	
 			}
 			public void widgetSelected(SelectionEvent e){
-				searchByMovie.dispose();	
-				searchByPerson.dispose();
+				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
+					searchByMovie.dispose();
+				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
+					searchByPerson.dispose();
 				searchByMovie = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
-					/*if (searchByPerson.isVisible())
-						searchByPerson.setVisible(false);*/
+				searchByMovie.setBackground(shell.getShell().getBackground());
 				searchByMovie(searchByMovie);
 			}
 		});
@@ -163,11 +167,12 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				searchByPerson.dispose();
-				searchByMovie.dispose();
+				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
+					searchByMovie.dispose();
+				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
+					searchByPerson.dispose();
 				searchByPerson = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
-				//if (searchByMovie.isVisible())
-				//	searchByMovie.setVisible(false);
+				searchByPerson.setBackground(shell.getShell().getBackground());
 				searchByPerson(searchByPerson);
 			}	
 		});
@@ -528,7 +533,6 @@ public class SampleRibbonClass {
 		quotes.setButtonSelectGroup(group);
 		locations.setButtonSelectGroup(group);
 		persons.setButtonSelectGroup(group);
-
 		final Composite movieDetails = new Composite(shell.getShell(),SWT.BORDER);
 		movieDetails.setVisible(true);
 		movieDetails.setLocation(0, 145);
@@ -734,7 +738,7 @@ public class SampleRibbonClass {
 				for (int i=0; i<titles.length; i++) {
 					TableColumn column = new TableColumn (table, SWT.NONE);
 					column.setText (titles [i]);
-				}	
+				}
 				final int count = quotes.size();
 				Map<String, String> map = null;
 				System.out.println(count);
@@ -762,7 +766,7 @@ public class SampleRibbonClass {
 		
 		
 		bar.setSpacing(8);
-		movieDetails.setSize(shell.getShell().getSize().x, (shell.getShell().getSize().y)*(2/3));
+		movieDetails.setSize(shell.getShell().getSize().x-5, (shell.getShell().getSize().y)/3);
 		
 	/*	tab.getTabFolder().addListener(SWT.MouseDown, new Listener(){
 			public void handleEvent(Event e){
