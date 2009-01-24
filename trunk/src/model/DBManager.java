@@ -2,8 +2,10 @@ package model;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import controller.NamedEntitiesEnum;
@@ -29,9 +31,12 @@ public class DBManager {
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
+	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT * FROM %s ORDER BY %s";
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+	
+	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
 	// Singleton instance
 	private static DBManager instance = null;
@@ -58,8 +63,12 @@ public class DBManager {
 				"oracle.jdbc.OracleDriver", 6);*/
 /*		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
 		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
-*/				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
+				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
 		  "checkflick", "oracle.jdbc.OracleDriver", 6);
+*/				getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
+		  "nadavsh2", "oracle.jdbc.OracleDriver", 6);
+		
+	
 	}
 
 	/**
@@ -432,6 +441,45 @@ public class DBManager {
 		return tempMovie;
 	}
 
+	/**
+	 * returns a map of movies selected from the DB, that were limited by (top, bottom) limit on the SELECT
+	 * results that are sent are ordered beforehand by MOVIE_ID
+	 * Note: there is no way to return the whole movies list, and you must specify a bottomLimit (memory reasons)
+	 * Note: the rows starts with 1 and not 0 (meaning, topLimit = 0 returns exactly what topLimit = 1 returns)
+	 * @param topLimit the start of the limit
+	 * @param bottomLimit the end of the limit
+	 * @return
+	 */
+	public Map<Integer, String> getAllMovies(int topLimit, int bottomLimit) {
+		MovieEntity tempMovie = null;
+		ResultSet set = null;
+
+		PreparedStatement pstmt = null;
+		Connection conn = pool.getConnection();
+		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
+		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
+		System.out.println(pstmtStr);
+		Map<Integer, String> moviesMap = new HashMap<Integer, String>();
+		
+		try {
+			pstmt = conn.prepareStatement(pstmtStr);
+
+			// Executing the query and building the movies map
+			set = pstmt.executeQuery();
+			while (set.next()) {
+				tempMovie = fillMovieFromSet(set);
+				moviesMap.put(tempMovie.getId(), tempMovie.getName());
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("Error in searchMovies");
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer in searchMovies");
+		}
+		pool.returnConnection(conn);
+		return moviesMap;
+	}
+	
 	/**
 	 * Search persons by filters
 	 * 
