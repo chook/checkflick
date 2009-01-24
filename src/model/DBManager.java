@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import controller.MovieDataEnum;
@@ -39,6 +40,7 @@ public class DBManager {
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+	private static String INSERT_DOUBLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?, ?)";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
 	// Singleton instance
@@ -297,6 +299,7 @@ public class DBManager {
 			break;
 		case MOVIE_CAST:
 			list = getAbsDataType(EntityEnum.MOVIE_APPEARANCE, filter);
+			break;
 		}
 		return list;
 	}
@@ -334,10 +337,12 @@ public class DBManager {
 			filter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.MOVIE_QUOTES.getTableName(),
 					DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(), id);
+			break;
 		case MOVIE_CONNECTIONS:
 			filter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.MOVIE_CONNECTIONS.getTableName(),
 					DBFieldsEnum.MOVIE_CONNECTIONS_MOVIE_ID.getFieldName(), id);
+			break;
 		case MOVIE_CAST:
 			filter = new OracleSingleFilter(FilterOptionEnum.Number,
 					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
@@ -1061,4 +1066,54 @@ public class DBManager {
 		}
 		return null;
 	}
+
+	public boolean insertAbsDataType(PersonDataEnum data, AbsDataType type) {
+		switch(data) {
+		case PERSON_QUOTES:
+			List<String> list = new ArrayList<String>();
+			list.add(DBFieldsEnum.PERSON_QUOTES_PERSON_ID.getFieldName());
+			list.add(DBFieldsEnum.PERSON_QUOTES_QUOTE_TEXT.getFieldName());
+			sendAbsDataTypeToDb(DBTablesEnum.PERSON_QUOTES.getTableName(),
+								list, type);
+			break;
+		}
+		return false;
+	}
+	
+	private boolean sendAbsDataTypeToDb(String table, List<String> fields, AbsDataType type) {
+		PreparedStatement s = null;
+		Connection conn = pool.getConnection();
+		Map<String, String> map = null;
+		try {
+			String parsedFields = "";
+			for(String stemp: fields) {
+				parsedFields += stemp + " ,";
+			}
+			
+			if (fields.size()> 0)
+				parsedFields = parsedFields.substring(0, parsedFields.length() - 2);
+			
+			map = type.toStringMap();
+			s = conn.prepareStatement(String.format(INSERT_DOUBLE_DATATYPE,
+									  table, parsedFields, map.get("name")),
+									  Statement.RETURN_GENERATED_KEYS);
+			
+			s.setInt(1, type.getId());
+			s.setString(2, map.get("name"));
+			
+			// Executing the query and building the movies array
+			s.executeUpdate();
+			return true;
+		} catch (SQLException e) {
+			System.out.println("Error in searchMovies " + e.toString());
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer in searchMovies");
+		}
+		return false;
+	}
 }
+
+
+
+
+
