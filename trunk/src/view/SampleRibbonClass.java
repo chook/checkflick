@@ -560,8 +560,6 @@ public class SampleRibbonClass {
 		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		new RibbonGroupSeparator(results);
-		RibbonButton locations = new RibbonButton(results, ImageCache.getImage("image_48.png"), " \nLocations", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		RibbonGroup personsGroup = new RibbonGroup(tab, "Movie Apearances" , toolTip);
 		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		ButtonSelectGroup group = new ButtonSelectGroup();
@@ -571,7 +569,6 @@ public class SampleRibbonClass {
 		goofs.setButtonSelectGroup(group);
 		languages.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
-		locations.setButtonSelectGroup(group);
 		persons.setButtonSelectGroup(group);
 		final Composite movieDetails = new Composite(shell.getShell(),SWT.BORDER);
 		movieDetails.setVisible(true);
@@ -630,40 +627,47 @@ public class SampleRibbonClass {
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				
 				Image image = ImageCache.getImage("book_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
+				if (akas.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = akas.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = akas.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("AKA Names For The Movie");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}	
-				final int count = akas.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = akas.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
+				else{
+					switch(okMessageBox("No AKA name for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
-				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("AKA Names For The Movie");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
-			}			
+			}
 		});
 		connections.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -671,39 +675,46 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				List<AbsType> connections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movie.getId());
 				Image image = ImageCache.getImage("google_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = connections.size();
-				//System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = connections.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
+				if (connections.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = connections.size();
+					//System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = connections.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Movie's Connections To Other Movies");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No movie connections for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movie's Connections To Other Movies");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}
 		});
 		countries.addSelectionListener(new SelectionListener() {
@@ -715,48 +726,96 @@ public class SampleRibbonClass {
 				
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("globe_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = countries.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = countries.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, getName(countriesList , map.get("name")));
+				if (countries.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = countries.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = countries.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, getName(countriesList , map.get("name")));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Movie's Countries");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No countries for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movie's Countries");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}
 		});
-		/*languages.addSelectionListener(new SelectionListener(){
+		languages.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsType> languages = dm.getMovieData(MovieDataEnum, movie.getId());
-		}});*/
+				List<AbsType> languages = dm.getMovieData(MovieDataEnum.MOVIE_LANGUAGES, movie.getId());
+				Image image = ImageCache.getImage("furl_48.png");
+				if (languages.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Language"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = languages.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = languages.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, getName(langList , map.get("name")));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Movie's Languages");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
+				}
+				else{
+					switch(okMessageBox("No languages for this movie.")){
+    				case(SWT.OK):{}
+					}
+				}
+		}});
 		goofs.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -765,39 +824,46 @@ public class SampleRibbonClass {
 				List<AbsType> goofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movie.getId());
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("smile_grin_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Goofs"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = goofs.size();
-				Map<String, String> map = null;
-				System.out.println(count);
-				for (int i=0; i<count; i++) {
-					map = goofs.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
+				if (goofs.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Goofs"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = goofs.size();
+					Map<String, String> map = null;
+					System.out.println(count);
+					for (int i=0; i<count; i++) {
+						map = goofs.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Movie's Goofs");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No goofs for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movie's Goofs");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}			
 		});
 		quotes.addSelectionListener(new SelectionListener(){
@@ -808,39 +874,46 @@ public class SampleRibbonClass {
 				List<AbsType> quotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, movie.getId());
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("speech_bubble_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Quotes"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
+				if (quotes.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Quotes"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}
+					final int count = quotes.size();
+					Map<String, String> map = null;
+					System.out.println(count);
+					for (int i=0; i<count; i++) {
+						map = quotes.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Famous Quotes From The Movie");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				final int count = quotes.size();
-				Map<String, String> map = null;
-				System.out.println(count);
-				for (int i=0; i<count; i++) {
-					map = quotes.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
+				else{
+					switch(okMessageBox("No quotes for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
-				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Famous Quotes From The Movie");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}
 		});
 		genres.addSelectionListener(new SelectionListener(){
@@ -849,80 +922,46 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				List<AbsType> genres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movie.getId());
 				Image image = ImageCache.getImage("pie_chart_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Genre"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = genres.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = genres.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, getName(genresList , map.get("name")));
+				if (genres.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Genre"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = genres.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = genres.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, getName(genresList , map.get("name")));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Movie's Genres");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No genres for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movie's Genres");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
-			}
-		});
-		locations.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				/*List<AbsType> locations = dm.getMovieData(MovieDataEnum.MOVIE_LOCATIONS, movie.getId());
-				Image image = ImageCache.getImage("image_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Country Name"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = locations.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = locations.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
-				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
-				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movie's Filming Locations");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);*/
 			}
 		});
 		persons.addSelectionListener(new SelectionListener(){
@@ -931,40 +970,47 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				List<AbsType> persons = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movie.getId());
 				Image image = ImageCache.getImage("users_two_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name" , "Production Role"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = persons.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = persons.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
-					item.setText (2, map.get("rol"));
+				if (persons.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name" , "Production Role"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = persons.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = persons.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+						item.setText (2, map.get("rol"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Movie's Cast");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No cast for this movie.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movie's Cast");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}
 		});
 
@@ -1084,39 +1130,46 @@ public class SampleRibbonClass {
 				List<AbsType> akas = dm.getPersonData(PersonDataEnum.PERSON_AKAS, person.getId());
 				Composite buttonsComp = new Composite (bar, SWT.FILL);
 				Image image = ImageCache.getImage("book_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = akas.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = akas.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
+				if (akas.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = akas.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = akas.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("AKA Names For The Person");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No AKA names for this person.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("AKA Names For The Person");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}			
 		});
 		movies.addSelectionListener(new SelectionListener() {
@@ -1127,40 +1180,47 @@ public class SampleRibbonClass {
 				List<AbsType> movies = dm.getPersonData(PersonDataEnum.PERSON_ROLES, person.getId());
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("camera_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Name", "Production Role"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = movies.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = movies.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
-					item.setText (2, map.get("role"));
+				if (movies.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name", "Production Role"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = movies.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = movies.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+						item.setText (2, map.get("role"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("The Films That This Person Participated In");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No movies for this person.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("The Films That This Person Participated In");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}			
 		});
 		quotes.addSelectionListener(new SelectionListener() {
@@ -1171,39 +1231,46 @@ public class SampleRibbonClass {
 				List<AbsType> quotes = dm.getPersonData(PersonDataEnum.PERSON_QUOTES, person.getId());
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("speech_bubble_48.png");
-				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-				table.setLinesVisible (true);
-				table.setHeaderVisible (true);
-				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-				data.heightHint = 200;
-				table.setLayoutData(data);
-				String[] titles = {" ", "Quote"};
-				for (int i=0; i<titles.length; i++) {
-					TableColumn column = new TableColumn (table, SWT.NONE);
-					column.setText (titles [i]);
-				}	
-				final int count = quotes.size();
-				System.out.println(count);
-				Map<String, String> map = null;
-				for (int i=0; i<count; i++) {
-					map = quotes.get(i).toStringMap();
-					TableItem item = new TableItem (table, SWT.NONE);
-					item.setText (0, String.valueOf(i+1));
-					item.setText (1, map.get("name"));
+				if (quotes.size()>0){
+					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Quote"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					final int count = quotes.size();
+					System.out.println(count);
+					Map<String, String> map = null;
+					for (int i=0; i<count; i++) {
+						map = quotes.get(i).toStringMap();
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, map.get("name"));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+					GridLayout layout = new GridLayout (3,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					buttonsComp.setLayout(layout);
+					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+					item1.setText("Famous Quotes Of The Person");
+					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(buttonsComp);
+					item1.setImage(image);
+					item1.setExpanded(true);
 				}
-				for (int i=0; i<titles.length; i++) {
-					table.getColumn (i).pack ();
+				else{
+					switch(okMessageBox("No quotes for this person.")){
+    				case(SWT.OK):{}
+					}
 				}
-				GridLayout layout = new GridLayout (3,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				buttonsComp.setLayout(layout);
-				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Famous Quotes Of The Person");
-				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(buttonsComp);
-				item1.setImage(image);
-				item1.setExpanded(true);
 			}
 		});
 		
