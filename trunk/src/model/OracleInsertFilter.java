@@ -3,10 +3,6 @@
  */
 package model;
 
-import java.util.Set;
-
-import controller.filter.AbsInsertFilter;
-import controller.filter.AbsSingleFilter;
 import controller.filter.FilterOptionEnum;
 
 /**
@@ -24,10 +20,11 @@ public class OracleInsertFilter extends OracleSingleFilter {
 		switch(option) {
 		case Number:
 			return super.getValue();
+		case Date: // TODO: Implement this
+		case Boolean: 
+			return "'" + ((Boolean.parseBoolean(super.getValue()) == true) ? "Y" : "N") + "'";
 		case String:
 			return "'" + super.getValue() + "'";
-		case Date:
-			return "'" + super.getValue() + "'"; // TODO: Needs to implement
 		}
 		return null;
 	}

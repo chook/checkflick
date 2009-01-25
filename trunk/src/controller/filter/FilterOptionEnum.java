@@ -5,5 +5,6 @@ public enum FilterOptionEnum {
 	String,
 	Date,
 	StringArray,
-	NumberRange
+	NumberRange,
+	Boolean
 }

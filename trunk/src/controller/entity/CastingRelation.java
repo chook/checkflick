@@ -3,9 +3,9 @@ package controller.entity;
 import java.util.List;
 import java.util.Map;
 
-public class MovieAppearance extends CategorizedRelation {
+public class CastingRelation extends CategorizedRelation {
 	private boolean actor;
-	private int actorRole;
+	private String actorRole;
 	private int actorCreditRank;
 
 	/**
@@ -26,7 +26,7 @@ public class MovieAppearance extends CategorizedRelation {
 	/**
 	 * @return the actorRole
 	 */
-	public int getActorRole() {
+	public String getActorRole() {
 		return actorRole;
 	}
 
@@ -34,7 +34,7 @@ public class MovieAppearance extends CategorizedRelation {
 	 * @param actorRole
 	 *            the actorRole to set
 	 */
-	public void setActorRole(int actorRole) {
+	public void setActorRole(String actorRole) {
 		this.actorRole = actorRole;
 	}
 
@@ -58,7 +58,7 @@ public class MovieAppearance extends CategorizedRelation {
 	 * @param secondaryId
 	 * @param productionRole
 	 */
-	public MovieAppearance(int id, int secondaryId, int productionRole) {
+	public CastingRelation(int id, int secondaryId, int productionRole) {
 		super(id, secondaryId, productionRole);
 	}
 
@@ -70,8 +70,8 @@ public class MovieAppearance extends CategorizedRelation {
 	 * @param actorRole
 	 * @param actorCreditRank
 	 */
-	public MovieAppearance(int id, int secondaryId, int productionRole,
-			boolean actor, int actorRole, int actorCreditRank) {
+	public CastingRelation(int id, int secondaryId, int productionRole,
+			boolean actor, String actorRole, int actorCreditRank) {
 		super(id, secondaryId, productionRole);
 		this.actor = actor;
 		this.actorRole = actorRole;
@@ -88,7 +88,7 @@ public class MovieAppearance extends CategorizedRelation {
 	public List<String> toStringList() {
 		List<String> list = super.toStringList();
 		list.add(String.valueOf(actor));
-		list.add(String.valueOf(actorRole));
+		list.add(actorRole);
 		list.add(String.valueOf(actorCreditRank));
 		return list;
 	}
@@ -97,7 +97,7 @@ public class MovieAppearance extends CategorizedRelation {
 	public Map<String, String> toStringMap() {
 		Map<String, String> map = super.toStringMap();
 		map.put("actor", String.valueOf(actor));
-		map.put("role", String.valueOf(actorRole));
+		map.put("role", actorRole);
 		map.put("creditRank", String.valueOf(actorCreditRank));
 		return map;
 	}

@@ -12,7 +12,7 @@ import java.util.Map;
  * @author CHENH
  * 
  */
-public class NamedEntity extends AbsDataType {
+public class NamedEntity extends AbsType {
 	protected String name;
 
 	/**

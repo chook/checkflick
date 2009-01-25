@@ -6,9 +6,11 @@ import java.util.Map;
 
 import controller.*;
 import controller.entity.*;
+import controller.enums.MovieDataEnum;
+import controller.enums.NamedEntitiesEnum;
+import controller.enums.PersonDataEnum;
+import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
-import controller.filter.AbsSingleFilter;
-import controller.filter.FilterOptionEnum;
 import model.*;
 
 /**
@@ -51,7 +53,7 @@ public class SampleMainClass {
 		List<AbsFilter> list = new ArrayList<AbsFilter>();
 		AbsFilter af = dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY, "1");
 		list.add(af);
-		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "ete"));
+		list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, "h"));
 		List<DatedEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
 		System.out.println(searched.get(0));
 		
@@ -62,10 +64,11 @@ public class SampleMainClass {
 		System.out.println(p);
 		System.out.println("Count:" + DBTablesEnum.getCounter());
 		
-		List<AbsDataType> pmovies = dm.getPersonData(PersonDataEnum.MOVIE_APPEARANCES, 7);
+		//AbsFilter prrFilter = dm.getFilter(SearchEntitiesEnum.PERSON_PRODUCTION_ROLE, "1");
+		List<AbsType> pmovies = dm.getPersonData(PersonDataEnum.PERSON_ROLES, 7);
 		System.out.println("person movies " + pmovies.toString());
 		
-		List<AbsDataType> ptrivia = dm.getPersonData(PersonDataEnum.PERSON_TRIVIA, 5);
+		List<AbsType> ptrivia = dm.getPersonData(PersonDataEnum.PERSON_TRIVIA, 5);
 		System.out.println("person trivia " + ptrivia.toString());
 		
 		/**
@@ -115,32 +118,32 @@ public class SampleMainClass {
 		/**
 		 * Getting movie countries revised 2
 		 */
-		List<AbsDataType> countriesGood = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movieId);
+		List<AbsType> countriesGood = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movieId);
 		System.out.println("countries revised count " + countriesGood.toString());
 		
-		List<AbsDataType> mgenres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movieId);
+		List<AbsType> mgenres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movieId);
 		System.out.println("countries revised count " + mgenres.toString());
 		
-		List<AbsDataType> mgoofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movieId);
+		List<AbsType> mgoofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movieId);
 		System.out.println("good goofs " + mgoofs.toString());
 		
-		for (AbsDataType t: mgoofs) {
+		for (AbsType t: mgoofs) {
 			Map<String, String> mgoofsmap = t.toStringMap();
 			System.out.println("name of goof is " + mgoofsmap.get("name"));
 		}
 		
-		List<AbsDataType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
+		List<AbsType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
 		System.out.println("good makas " + makas.toString());
 		
-		List<AbsDataType> mconnections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movieId);
+		List<AbsType> mconnections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movieId);
 		System.out.println("good connections :" + mconnections.toString());
 		
 		
-		List<AbsDataType> mquotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, 43);
+		List<AbsType> mquotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, 43);
 		System.out.println("good quotes :" + mquotes.toString());
 		
 		
-		List<AbsDataType> mappear = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movieId);
+		List<AbsType> mappear = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movieId);
 		System.out.println("good cast :" + mappear.toString());
 		
 		/**
@@ -156,7 +159,11 @@ public class SampleMainClass {
 		//dm.savePersonData(PersonDataEnum.PERSON_QUOTES, t);
 		
 		//dm.getInsertFilter(InsertEntitiesEnum.MOVIE_QUOTE, value)
-		AbsDataType t = new NamedEntity(43, "Trying to insert a movie generic way!");
-		dm.sendMovieData(MovieDataEnum.MOVIE_QUOTES, t);
+		AbsType t = new NamedEntity(7, "Trying to insert a person quote!");
+		dm.insertPersonData(PersonDataEnum.PERSON_QUOTES, t);
+		//dm.sendMovieData(MovieDataEnum.MOVIE_QUOTES, t);
+		
+		t = new CastingRelation(7, 43, 1, true, "Shrek", 1);
+		System.out.println(dm.insertMovieData(MovieDataEnum.MOVIE_CAST, t));
 	}
 }

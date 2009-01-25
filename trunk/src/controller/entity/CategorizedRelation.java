@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Chook
  * 
  */
-public class CategorizedRelation extends AbsRelation {
+public class CategorizedRelation extends Relation {
 	protected int type;
 
 	/**

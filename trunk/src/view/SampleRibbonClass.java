@@ -27,15 +27,15 @@ import com.hexapixel.widgets.ribbon.RibbonTabFolder;
 import com.hexapixel.widgets.ribbon.RibbonTooltip;
 
 import controller.DataManager;
-import controller.MovieDataEnum;
-import controller.NamedEntitiesEnum;
-import controller.PersonDataEnum;
-import controller.SearchEntitiesEnum;
-import controller.entity.AbsDataType;
+import controller.entity.AbsType;
 import controller.entity.DatedEntity;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
 import controller.entity.PersonEntity;
+import controller.enums.MovieDataEnum;
+import controller.enums.NamedEntitiesEnum;
+import controller.enums.PersonDataEnum;
+import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
 
 public class SampleRibbonClass {
@@ -624,7 +624,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				buttonsComp.setVisible(true);
-				List<AbsDataType> akas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movie.getId());
+				List<AbsType> akas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movie.getId());
 				/*if ((buttonsComp!= null) && (!buttonsComp.isDisposed()))
 						buttonsComp.dispose();*/
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
@@ -669,7 +669,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				List<AbsDataType> connections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movie.getId());
+				List<AbsType> connections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movie.getId());
 				Image image = ImageCache.getImage("google_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
@@ -711,7 +711,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> countries = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movie.getId());
+				List<AbsType> countries = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movie.getId());
 				
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("globe_48.png");
@@ -755,14 +755,14 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> languages = dm.getMovieData(MovieDataEnum, movie.getId());
+				List<AbsType> languages = dm.getMovieData(MovieDataEnum, movie.getId());
 		}});*/
 		goofs.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> goofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movie.getId());
+				List<AbsType> goofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movie.getId());
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("smile_grin_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -805,7 +805,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> quotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, movie.getId());
+				List<AbsType> quotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, movie.getId());
 				//Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("speech_bubble_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -847,7 +847,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				List<AbsDataType> genres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movie.getId());
+				List<AbsType> genres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movie.getId());
 				Image image = ImageCache.getImage("pie_chart_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
@@ -888,7 +888,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				List<AbsDataType> locations = dm.getMovieData(MovieDataEnum.MOVIE_LOCATIONS, movie.getId());
+				/*List<AbsType> locations = dm.getMovieData(MovieDataEnum.MOVIE_LOCATIONS, movie.getId());
 				Image image = ImageCache.getImage("image_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
@@ -922,14 +922,14 @@ public class SampleRibbonClass {
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
-				item1.setExpanded(true);
+				item1.setExpanded(true);*/
 			}
 		});
 		persons.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				List<AbsDataType> persons = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movie.getId());
+				List<AbsType> persons = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movie.getId());
 				Image image = ImageCache.getImage("users_two_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 				table.setLinesVisible (true);
@@ -1081,7 +1081,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				List<AbsDataType> akas = dm.getPersonData(PersonDataEnum.PERSON_AKAS, person.getId());
+				List<AbsType> akas = dm.getPersonData(PersonDataEnum.PERSON_AKAS, person.getId());
 				Composite buttonsComp = new Composite (bar, SWT.FILL);
 				Image image = ImageCache.getImage("book_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -1124,7 +1124,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> movies = dm.getPersonData(PersonDataEnum.MOVIE_APPEARANCES, person.getId());
+				List<AbsType> movies = dm.getPersonData(PersonDataEnum.PERSON_ROLES, person.getId());
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("camera_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -1168,7 +1168,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsDataType> quotes = dm.getPersonData(PersonDataEnum.PERSON_QUOTES, person.getId());
+				List<AbsType> quotes = dm.getPersonData(PersonDataEnum.PERSON_QUOTES, person.getId());
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("speech_bubble_48.png");
 				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);

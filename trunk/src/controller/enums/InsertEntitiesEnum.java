@@ -1,4 +1,4 @@
-package controller;
+package controller.enums;
 
 public enum InsertEntitiesEnum {
 	MOVIE_AKA,

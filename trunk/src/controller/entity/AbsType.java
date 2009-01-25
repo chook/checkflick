@@ -5,17 +5,15 @@ package controller.entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This is the most basic and that is why abstract representation of an entity.
  * @author Chook
  * 
  */
-public abstract class AbsDataType {
+public abstract class AbsType {
 	private int id;
 
 	/**
@@ -33,11 +31,11 @@ public abstract class AbsDataType {
 		this.id = id;
 	}
 
-	protected AbsDataType(int id) {
+	protected AbsType(int id) {
 		this.id = id;
 	}
 
-	protected AbsDataType() {
+	protected AbsType() {
 		id = 0;
 	}
 	
