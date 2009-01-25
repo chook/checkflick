@@ -1,34 +1,40 @@
 package view;
 
-import java.awt.Checkbox;
-import java.awt.CheckboxGroup;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.internal.win32.CREATESTRUCT;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.*;
-import org.eclipse.swt.events.*;
-import com.hexapixel.widgets.generic.ColorCache;
+import org.eclipse.swt.widgets.*;
+
 import com.hexapixel.widgets.generic.ImageCache;
 import com.hexapixel.widgets.generic.Utils;
-import com.hexapixel.widgets.ribbon.*;
+import com.hexapixel.widgets.ribbon.ButtonSelectGroup;
+import com.hexapixel.widgets.ribbon.QuickAccessShellToolbar;
+import com.hexapixel.widgets.ribbon.RibbonButton;
+import com.hexapixel.widgets.ribbon.RibbonGroup;
+import com.hexapixel.widgets.ribbon.RibbonGroupSeparator;
+import com.hexapixel.widgets.ribbon.RibbonShell;
+import com.hexapixel.widgets.ribbon.RibbonTab;
+import com.hexapixel.widgets.ribbon.RibbonTabFolder;
+import com.hexapixel.widgets.ribbon.RibbonTooltip;
 
 import controller.DataManager;
 import controller.MovieDataEnum;
 import controller.NamedEntitiesEnum;
-import controller.NamedRelationsEnum;
+import controller.PersonDataEnum;
 import controller.SearchEntitiesEnum;
 import controller.entity.AbsDataType;
 import controller.entity.DatedEntity;
-import controller.entity.GeoEntity;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
-import controller.entity.NamedRelation;
 import controller.entity.PersonEntity;
 import controller.filter.AbsFilter;
 
@@ -571,7 +577,6 @@ public class SampleRibbonClass {
 		movieDetails.setVisible(true);
 		movieDetails.setLocation(0, 145);
 		movieDetails.setLayout(new FillLayout());
-		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		final ExpandBar bar = new ExpandBar (movieDetails, SWT.V_SCROLL);
 		Image image = ImageCache.getImage("paper_content_48.png");
 		
@@ -976,7 +981,7 @@ public class SampleRibbonClass {
 	
 	public static void ShowPersonResult(RibbonTab tab,final PersonEntity person){
 		searchByPerson.setVisible(false);
-		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
+		RibbonTooltip toolTip = new RibbonTooltip("Get More Information About This Person", "To get more information about this person\nplease click on one of the wanted buttons.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), ""); 
 
 		// Person Tab
 		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
@@ -998,7 +1003,6 @@ public class SampleRibbonClass {
 		movieDetails.setVisible(true);
 		movieDetails.setLocation(0, 145);
 		movieDetails.setLayout(new FillLayout());
-		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		final ExpandBar bar = new ExpandBar (movieDetails, SWT.V_SCROLL);
 		Image image = ImageCache.getImage("paper_content_48.png");
 		
@@ -1011,39 +1015,55 @@ public class SampleRibbonClass {
 		Label personName = new Label(composite,SWT.NONE);
 		personName.setText("Person Name:");
 		Text nameText = new Text(composite ,SWT.FILL);
-		nameText.setText("Brad Pit");
+		nameText.setText(person.getName());
 		Label realName = new Label(composite,SWT.NONE);
 		realName.setText("Real Name:");
 		Text rnameText = new Text(composite ,SWT.FILL);
-		rnameText.setText("Overrated");
+		if (person.getPersonRealName()!= null)
+			rnameText.setText(person.getPersonRealName());
 		Label nicks = new Label(composite ,SWT.NONE);
 		nicks.setText("Nick Names:");
-		Text nicksText = new Text(composite ,SWT.FILL);
-		nicksText.setText("Angelina's husband");
+		org.eclipse.swt.widgets.List nicksList = new org.eclipse.swt.widgets.List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		if (person.getPersonNickNames()!= null){
+			String[] nicksString = person.getPersonNickNames().split("/X\\");
+			//nicksList.setBounds(50, 50, 75, 75);
+			for(int i=0; i<nicksString.length; i++) nicksList.add(nicksString[i]);
+		}
 		Label date = new Label(composite,SWT.NONE);
 		date.setText("Date Of Birth: ");
 		Text dateText = new Text(composite ,SWT.FILL);
-		dateText.setText("11.3.85");
+		if (person.getDateOfBirth()!= null)
+			dateText.setText(person.getDateOfBirth().toString());
 		Label city = new Label(composite,SWT.NONE);
 		city.setText("Born in: ");
 		Text cityText = new Text(composite ,SWT.FILL);
-		cityText.setText("Rishon");
+		if (person.getCityOfBirth()!= null)
+			cityText.setText(person.getCityOfBirth());
 		Label country = new Label(composite,SWT.NONE);
 		country.setText("Country: ");
 		Text countryText = new Text(composite ,SWT.FILL);
-		countryText.setText("Israel");
+		if (person.getCountryOfBirth()!= 0)
+			countryText.setText(getName(countriesList , String.valueOf(person.getCountryOfBirth())));
 		Label death = new Label(composite,SWT.NONE);
 		death.setText("Died in: ");
 		Text deathText = new Text(composite ,SWT.FILL);
-		deathText.setText("it's alive...ALIVE!");
+		if (person.getDateOfDeath()!= null)
+			deathText.setText(person.getDateOfDeath().toString());
 		Label height = new Label(composite,SWT.NONE);
 		height.setText("Height: ");
 		Text heightText = new Text(composite ,SWT.FILL);
-		heightText.setText("1.88");
+		if (person.getHeight()!= 0)
+			heightText.setText(String.valueOf(person.getHeight()));
 		Label bio = new Label(composite,SWT.NONE);
 		bio.setText("Biography: ");
-		Text bioText = new Text(composite ,SWT.FILL);
-		bioText.setText("bla bla bla bla bla");
+		Text bioText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL);
+		if (person.getBiography()!= null)	
+			bioText.setText(person.getBiography());
+		Label trademark = new Label(composite, SWT.NONE);
+		trademark.setText("Trademark: ");
+		Text tmText = new Text(composite, SWT.FILL);
+		if (person.getTrademark()!= null)	
+			tmText.setText(person.getTrademark());
 		
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Save");
@@ -1054,23 +1074,43 @@ public class SampleRibbonClass {
 		item0.setImage(image);
 		item0.setExpanded(true);
 		
-		//final Composite buttonsComp = new Composite (bar, SWT.FILL);
+	//	 final Composite buttonsComp = new Composite (bar, SWT.FILL);
 		//buttonsComp.setVisible(false);
 
 		aka.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				//buttonsComp.setVisible(true);
-				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				List<AbsDataType> akas = dm.getPersonData(PersonDataEnum.PERSON_AKAS, person.getId());
+				Composite buttonsComp = new Composite (bar, SWT.FILL);
 				Image image = ImageCache.getImage("book_48.png");
-				GridLayout layout = new GridLayout (6,false);
+				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "Name"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				final int count = akas.size();
+				System.out.println(count);
+				Map<String, String> map = null;
+				for (int i=0; i<count; i++) {
+					map = akas.get(i).toStringMap();
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, map.get("name"));
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}
+				GridLayout layout = new GridLayout (3,false);
 				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 				layout.verticalSpacing = 10;
 				buttonsComp.setLayout(layout);
-				//result table goes here
-				Text text = new Text(buttonsComp ,SWT.None);
-				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
 				item1.setText("AKA Names For The Person");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -1084,23 +1124,89 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
+				List<AbsDataType> movies = dm.getPersonData(PersonDataEnum.MOVIE_APPEARANCES, person.getId());
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("camera_48.png");
-				GridLayout layout = new GridLayout (6,false);
+				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "Name", "Production Role"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				final int count = movies.size();
+				System.out.println(count);
+				Map<String, String> map = null;
+				for (int i=0; i<count; i++) {
+					map = movies.get(i).toStringMap();
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, map.get("name"));
+					item.setText (2, map.get("role"));
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}
+				GridLayout layout = new GridLayout (3,false);
 				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 				layout.verticalSpacing = 10;
 				buttonsComp.setLayout(layout);
-				//result table goes here
-				Text text = new Text(buttonsComp ,SWT.None);
-				text.setText( "result table goes here");
 				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-				item1.setText("Movies The Person Participated In");
+				item1.setText("The Films That This Person Participated In");
 				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 				item1.setControl(buttonsComp);
 				item1.setImage(image);
 				item1.setExpanded(true);
 			}			
 		});
+		quotes.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//buttonsComp.setVisible(false);
+				List<AbsDataType> quotes = dm.getPersonData(PersonDataEnum.PERSON_QUOTES, person.getId());
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Image image = ImageCache.getImage("speech_bubble_48.png");
+				final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+				table.setLinesVisible (true);
+				table.setHeaderVisible (true);
+				GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+				data.heightHint = 200;
+				table.setLayoutData(data);
+				String[] titles = {" ", "Quote"};
+				for (int i=0; i<titles.length; i++) {
+					TableColumn column = new TableColumn (table, SWT.NONE);
+					column.setText (titles [i]);
+				}	
+				final int count = quotes.size();
+				System.out.println(count);
+				Map<String, String> map = null;
+				for (int i=0; i<count; i++) {
+					map = quotes.get(i).toStringMap();
+					TableItem item = new TableItem (table, SWT.NONE);
+					item.setText (0, String.valueOf(i+1));
+					item.setText (1, map.get("name"));
+				}
+				for (int i=0; i<titles.length; i++) {
+					table.getColumn (i).pack ();
+				}
+				GridLayout layout = new GridLayout (3,false);
+				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+				layout.verticalSpacing = 10;
+				buttonsComp.setLayout(layout);
+				ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+				item1.setText("Famous Quotes Of The Person");
+				item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+				item1.setControl(buttonsComp);
+				item1.setImage(image);
+				item1.setExpanded(true);
+			}
+		});
+		
 		bar.setSpacing(8);
 		movieDetails.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/3);
 		
