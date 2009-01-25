@@ -3,19 +3,21 @@ package model;
 import java.util.regex.*;
 import java.util.*;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import controller.ImportHandler;
+import controller.ListFilesEnum;
+import controller.NamedEntitiesEnum;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
 import controller.entity.NamedRelation;
-import controller.enums.ListFilesEnum;
-import controller.enums.NamedEntitiesEnum;
+import controller.filter.AbsSingleFilter;
 
 public class DataImporter {
 
 	private Map<ListFilesEnum, String> listfilesMap;
 	static int PSTMT_BATCH_SIZE = 15000;
-	static int SELECT_BUCKET_SIZE = 500000;
+	static int SELECT_BUCKET_SIZE = 50000;
 	
 	// languagePattern explanation:
 	// [^\"] 							- ignore lines that start with '"' (since they are TV shows)
@@ -236,6 +238,74 @@ public class DataImporter {
 		return true;
 	}
 
+	public void runOverResultSet(ResultSet moviesResultSet) {
+		Map<String, Integer> moviesMap;
+		Map<String, Integer> languagesMap = new HashMap<String, Integer>();
+		Set<NamedRelation> movieLanguagesSet = new LinkedHashSet<NamedRelation>();
+		String lineFromFile;
+		String patternRegExp = null;
+		Pattern pattern;
+		Matcher matcher;
+		boolean matchFound;
+		int totalElementsNum = 0;
+		List<NamedEntity> languagesList;
+		StringBuilder movieNameBuilder;
+		String tempMovieName;
+		String tempMovieDBName;
+		int tempMovieId;
+		int tempMovieDBYear;
+		String tempMovieYear;
+		String tempMovieRomanNotation;
+		String tempMovieMadeFor;
+		int moviesStartRow;
+		int moviesEndRow;
+		int tempMoviesSetCounter;
+		
+		moviesMap = new HashMap<String, Integer>();
+		tempMoviesSetCounter = 0;
+		try {
+		while (moviesResultSet.next()) {
+			if (moviesMap.size() == 0)
+				System.out.println("moviesMap.size = 0");
+			if (moviesMap.size() == 100)
+				System.out.println("moviesMap.size = 100");
+			tempMovieId = moviesResultSet.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
+			tempMovieDBName = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
+			tempMovieDBYear = moviesResultSet.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
+			tempMovieRomanNotation = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName());
+			tempMovieMadeFor = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
+			if (tempMovieDBYear == 0)
+				tempMovieYear = "????";
+			else
+				tempMovieYear = String.valueOf(tempMovieDBYear);
+			
+			// rebuilding the movie name as it appears on the lists, for comparing
+			movieNameBuilder = new StringBuilder(tempMovieDBName);
+			movieNameBuilder.append(" (").append(tempMovieYear);
+			if (tempMovieRomanNotation != null)
+				movieNameBuilder.append("/").append(tempMovieRomanNotation);
+			movieNameBuilder.append(")");
+			if (tempMovieMadeFor != null)
+				movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
+			tempMovieName = movieNameBuilder.toString();
+			
+//			tempMovieName = "name";
+//			tempMovieId = 1;
+			if (moviesMap.size() == 0)
+				System.out.println("before putting first element");
+			moviesMap.put(tempMovieName, tempMovieId);
+			if (moviesMap.size() == 1)
+				System.out.println("after putting first element");
+			if (moviesMap.size() == 10)
+				System.out.println("moviesMap.size = 10");
+			if (tempMoviesSetCounter % 5000 == 0)
+				System.out.println("moviesMap - reached element no. " + tempMoviesSetCounter);
+			++tempMoviesSetCounter;
+		}
+		} catch (SQLException e){
+			
+		}
+	}
 	
 	public boolean getMoviesLanguages() {
 		
@@ -286,6 +356,61 @@ public class DataImporter {
 				isEmpty = true;
 			
 			if (!isEmpty) {
+				try {
+					// run over the Result Set, and enter all the movies there to the moviesMap
+					tempMoviesSetCounter = 1;
+					for (int i = 1; i < 50001; ++i) {
+						if (i % 5000 == 0)
+							System.out.println("temp - reached element no. " + i);
+					}
+					System.out.println("moviesMap size = " + moviesMap.size());
+					System.out.println("trying to change setFetchSize");
+					System.out.println(moviesResultSet.getFetchSize());
+					moviesResultSet.setFetchSize(2000);
+					runOverResultSet(moviesResultSet);
+//					moviesMap = new HashMap<String, Integer>();
+//					while (moviesResultSet.next()) {
+//						if (moviesMap.size() == 0)
+//							System.out.println("moviesMap.size = 0");
+//						if (moviesMap.size() == 100)
+//							System.out.println("moviesMap.size = 100");
+//						tempMovieId = moviesResultSet.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
+//						tempMovieDBName = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
+//						tempMovieDBYear = moviesResultSet.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
+//						tempMovieRomanNotation = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName());
+//						tempMovieMadeFor = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
+//						if (tempMovieDBYear == 0)
+//							tempMovieYear = "????";
+//						else
+//							tempMovieYear = String.valueOf(tempMovieDBYear);
+//						
+//						// rebuilding the movie name as it appears on the lists, for comparing
+//						movieNameBuilder = new StringBuilder(tempMovieDBName);
+//						movieNameBuilder.append(" (").append(tempMovieYear);
+//						if (tempMovieRomanNotation != null)
+//							movieNameBuilder.append("/").append(tempMovieRomanNotation);
+//						movieNameBuilder.append(")");
+//						if (tempMovieMadeFor != null)
+//							movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
+//						tempMovieName = movieNameBuilder.toString();
+//						
+////						tempMovieName = "name";
+////						tempMovieId = 1;
+//						if (moviesMap.size() == 0)
+//							System.out.println("before putting first element");
+//						moviesMap.put(tempMovieName, tempMovieId);
+//						if (moviesMap.size() == 1)
+//							System.out.println("after putting first element");
+//						if (moviesMap.size() == 10)
+//							System.out.println("moviesMap.size = 10");
+//						if (tempMoviesSetCounter % 5000 == 0)
+//							System.out.println("moviesMap - reached element no. " + tempMoviesSetCounter);
+//						++tempMoviesSetCounter;
+//					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				// run over the Result Set, and enter all the movies there to the moviesMap
 				tempMoviesSetCounter = 1;
 				for (int i = 1; i < 50001; ++i) {
@@ -310,6 +435,7 @@ public class DataImporter {
 					++tempMoviesSetCounter;
 				
 				parser.loadFile(listfilesMap.get(ListFilesEnum.LANGUAGES), ListFilesEnum.LANGUAGES);
+				movieLanguagesSet = new LinkedHashSet<NamedRelation>();
 				// Making sure we find the start of the list
 				if (parser.findStartOfList()) {
 					System.out.println("Found the start of the list!");
