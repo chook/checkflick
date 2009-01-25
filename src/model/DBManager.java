@@ -44,11 +44,11 @@ public class DBManager {
 	 * DWefault Constructor - Initiates the connection pool
 	 */
 	protected DBManager() {
-		pool = DBConnectionPool.getInstance(
+		pool = DBConnectionPool./*getInstance(
 				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
-				"oracle.jdbc.OracleDriver", 6);
-//		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
-//		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
+				"oracle.jdbc.OracleDriver", 6);*/
+		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
+		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
 //				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
 //		  "checkflick", "oracle.jdbc.OracleDriver", 6);
 //		getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
@@ -436,6 +436,48 @@ public class DBManager {
 				pstmt.setInt(2, setMovie.getYear());
 				pstmt.setString(3, setMovie.getRomanNotation());
 				pstmt.setString(4, setMovie.getMadeFor());
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
+	}
+
+	/**
+	 * This function receives a set of NamedEntities, and a definition of a table, and
+	 * adds all the values to the DB with one PreparedStatementBatch
+	 * This refers to the MOVIE_LANGUAGES, MOVIE_COUNTRIES & MOVIE_GENRES tables
+	 * 
+	 * @param set
+	 *            - The set of values to add to the DB
+	 * @param table
+	 *            - The name of the table
+	 * @param field
+	 *            - The name of the Value_name field
+	 * 
+	 **/
+	public boolean insertMovieSingleDataTypeSetToDB(Set<NamedRelation> set, DBTablesEnum table,
+			DBFieldsEnum field1, DBFieldsEnum field2) {
+
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr;
+		statementStr = String.format(INSERT_MOVIE_SINGLE_DATATYPE, 
+										DBTablesEnum.MOVIE_LANGUAGES.getTableName(), 
+										DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
+										DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName());
+
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (NamedRelation setNamedRelation : set) {
+				pstmt.setInt(1, setNamedRelation.getId());
+				pstmt.setInt(2, setNamedRelation.getSecondaryId());
 				pstmt.addBatch();
 			}
 		} catch (SQLException e) {
