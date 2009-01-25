@@ -448,48 +448,6 @@ public class DBManager {
 	}
 
 	/**
-	 * This function receives a set of NamedEntities, and a definition of a table, and
-	 * adds all the values to the DB with one PreparedStatementBatch
-	 * This refers to the MOVIE_LANGUAGES, MOVIE_COUNTRIES & MOVIE_GENRES tables
-	 * 
-	 * @param set
-	 *            - The set of values to add to the DB
-	 * @param table
-	 *            - The name of the table
-	 * @param field
-	 *            - The name of the Value_name field
-	 * 
-	 **/
-	public boolean insertMovieSingleDataTypeSetToDB(Set<NamedRelation> set, DBTablesEnum table,
-			DBFieldsEnum field1, DBFieldsEnum field2) {
-
-		PreparedStatement pstmt = null;
-		boolean bReturn = false;
-		Connection conn = pool.getConnection();
-		String statementStr;
-		statementStr = String.format(INSERT_MOVIE_SINGLE_DATATYPE, 
-										DBTablesEnum.MOVIE_LANGUAGES.getTableName(), 
-										DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
-										DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName());
-
-		try {
-			pstmt = conn.prepareStatement(statementStr);
-
-			for (NamedRelation setNamedRelation : set) {
-				pstmt.setInt(1, setNamedRelation.getId());
-				pstmt.setInt(2, setNamedRelation.getSecondaryId());
-				pstmt.addBatch();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
-		return bReturn;
-	}
-	
-	/**
 	 * This function receives a set of values, and a definition of a table, and
 	 * adds all the values to the DB with one PreparedStatementBatch
 	 * This refers to the LANGUAGES, COUNTRIES & GENRES tables

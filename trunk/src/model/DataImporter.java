@@ -6,8 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import controller.ImportHandler;
-import controller.ListFilesEnum;
-import controller.NamedEntitiesEnum;
+import controller.enums.*;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
 import controller.entity.NamedRelation;
@@ -356,18 +355,17 @@ public class DataImporter {
 				isEmpty = true;
 			
 			if (!isEmpty) {
-				try {
 					// run over the Result Set, and enter all the movies there to the moviesMap
 					tempMoviesSetCounter = 1;
 					for (int i = 1; i < 50001; ++i) {
 						if (i % 5000 == 0)
 							System.out.println("temp - reached element no. " + i);
 					}
-					System.out.println("moviesMap size = " + moviesMap.size());
-					System.out.println("trying to change setFetchSize");
-					System.out.println(moviesResultSet.getFetchSize());
-					moviesResultSet.setFetchSize(2000);
-					runOverResultSet(moviesResultSet);
+//					System.out.println("moviesMap size = " + moviesMap.size());
+//					System.out.println("trying to change setFetchSize");
+//					System.out.println(moviesResultSet.getFetchSize());
+//					moviesResultSet.setFetchSize(2000);
+//					runOverResultSet(moviesResultSet);
 //					moviesMap = new HashMap<String, Integer>();
 //					while (moviesResultSet.next()) {
 //						if (moviesMap.size() == 0)
@@ -407,10 +405,6 @@ public class DataImporter {
 //							System.out.println("moviesMap - reached element no. " + tempMoviesSetCounter);
 //						++tempMoviesSetCounter;
 //					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				// run over the Result Set, and enter all the movies there to the moviesMap
 				tempMoviesSetCounter = 1;
 				for (int i = 1; i < 50001; ++i) {
