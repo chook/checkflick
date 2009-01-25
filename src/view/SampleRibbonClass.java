@@ -498,7 +498,7 @@ public class SampleRibbonClass {
 							}
 							final RibbonTabFolder tabs = shell.getRibbonTabFolder();
 							personTab = new RibbonTab(tabs, "Person");
-							ShowPersonResult(personTab);
+							ShowPersonResult(personTab, person);
 							tabs.selectTab(personTab);
 							resultsPersonTable.setVisible(false);
 						}
@@ -974,7 +974,7 @@ public class SampleRibbonClass {
 		});*/
 	}
 	
-	public static void ShowPersonResult(RibbonTab tab){
+	public static void ShowPersonResult(RibbonTab tab,final PersonEntity person){
 		searchByPerson.setVisible(false);
 		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
 
