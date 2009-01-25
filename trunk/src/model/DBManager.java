@@ -7,6 +7,27 @@ import controller.entity.*;
 import controller.enums.*;
 
 public class DBManager {
+
+	// Different Connections used in testings
+	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
+	private static int CONNECTION_MAX_CONNECTIONS = 6;
+/** Chen's home server 1	**/
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+//	private static String CONNECTION_USERNAME = "chook";
+//	private static String CONNECTION_PASSWORD = "shoochi";
+/** Chen's TAU server		**/
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_USERNAME = "chenhare";
+//	private static String CONNECTION_PASSWORD = "Shoochi0";
+/** Nadav's home server		**/
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+//	private static String CONNECTION_USERNAME = "checkflick";
+//	private static String CONNECTION_PASSWORD = "checkflick";
+/** Nadav's TAU server		**/
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "nadavsh2";
+	private static String CONNECTION_PASSWORD = "nadavsh2";
+
 	// The strings for prepared statements
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
 	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE MOVIE_ID=?";
@@ -44,15 +65,11 @@ public class DBManager {
 	 * DWefault Constructor - Initiates the connection pool
 	 */
 	protected DBManager() {
-		pool = DBConnectionPool./*getInstance(
-				"jdbc:oracle:thin:@localhost:1521:XE", "chook", "shoochi",
-				"oracle.jdbc.OracleDriver", 6);*/
-		  getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "chenhare",
-		  "Shoochi0", "oracle.jdbc.OracleDriver", 6);
-//				getInstance("jdbc:oracle:thin:@localhost:1521:XE", "checkflick",
-//		  "checkflick", "oracle.jdbc.OracleDriver", 6);
-//		getInstance("jdbc:oracle:thin:@localhost:1555:csodb", "nadavsh2",
-//				  "nadavsh2", "oracle.jdbc.OracleDriver", 6);
+		pool = DBConnectionPool.getInstance(CONNECTION_URI, 
+											CONNECTION_USERNAME, 
+											CONNECTION_PASSWORD, 
+											CONNECTION_DRIVER_NAME, 
+											CONNECTION_MAX_CONNECTIONS);
 		
 		filters = OracleFilterManager.getInstance();
 	}
