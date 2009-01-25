@@ -3,6 +3,8 @@ package controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import controller.enums.ListFilesEnum;
+
 import model.DataImporter;
 
 public class ImportHandler {

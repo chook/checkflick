@@ -1,8 +1,8 @@
-package controller;
+package controller.enums;
 
 public enum PersonDataEnum {
 	PERSON_AKAS,
 	PERSON_QUOTES,
 	PERSON_TRIVIA,
-	MOVIE_APPEARANCES
+	PERSON_ROLES
 }

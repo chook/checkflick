@@ -2,8 +2,11 @@ package controller;
 
 import java.util.*;
 import controller.entity.*;
+import controller.enums.MovieDataEnum;
+import controller.enums.NamedEntitiesEnum;
+import controller.enums.PersonDataEnum;
+import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
-import controller.filter.AbsSingleFilter;
 import model.DBManager;
 import model.DBOperationEnum;
 import model.DBTablesEnum;
@@ -33,6 +36,13 @@ public class DataManager {
 	}
 
 	/**
+	 * Clears all named entities, forces the data manager to query them again
+	 */
+	public void clearAllNamedEntities() {
+		namedEntities.clear();
+	}
+	
+	/**
 	 * Delete a movie from the database
 	 * @param id - The id to delete
 	 * @return True - If delete succeeded, Else - Otherwise
@@ -42,18 +52,17 @@ public class DataManager {
 		return DBManager.getInstance().sendMovieToDB(DBOperationEnum.DeleteMovie, new MovieEntity(id));
 	}
 	
-	public MovieEntity getMovieById(int id) {
-		if (id != 0)
-			return DBManager.getInstance().getMovieById(id);
-		else 
-			return null;
-	}
-	
-	public PersonEntity getPersonById(int id) {
-		if (id != 0)
-			return DBManager.getInstance().getPersonById(id);
-		else 
-			return null;
+	/**
+	 * This function gets a list of named entities
+	 * It doesn't go to the db for every call, just one time 
+	 * TODO: In the future we might want to put a timeout on the data
+	 * @param name
+	 * @return
+	 */
+	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
+		if(!namedEntities.containsKey(name))
+			namedEntities.put(name, db.getAllNamedEntities(name));
+		return namedEntities.get(name);
 	}
 	
 	/**
@@ -71,30 +80,65 @@ public class DataManager {
 		return getFilterFromDB(entity, value, value2);
 	}
 	
-	/*public AbsSingleFilter getInsertFilter(InsertEntitiesEnum entity, String value) {
-		return getInsertFilterFromDB(entity, value);
-	}*/
+	public MovieEntity getMovieById(int id) {
+		if (id != 0)
+			return DBManager.getInstance().getMovieById(id);
+		else 
+			return null;
+	}
+	
+	/**
+	 * This function gets various data about a movie
+	 * @param dataType - Which data to get
+	 * @param id - The movie id
+	 * @return A list of data objects
+	 */
+	public List<AbsType> getMovieData(MovieDataEnum dataType, int id) {
+		if (id != 0)
+			return db.getMovieData(dataType, String.valueOf(id));
+		else 
+			return null;
+	}
+	
+	public PersonEntity getPersonById(int id) {
+		if (id != 0)
+			return DBManager.getInstance().getPersonById(id);
+		else 
+			return null;
+	}
 
 	/**
-	 * This function gets a list of named entities
-	 * It doesn't go to the db for every call, just one time 
-	 * TODO: In the future we might want to put a timeout on the data
-	 * @param name
-	 * @return
+	 * This function gets various data about a person
+	 * @param dataType - Which data to get
+	 * @param id - The person id
+	 * @return List of data objects
 	 */
-	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
-		if(!namedEntities.containsKey(name))
-			namedEntities.put(name, db.getAllNamedEntities(name));
-		return namedEntities.get(name);
+	public List<AbsType> getPersonData(PersonDataEnum dataType, int id) {
+		if (id != 0)
+			return db.getPersonData(dataType, String.valueOf(id));
+		else 
+			return null;
+	}
+	/**
+	 * This function inserts a new movie data object
+	 * @param dataType - Type of data
+	 * @param dataObject - Data
+	 * @return - True if successfully inserted, False - Otherwise
+	 */
+	public Boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject) {
+		return db.insertMovieData(dataType, dataObject);
 	}
 	
 	/**
-	 * Clears all named entities, forces the data manager to query them again
+	 * This function inserts a new person data object
+	 * @param dataType - Type of data
+	 * @param dataObject - Data
+	 * @return - True if successfully inserted, False - Otherwise
 	 */
-	public void clearAllNamedEntities() {
-		namedEntities.clear();
+	public boolean insertPersonData(PersonDataEnum dataType, AbsType dataObject) {
+		return db.insertPersonData(dataType, dataObject);
 	}
-	
+
 	/**
 	 * Save the movie (Update or Insert according to movie id)
 	 * @param movie - The movie to update/insert
@@ -113,7 +157,7 @@ public class DataManager {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Search function - Gets a list of filters and an entity
 	 * @param entity - The entity to search on
@@ -135,6 +179,7 @@ public class DataManager {
 				return null;
 		}
 	}
+	
 	/**
 	 * Search movies using filters
 	 * @param arlFilters - List of filters for WHERE clause
@@ -147,66 +192,5 @@ public class DataManager {
 	
 	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
 		return db.getSearchFilter(entity, value, value2);
-	}
-
-	/*private AbsSingleFilter getFilterFromDB(InsertEntitiesEnum entity, String value) {
-		return db.getSearchFilter(entity, value);
-	}
-	
-	@ Deprecated
-	public List<NamedRelation> getNamedRelationsById(String movieId, NamedRelationsEnum rel) {
-		AbsSingleFilter filter = db.getSearchFilter(SearchEntitiesEnum.MOVIE_GOOFS, movieId);
-		switch (rel){
-		case GOOFS:
-			return db.getNamedRalations(filter);
-		}	
-		return null;
-	}
-
-	@ Deprecated
-	public List<GeoEntity> getGeoEntities(String movieId,
-										  SearchEntitiesEnum entity) {
-		AbsSingleFilter filter = db.getSearchFilter(SearchEntitiesEnum.MOVIE_AKAS, movieId);
-		switch (entity){
-		case MOVIE_AKAS:
-			//return db.getGeoEntities(filter);
-		}
-		return null;
-	}
-
-	@ Deprecated
-	public List<NamedEntity> getNamedEntity(NamedEntitiesEnum entity,
-										    String id) {
-		AbsSingleFilter filter = db.getFilter(entity, id);
-		return db.getNamedEntities(filter);
-	}
-	*/
-	
-	/**
-	 * This function gets various data about a movie
-	 * @param data - Which data to get
-	 * @param id - The movie id
-	 * @return A list of objects that are NamedEntity or its children
-	 */
-	public List<AbsDataType> getMovieData(MovieDataEnum data, int id) {
-		if (id != 0)
-			return db.getMovieData(data, String.valueOf(id));
-		else 
-			return null;
-	}
-	
-	public List<AbsDataType> getPersonData(PersonDataEnum data, int id) {
-		if (id != 0)
-			return db.getPersonData(data, String.valueOf(id));
-		else 
-			return null;
-	}
-	
-	public boolean savePersonData(PersonDataEnum data, AbsDataType type) {
-			return db.insertAbsDataType(data, type);
-	}
-
-	public void sendMovieData(MovieDataEnum movie_genres, AbsDataType t) {
-		db.sendMovieData(movie_genres, t);
 	}
 }

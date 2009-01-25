@@ -1,4 +1,4 @@
-package controller;
+package controller.enums;
 
 /**
  * This enum is used to help the view select which entity filter

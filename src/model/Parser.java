@@ -1,7 +1,7 @@
 package model;
 import java.io.*;
 
-import controller.ListFilesEnum;
+import controller.enums.ListFilesEnum;
 
 public class Parser {
 

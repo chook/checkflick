@@ -3,21 +3,19 @@ package model;
 import java.util.regex.*;
 import java.util.*;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import controller.ImportHandler;
-import controller.ListFilesEnum;
-import controller.NamedEntitiesEnum;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
 import controller.entity.NamedRelation;
-import controller.filter.AbsSingleFilter;
+import controller.enums.ListFilesEnum;
+import controller.enums.NamedEntitiesEnum;
 
 public class DataImporter {
 
 	private Map<ListFilesEnum, String> listfilesMap;
 	static int PSTMT_BATCH_SIZE = 15000;
-	static int SELECT_BUCKET_SIZE = 50000;
+	static int SELECT_BUCKET_SIZE = 500000;
 	
 	// languagePattern explanation:
 	// [^\"] 							- ignore lines that start with '"' (since they are TV shows)
@@ -283,70 +281,33 @@ public class DataImporter {
 		do {
 			// retrieving part of the movies list to put inside a map
 			// since the movie list is huge, we select buckets and iterate over all of them
-			moviesResultSet = DBManager.getInstance().getAllMovies(moviesStartRow, moviesEndRow);
-			// checking if we have already reached the end of the entries list in the DB
-			try {
-				if (!moviesResultSet.next())
-					isEmpty = true;
-			} catch (SQLException e) {
-				e.printStackTrace();			
-			}
+			moviesMap = DBManager.getInstance().getAllMovies(moviesStartRow, moviesEndRow);
+			if (moviesMap == null)
+				isEmpty = true;
 			
 			if (!isEmpty) {
-				try {
-					// run over the Result Set, and enter all the movies there to the moviesMap
-					tempMoviesSetCounter = 1;
-					for (int i = 1; i < 50001; ++i) {
-						if (i % 5000 == 0)
-							System.out.println("temp - reached element no. " + i);
-					}
-					System.out.println("moviesMap size = " + moviesMap.size());
-					System.out.println("trying to change setFetchSize");
-					System.out.println(moviesResultSet.getFetchSize());
-					moviesResultSet.setFetchSize(1000);
-					moviesMap = new HashMap<String, Integer>();
-					while (moviesResultSet.next()) {
-						if (moviesMap.size() == 0)
-							System.out.println("moviesMap.size = 0");
-						if (moviesMap.size() == 100)
-							System.out.println("moviesMap.size = 100");
-						tempMovieId = moviesResultSet.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
-						tempMovieDBName = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
-						tempMovieDBYear = moviesResultSet.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
-						tempMovieRomanNotation = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName());
-						tempMovieMadeFor = moviesResultSet.getString(DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
-						if (tempMovieDBYear == 0)
-							tempMovieYear = "????";
-						else
-							tempMovieYear = String.valueOf(tempMovieDBYear);
-						
-						// rebuilding the movie name as it appears on the lists, for comparing
-						movieNameBuilder = new StringBuilder(tempMovieDBName);
-						movieNameBuilder.append(" (").append(tempMovieYear);
-						if (tempMovieRomanNotation != null)
-							movieNameBuilder.append("/").append(tempMovieRomanNotation);
-						movieNameBuilder.append(")");
-						if (tempMovieMadeFor != null)
-							movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
-						tempMovieName = movieNameBuilder.toString();
-						
+				// run over the Result Set, and enter all the movies there to the moviesMap
+				tempMoviesSetCounter = 1;
+				for (int i = 1; i < 50001; ++i) {
+					if (i % 5000 == 0)
+						System.out.println("temp - reached element no. " + i);
+				}
+				System.out.println("moviesMap size = " + moviesMap.size());
+				//System.out.println("trying to change setFetchSize");
+				//System.out.println(moviesResultSet.getFetchSize());
+				
 //						tempMovieName = "name";
 //						tempMovieId = 1;
-						if (moviesMap.size() == 0)
-							System.out.println("before putting first element");
-						moviesMap.put(tempMovieName, tempMovieId);
-						if (moviesMap.size() == 1)
-							System.out.println("after putting first element");
-						if (moviesMap.size() == 10)
-							System.out.println("moviesMap.size = 10");
-						if (tempMoviesSetCounter % 5000 == 0)
-							System.out.println("moviesMap - reached element no. " + tempMoviesSetCounter);
-						++tempMoviesSetCounter;
-					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//					if (moviesMap.size() == 0)
+//						System.out.println("before putting first element");
+//					
+//					if (moviesMap.size() == 1)
+//						System.out.println("after putting first element");
+//					if (moviesMap.size() == 10)
+//						System.out.println("moviesMap.size = 10");
+//					if (tempMoviesSetCounter % 5000 == 0)
+//						System.out.println("moviesMap - reached element no. " + tempMoviesSetCounter);
+					++tempMoviesSetCounter;
 				
 				parser.loadFile(listfilesMap.get(ListFilesEnum.LANGUAGES), ListFilesEnum.LANGUAGES);
 				// Making sure we find the start of the list
@@ -368,20 +329,23 @@ public class DataImporter {
 							}
 						}
 						// every 10,000 movies, flush the results via one prepared statement batch to the DB 
-						if ((movieLanguagesSet.size() > 0) && (movieLanguagesSet.size() % PSTMT_BATCH_SIZE == 0)) {
+						/*if ((movieLanguagesSet.size() > 0) && (movieLanguagesSet.size() % PSTMT_BATCH_SIZE == 0)) {
 							System.out.println("got to line " + parser.getLineNumber() + ", uploading to DB...");
 							System.out.println("Inserting " + movieLanguagesSet.size() + " elements to the DB");
 //							DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieLanguagesSet, DBTablesEnum.MOVIE_LANGUAGES, DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID);
 							totalElementsNum += movieLanguagesSet.size();
 							movieLanguagesSet.clear();
-						}
+						}*/
 					}
 					
 					System.out.println("Inserting " + movieLanguagesSet.size() + " elements to the DB");
 //					DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieLanguagesSet, DBTablesEnum.MOVIE_LANGUAGES, DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID);
 					totalElementsNum += movieLanguagesSet.size();
 					movieLanguagesSet.clear();
-					System.out.println("movieLanguagesSet's size after clearing is " + movieLanguagesSet.size());
+					moviesMap.clear();
+					moviesMap = null;
+					System.gc();
+					//System.out.println("movieLanguagesSet's size after clearing is " + movieLanguagesSet.size());
 					
 					System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 		
@@ -391,12 +355,7 @@ public class DataImporter {
 			moviesStartRow += SELECT_BUCKET_SIZE;
 			moviesEndRow += SELECT_BUCKET_SIZE;
 			parser.closeFile();
-			moviesMap.clear();
-			try {
-				moviesResultSet.close();
-			} catch (SQLException e){
-				e.printStackTrace();
-			}
+			//moviesMap.clear();
 			System.gc();
 		} while (!isEmpty);
 

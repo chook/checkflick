@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Chook
  * 
  */
-public class NamedRelation extends AbsRelation {
+public class NamedRelation extends Relation {
 	protected String name;
 
 	/**

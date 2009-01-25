@@ -1,7 +1,7 @@
 /**
  * 
  */
-package controller;
+package controller.enums;
 
 /**
  * @author Nadav Shamgar
