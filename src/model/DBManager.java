@@ -2,6 +2,7 @@ package model;
 
 import java.sql.*;
 import java.util.*;
+
 import controller.filter.*;
 import controller.entity.*;
 import controller.enums.*;
@@ -12,9 +13,9 @@ public class DBManager {
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 	private static int CONNECTION_MAX_CONNECTIONS = 6;
 /** Chen's home server 1	**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-//	private static String CONNECTION_USERNAME = "chook";
-//	private static String CONNECTION_PASSWORD = "shoochi";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+	private static String CONNECTION_USERNAME = "chook";
+	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
 //	private static String CONNECTION_USERNAME = "chenhare";
@@ -24,9 +25,9 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-	private static String CONNECTION_USERNAME = "nadavsh2";
-	private static String CONNECTION_PASSWORD = "nadavsh2";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_USERNAME = "nadavsh2";
+//	private static String CONNECTION_PASSWORD = "nadavsh2";
 
 	// The strings for prepared statements
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
@@ -62,7 +63,7 @@ public class DBManager {
 	private OracleFilterManager filters = null;
 
 	/**
-	 * DWefault Constructor - Initiates the connection pool
+	 * Default Constructor - Initiates the connection pool
 	 */
 	protected DBManager() {
 		pool = DBConnectionPool.getInstance(CONNECTION_URI, 
@@ -80,14 +81,16 @@ public class DBManager {
 	 * @param filter - The single filter to build the query
 	 * @return a list of data types of data (encapsulated)
 	 */
-	public List<AbsType> getAbsDataType(EntityEnum data, AbsSingleFilter filter) {
+	public List<AbsType> getAbsDataType(EntityEnum data, AbsFilter filter) {
 		return getAbsDataType(data, filter, null);
 	}
-	public List<AbsType> getAbsDataType(EntityEnum data, AbsSingleFilter filter, AbsSingleFilter filter2) {
+	public List<AbsType> getAbsDataType(EntityEnum data, AbsFilter filter, AbsFilter filter2) {
 		Connection conn = pool.getConnection();
 		List<AbsType> retList = new ArrayList<AbsType>();
 		Statement stmt;
 		ResultSet resultSet;
+		Set<String> tablesSet = null;
+		int i = 0;
 		StringBuffer sbQuery = new StringBuffer();
 		sbQuery.append(SELECT_GENERIC_STMT);
 		
@@ -101,11 +104,20 @@ public class DBManager {
 
 		// Executing the query and building the movies array
 		try {
-			sbQuery.append(filter.getTable());
+			/*sbQuery.append(filter.getTable());
 			if(filter2 != null && filter.getTable() != filter2.getTable()) {
 				sbQuery.append(", ");
 				sbQuery.append(filter.getTable());
+			}*/
+			tablesSet = filter.toTablesSet();
+			for(String s: tablesSet) {
+				++i;
+				sbQuery.append(s);
+				if(i < tablesSet.size()) {
+					sbQuery.append(", ");
+				}
 			}
+				
 			sbQuery.append(" WHERE ");
 			sbQuery.append(filter);
 			if(filter2 != null) {
@@ -283,13 +295,12 @@ public class DBManager {
 	 * @return the list of data types
 	 */
 	public List<AbsType> getMovieData(MovieDataEnum data, String id) {
-		AbsSingleFilter filter = filters.getMovieDataFilter(data, id);
+		AbsFilter filter = filters.getMovieDataFilter(data, id);
 		List<AbsType> list = null;
 		switch(data) {
 		case MOVIE_AKAS:
 			list = getAbsDataType(EntityEnum.GEO_ENTITY, filter);
 			break;
-		
 		case MOVIE_GENRES:
 		case MOVIE_LANGUAGES:
 		case MOVIE_COUNTRIES:
@@ -307,7 +318,10 @@ public class DBManager {
 			list = getAbsDataType(EntityEnum.CATEGORIZED_RELATION, filter);
 			break;
 		case MOVIE_CAST:
-			list = getAbsDataType(EntityEnum.CASTING_RELATION, filter);
+			list = getAbsDataType(EntityEnum.NAMED_CASTING_RELATION, filter);
+			break;
+		case MOVIE:
+			list = getAbsDataType(EntityEnum.MOVIE_ENTITY, filter);
 			break;
 		}
 		return list;
@@ -349,7 +363,7 @@ public class DBManager {
 	 * @return the list of data type
 	 */
 	public List<AbsType> getPersonData(PersonDataEnum data, String id) {
-		AbsSingleFilter filter = filters.getPersonDataFilter(data, id);
+		AbsFilter filter = filters.getPersonDataFilter(data, id);
 		List<AbsType> list = null;
 		switch(data) {
 		case PERSON_AKAS:
@@ -358,8 +372,10 @@ public class DBManager {
 			list = getAbsDataType(EntityEnum.NAMED_ENTITY, filter);
 			break;
 		case PERSON_ROLES:
-			list = getAbsDataType(EntityEnum.CASTING_RELATION, filter);
+			list = getAbsDataType(EntityEnum.NAMED_CASTING_RELATION, filter);
 			break;
+		case PERSON:
+			list = getAbsDataType(EntityEnum.PERSON_ENTITY, filter);
 		}
 		
 		return list;
@@ -378,6 +394,49 @@ public class DBManager {
 	}
 
 	
+	/**
+	 * This function inserts a movie data into the DB
+	 * @param dataType - Which movie data to insert
+	 * @param dataObject - The movie data itself
+	 * @return
+	 */
+	public boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject, boolean update) {
+		List<AbsSingleFilter> filterList = filters.getMovieInsertFilter(dataType, dataObject);
+		EntityEnum entity = null;
+		switch(dataType) {
+		case MOVIE_QUOTES:
+		case MOVIE_CRAZY_CREDITS:
+		case MOVIE_TRIVIA:
+			entity = EntityEnum.NAMED_ENTITY;
+			break;
+		case MOVIE_CAST:
+			entity = EntityEnum.CASTING_RELATION;
+			break;
+		case MOVIE:
+			entity = EntityEnum.MOVIE_ENTITY;
+			break;
+		case MOVIE_AKAS:
+			entity = EntityEnum.GEO_ENTITY;
+			break;
+		case MOVIE_CONNECTIONS:
+			entity = EntityEnum.CATEGORIZED_RELATION;
+			break;
+		case MOVIE_GOOFS:
+			entity = EntityEnum.NAMED_RELATION;
+			break;
+		case MOVIE_LANGUAGES:
+		case MOVIE_GENRES:
+		case MOVIE_COUNTRIES:
+			entity = EntityEnum.RELATION;
+			break;
+		}
+		if(update) {
+			return updateAbsDataType(entity, filterList);
+		} else {
+			return insertAbsDataType(entity, filterList);
+		}
+	}
+
 	/**
 	 * This function receives a set of NamedEntities, and a definition of a table, and
 	 * adds all the values to the DB with one PreparedStatementBatch
@@ -419,7 +478,7 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;
 	}
-
+	
 	/**
 	 * This function receives a set of values, and a definition of a table, and
 	 * adds all the values to the DB with one PreparedStatementBatch
@@ -465,6 +524,35 @@ public class DBManager {
 	}
 
 	/**
+	 * This function inserts a person data into the DB
+	 * @param dataType - Which person data to insert
+	 * @param dataObject - The person data itself
+	 * @return
+	 */
+	public boolean insertPersonData(PersonDataEnum dataType, AbsType dataObject, boolean update) {
+		List<AbsSingleFilter> filterList = filters.getPersonInsertFilter(dataType, dataObject);
+		EntityEnum entity = null;
+		switch(dataType) {
+		case PERSON_AKAS:
+		case PERSON_QUOTES:
+		case PERSON_TRIVIA:
+			entity = EntityEnum.NAMED_ENTITY;
+			break;
+		case PERSON_ROLES:
+			entity = EntityEnum.CASTING_RELATION;
+			break;
+		case PERSON:
+			entity = EntityEnum.PERSON_ENTITY;
+			break;
+		}
+		if (update) {
+			return updateAbsDataType(entity, filterList);
+		} else {
+			return insertAbsDataType(entity, filterList);
+		}
+	}
+
+	/**
 	 * This function receives a set of values, and a definition of a table, and
 	 * adds all the values to the DB with one PreparedStatementBatch
 	 * This refers to the LANGUAGES, COUNTRIES & GENRES tables
@@ -501,14 +589,14 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;
 	}
-
+	
 	/**
 	 * The search function - searches movies/persons
 	 * @param arlFilters - List of filters
 	 * @param tableToSearch - The table to search
 	 * TODO: Change this function a little bit, we know which table we use from the filters,
 	 * no need to send it as an extra parameter (Chen 24.01.09)
-	 * @return List of search objects (TODO: DatedEntity in the future)
+	 * @return List of search objects
 	 */
 	public List<DatedEntity> search(List<AbsFilter> arlFilters,
 			DBTablesEnum tableToSearch) {
@@ -561,101 +649,6 @@ public class DBManager {
 	}
 
 	/**
-	 * This function inserts a movie data into the DB
-	 * @param dataType - Which movie data to insert
-	 * @param dataObject - The movie data itself
-	 * @return
-	 */
-	public Boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject) {
-		List<AbsSingleFilter> filterList = filters.getMovieInsertFilter(dataType, dataObject);
-		switch(dataType) {
-		case MOVIE_COUNTRIES:
-		case MOVIE_QUOTES:
-		case MOVIE_GENRES:
-			return insertAbsDataType(EntityEnum.NAMED_ENTITY, filterList);
-		case MOVIE_CAST:
-			return insertAbsDataType(EntityEnum.CASTING_RELATION, filterList);
-		}
-		return false;
-	}
-	
-	/**
-	 * This function inserts a person data into the DB
-	 * @param dataType - Which person data to insert
-	 * @param dataObject - The person data itself
-	 * @return
-	 */
-	public Boolean insertPersonData(PersonDataEnum dataType, AbsType dataObject) {
-		List<AbsSingleFilter> filterList = filters.getPersonInsertFilter(dataType, dataObject);
-		switch(dataType) {
-		case PERSON_AKAS:
-		case PERSON_QUOTES:
-		case PERSON_TRIVIA:
-			return insertAbsDataType(EntityEnum.NAMED_ENTITY, filterList);
-		case PERSON_ROLES:
-			return insertAbsDataType(EntityEnum.CASTING_RELATION, filterList);
-		}
-		return false;
-	}
-
-	/**
-	 * This function used to send a movie query into the DB. The function
-	 * supports Insert/Update/Delete
-	 * 
-	 * @param oper
-	 *            - The operation to do
-	 * @param movie
-	 *            - The movie to send
-	 * @return If the operation was successful or not TODO: Check this function
-	 *         (22/01/09)
-	 */
-	public boolean sendMovieToDB(DBOperationEnum oper, MovieEntity movie) {
-		PreparedStatement pstmt = null;
-		boolean bReturn = false;
-		Connection conn = pool.getConnection();
-		switch (oper) {
-		case InsertMovie: {
-			try {
-				pstmt = conn.prepareStatement(INSERT_MOVIE_PSTMT);
-				pstmt.setInt(0, movie.getId());
-				pstmt.setString(1, movie.getName());
-				pstmt.setInt(2, movie.getYear());
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-		case DeleteMovie: {
-			try {
-				pstmt = conn.prepareStatement(DELETE_MOVIE_PSTMT);
-				pstmt.setInt(1, movie.getId());
-			} catch (SQLException e) {
-				System.out.println(e.getMessage());
-			}
-			break;
-		}
-		case UpdateMovie: {
-			try {
-				pstmt = conn.prepareStatement(UPDATE_MOVIE_PSTMT);
-
-				// TODO: Get the "set" clause
-				pstmt.setString(1, movie.getName());
-
-				pstmt.setInt(2, movie.getId());
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-		}
-		bReturn = executePreparedStatement(pstmt);
-		pool.returnConnection(conn);
-		return bReturn;
-	}
-
-	/**
 	 * executes the executePreparedStatement
 	 */
 	private boolean executePreparedStatement(PreparedStatement pstmt) {
@@ -693,7 +686,17 @@ public class DBManager {
 		}
 		return true;
 	}
-	
+
+	private DatedEntity fillDatedSearchResult(ResultSet set, DBTablesEnum table) {
+		switch (table) {
+		case MOVIES:
+			return fillMovieSearchResult(set);
+		case PERSONS:
+			return fillPersonSearchResult(set);
+		}
+		return null;
+	}
+
 	private MovieEntity fillMovieFromSet(ResultSet set) {
 		MovieEntity movie = null;
 		try {
@@ -713,7 +716,7 @@ public class DBManager {
 		}
 		return movie;
 	}
-	
+
 	private DatedEntity fillMovieSearchResult(ResultSet set) {
 		DatedEntity retEntity = null;
 		try {
@@ -725,7 +728,7 @@ public class DBManager {
 			return null;
 		}
 	}
-
+	
 	private PersonEntity fillPersonFromSet(ResultSet set) {
 		PersonEntity person = null;
 		try {
@@ -749,7 +752,7 @@ public class DBManager {
 		}
 		return person;
 	}
-
+	
 	private DatedEntity fillPersonSearchResult(ResultSet set) {
 		DatedEntity retEntity = null;
 		try {
@@ -760,85 +763,6 @@ public class DBManager {
 		} catch (SQLException e) {
 			return null;
 		}
-	}
-
-	private DatedEntity fillDatedSearchResult(ResultSet set, DBTablesEnum table) {
-		switch (table) {
-		case MOVIES:
-			return fillMovieSearchResult(set);
-		case PERSONS:
-			return fillPersonSearchResult(set);
-		}
-		return null;
-	}
-	
-	/**
-	 * Private method to parse a where clause from the filters
-	 * 
-	 * @param arlFilters
-	 * @return a WHERE clause to use in SELECT statements
-	 */
-	private String parseClauseFromFilters(List<AbsFilter> arlFilters) {
-		StringBuilder stbFilter = new StringBuilder();
-		StringBuilder fromClause = new StringBuilder();
-		int i = 0;
-		int filterCounter = 0;
-
-		// Get the tables names we need
-		Set<String> tablesSet = new HashSet<String>();
-
-		// Building the WHERE clause
-		if (arlFilters.size() > 0) {
-			stbFilter.append(" WHERE ");
-			for (AbsFilter filter : arlFilters) {
-				if(filter != null) {
-					++filterCounter;
-					// Making sure the clause won't end with an AND
-					if (filterCounter != 1) {
-						stbFilter.append(" AND ");
-					}
-					stbFilter.append(filter);
-					tablesSet.addAll(filter.toTablesSet());
-				}
-			}
-		}
-		
-		for (String tableName : tablesSet) {
-			++i;
-			fromClause.append(tableName);
-			if (i < tablesSet.size())
-				fromClause.append(", ");
-		}
-		fromClause.append(stbFilter);
-		return fromClause.toString();
-	}
-	
-	/**
-	 * This function is a factory for data types
-	 * @param rs - The tuple to parse
-	 * @param entity - The type of tuple
-	 * @return - The data type
-	 */
-	private AbsType resultSetToAbsEntity(ResultSet rs, EntityEnum entity) {
-		try {
-			switch(entity) {
-			case NAMED_ENTITY:
-				return new NamedEntity(rs.getInt(1), rs.getString(2));
-			case GEO_ENTITY:
-				return new GeoEntity(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4));
-			case NAMED_RELATION:
-				return new NamedRelation(rs.getInt(1), rs.getInt(2), rs.getString(3));
-			case CATEGORIZED_RELATION:
-				return new CategorizedRelation(rs.getInt(1), rs.getInt(2), rs.getInt(3));
-			case CASTING_RELATION:
-				return new CastingRelation(rs.getInt(1), rs.getInt(2), rs.getInt(3),
-										   (rs.getString(4).equals("Y") ? true : false), rs.getString(5), rs.getInt(6));
-			}
-		}
-		catch (SQLException e) {
-			System.out.println("Error in resultSetToAbsEntity");
-		}
-		return null;
 	}
 
 	/**
@@ -882,6 +806,169 @@ public class DBManager {
 			stbQuery.append("(").append(strFields).append(")");
 			stbQuery.append(" VALUES ");
 			stbQuery.append("(").append(strValues).append(")");
+			stmt.executeUpdate(stbQuery.toString());
+		} catch (SQLException e) {
+			return false;
+		}
+		pool.returnConnection(conn);
+		return true;
+	}
+
+	/**
+	 * Private method to parse a where clause from the filters
+	 * 
+	 * @param arlFilters
+	 * @return a WHERE clause to use in SELECT statements
+	 */
+	private String parseClauseFromFilters(List<AbsFilter> arlFilters) {
+		StringBuilder stbFilter = new StringBuilder();
+		StringBuilder fromClause = new StringBuilder();
+		int i = 0;
+		int filterCounter = 0;
+
+		// Get the tables names we need
+		Set<String> tablesSet = new HashSet<String>();
+
+		// Building the WHERE clause
+		if (arlFilters.size() > 0) {
+			stbFilter.append(" WHERE ");
+			for (AbsFilter filter : arlFilters) {
+				if(filter != null) {
+					++filterCounter;
+					// Making sure the clause won't end with an AND
+					if (filterCounter != 1) {
+						stbFilter.append(" AND ");
+					}
+					stbFilter.append(filter);
+					tablesSet.addAll(filter.toTablesSet());
+				}
+			}
+		}
+		
+		for (String tableName : tablesSet) {
+			++i;
+			fromClause.append(tableName);
+			if (i < tablesSet.size())
+				fromClause.append(", ");
+		}
+		fromClause.append(stbFilter);
+		return fromClause.toString();
+	}
+
+	/**
+	 * This function is a factory for data types
+	 * @param rs - The tuple to parse
+	 * @param entity - The type of tuple
+	 * @return - The data type
+	 */
+	private AbsType resultSetToAbsEntity(ResultSet rs, EntityEnum entity) {
+		try {
+			switch(entity) {
+			case NAMED_ENTITY:
+				return new NamedEntity(rs.getInt(1), rs.getString(2));
+			case GEO_ENTITY:
+				return new GeoEntity(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4));
+			case NAMED_RELATION:
+				return new NamedRelation(rs.getInt(1), rs.getInt(2), rs.getString(3));
+			case CATEGORIZED_RELATION:
+				return new CategorizedRelation(rs.getInt(1), rs.getInt(2), rs.getInt(3));
+			case CASTING_RELATION:
+				return new CastingRelation(rs.getInt(1), rs.getInt(2), rs.getInt(3),
+										   (rs.getString(4).equals("Y") ? true : false), rs.getString(5), rs.getInt(6));
+			case NAMED_CASTING_RELATION:
+				return new NamedCastingRelation(rs.getInt(1), rs.getInt(2),
+						rs.getInt(3),(rs.getString(4).equals("Y") ? true : false), rs.getString(5), rs.getInt(6),rs.getString(8));
+			case MOVIE_ENTITY:
+				return fillMovieFromSet(rs);
+			case PERSON_ENTITY:
+				return fillPersonFromSet(rs);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("Error in resultSetToAbsEntity");
+		}
+		return null;
+	}
+
+	private boolean updateAbsDataType(EntityEnum entity,
+			  						List<AbsSingleFilter> filterList) {							
+		Connection conn = pool.getConnection();
+		Statement stmt = null;
+		StringBuffer stbQuery = new StringBuffer();
+		StringBuffer stbWhere = new StringBuffer();
+		int i = 0;
+		
+		// Trying to get a connection statement
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	
+		// Executing the query and building the movies array
+		try {
+			stbQuery.append("UPDATE ");
+			for (AbsSingleFilter filter : filterList) {
+				++i;
+				if(i == 1) {
+					stbQuery.append(filter.getTable());
+					stbQuery.append(" SET ");
+					stbWhere.append(" WHERE ");
+					stbWhere.append(filter.getColumn());
+					stbWhere.append("=");
+					stbWhere.append(filter.getValue());
+				} 
+				stbQuery.append(filter.getColumn());
+				stbQuery.append("=");
+				stbQuery.append(filter.getValue());
+				
+				if (i < filterList.size()) {
+					stbQuery.append(",");
+				}
+			}
+			stbQuery.append(stbWhere);
+			stmt.executeUpdate(stbQuery.toString());
+		} catch (SQLException e) {
+			return false;
+		}
+		pool.returnConnection(conn);
+		return true;
+	}
+
+	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType dataObject) {
+		return deleteAbsDataType(filters.getMovieDeleteFilter(dataType, dataObject));
+	}
+
+	private boolean deleteAbsDataType(List<AbsSingleFilter> filterList) {
+		Connection conn = pool.getConnection();
+		Statement stmt = null;
+		StringBuffer stbQuery = new StringBuffer();
+		int i = 0;
+		
+		// Trying to get a connection statement
+		try {
+			stmt = conn.createStatement();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	
+		// Executing the query and building the movies array
+		try {
+			stbQuery.append("DELETE FROM ");
+			for (AbsSingleFilter filter : filterList) {
+				++i;
+				if(i == 1) {
+					stbQuery.append(filter.getTable());
+					stbQuery.append(" WHERE ");
+				} 
+				stbQuery.append(filter.getColumn());
+				stbQuery.append("=");
+				stbQuery.append(filter.getValue());
+				
+				if (i < filterList.size()) {
+					stbQuery.append(" AND ");
+				}
+			}
 			stmt.executeUpdate(stbQuery.toString());
 		} catch (SQLException e) {
 			return false;

@@ -56,7 +56,7 @@ public class NamedEntity extends AbsType {
 	@Override
 	public List<String> toStringList() {
 		List<String> list = super.toStringList();
-		list.add(String.valueOf(getName()));
+		list.add(getName());
 		return list;
 	}
 	
