@@ -1,6 +1,7 @@
 package controller.entity;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Person Entity
@@ -217,5 +218,25 @@ public class PersonEntity extends NamedEntity {
 		this.height = height;
 		this.trademark = trademark;
 		this.biography = biography;
+	}
+
+	/* (non-Javadoc)
+	 * @see controller.entity.NamedEntity#toStringList()
+	 */
+	@Override
+	public List<String> toStringList() {
+		List<String> list = super.toStringList();
+		list.add(personRealName);
+		list.add(personNickNames);
+		list.add((dateOfBirth == null) ? null : dateOfBirth.toString());
+		list.add(String.valueOf(yearOfBirth));
+		list.add(cityOfBirth);
+		list.add(String.valueOf(countryOfBirth));
+		list.add((dateOfDeath == null) ? null : dateOfDeath.toString());
+		list.add(String.valueOf(yearOfDeath));
+		list.add(String.valueOf(height));
+		list.add(trademark);
+		list.add(biography);
+		return list;
 	}
 }

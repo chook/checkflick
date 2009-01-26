@@ -1,6 +1,7 @@
 package controller.enums;
 
 public enum MovieDataEnum {
+	MOVIE,
 	MOVIE_AKAS,
 	MOVIE_GOOFS,
 	MOVIE_COUNTRIES,

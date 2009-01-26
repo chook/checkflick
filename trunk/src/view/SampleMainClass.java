@@ -1,6 +1,7 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,16 +24,22 @@ public class SampleMainClass {
 	/**
 	 * @param args
 	 */
+	//public static DataManager dm = null;
 	public static void main(String[] args) {
 		// Creates a GUI thread
 		//testDBManager();
+//		DataManager dm = new DataManager();
+//		dm.start();
+		//ControllerInterface c = new ControllerInterface();
+		//c.start();
 		
-		testDataManager();
 		Thread guiThread = new SampleRibbonThread();
 		guiThread.start();
-		
 		try {
-			// This is a join try
+			//Thread.sleep(2000);
+			testDataManager();
+		// This is a join try
+			
 			guiThread.join(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -144,11 +151,13 @@ public class SampleMainClass {
 		
 		
 		List<AbsType> mappear = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movieId);
-		System.out.println("good cast :" + mappear.toString());
+		System.out.println("good cast of movie:" + mappear.toString());
+
+		List<AbsType> pappear = dm.getPersonData(PersonDataEnum.PERSON_ROLES, 7);
+		System.out.println("good movies of person:" + pappear.toString());
+
+		//List<AbsType> mcast = dm.getMovieData(MovieDataEnum.MOVIE_CAST, id)
 		
-		/**
-		 * Try to find goofs
-		 */
 		//List<NamedRelation> goofs = dm.getNamedRelationsById(String.valueOf(movieId),
 		//													 NamedRelationsEnum.GOOFS);
 		//System.out.println("goofs count " + goofs.size());
@@ -159,11 +168,23 @@ public class SampleMainClass {
 		//dm.savePersonData(PersonDataEnum.PERSON_QUOTES, t);
 		
 		//dm.getInsertFilter(InsertEntitiesEnum.MOVIE_QUOTE, value)
-		AbsType t = new NamedEntity(7, "Trying to insert a person quote!");
-		dm.insertPersonData(PersonDataEnum.PERSON_QUOTES, t);
+		//AbsType t = new NamedEntity(7, "Trying to insert a person quote!");
+		//dm.insertPersonData(PersonDataEnum.PERSON_QUOTES, t);
 		//dm.sendMovieData(MovieDataEnum.MOVIE_QUOTES, t);
 		
-		t = new CastingRelation(7, 43, 1, true, "Shrek", 1);
-		System.out.println(dm.insertMovieData(MovieDataEnum.MOVIE_CAST, t));
+		//AbsType t = new CastingRelation(7, 43, 1, true, "Shrek", 1);
+		//System.out.println(dm.insertMovieData(MovieDataEnum.MOVIE_CAST, t));
+		
+		//AbsType nadav = new PersonEntity(0, "Nadav Shamgar", "Nash-Control","DjNash",
+		//				null, 1982, "Tel-Aviv",1,null, 0, 160, "Fuckbook", "Some isoteric data here");
+		//System.out.println(dm.insertPersonData(PersonDataEnum.PERSON, nadav));
+		
+		//dm.updatePersonData(PersonDataEnum.PERSON, p);
+		
+		//AbsType shindlist = new MovieEntity(0, "Shindler's list", 1999, null, null, 1, 90, "Shoa", "Shoa", "Shoa");
+		//System.out.println(dm.insertMovieData(MovieDataEnum.MOVIE, shindlist));
+		
+		AbsType entity = new CastingRelation(7, 43, 1);
+		System.out.println(dm.deleteMovieEntity(MovieDataEnum.MOVIE_CAST, entity));
 	}
 }

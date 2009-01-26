@@ -29,23 +29,23 @@ public class Filter {
 		
 		switch(option)
 		{
-			case Date: // TODO: This is wrong but i still haven't checked how to properly do it
-			case Number:
+			case DATE: // TODO: This is wrong but i still haven't checked how to properly do it
+			case NUMBER:
 			{
 				strFilter = columnName + "=" + value;
 				break;
 			}
-			case String:
+			case STRING:
 			{
 				strFilter = columnName + " LIKE '" + value + "'";
 				break;
 			}
-			case StringArray:
+			case STRING_ARRAY:
 			{
 				strFilter = columnName + " IN (" + value + ")";
 				break;
 			}
-			case NumberRange:
+			case NUMBER_RANGE:
 			{
 				// We rely on the fact that value is of type "3 and 10"
 				// Will mean: 3<=x<=10

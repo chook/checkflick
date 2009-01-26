@@ -36,7 +36,7 @@ public class Relation extends AbsType {
 	 * @param secondaryId
 	 *            - The secondary id of the relation
 	 */
-	protected Relation(int id, int secondaryId) {
+	public Relation(int id, int secondaryId) {
 		super(id);
 		this.secondaryId = secondaryId;
 	}

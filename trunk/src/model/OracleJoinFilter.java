@@ -3,8 +3,15 @@
  */
 package model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import sun.security.action.GetLongAction;
 
 import controller.filter.AbsJoinFilter;
 import controller.filter.AbsSingleFilter;
@@ -35,26 +42,24 @@ public class OracleJoinFilter extends AbsJoinFilter {
 			buffer.append(single);
 			buffer.append(" AND ");
 		}
-		buffer.append(ltable);
+		buffer.append(getTable());
 		buffer.append('.');
-		buffer.append(lcolumn);
+		buffer.append(getColumn());
 		buffer.append('=');
-		buffer.append(rtable);
+		buffer.append(getOtherTable());
 		buffer.append('.');
-		buffer.append(rcolumn);
+		buffer.append(getOtherColumn());
 		return buffer.toString();
 	}
 
 	@Override
 	public Set<String> toTablesSet() {
-		Set<String> s = new HashSet<String>(3);
+		Set<String> s = new LinkedHashSet<String>();
 		if (single.getTable() != null && single.getTable() != "") {
-			
 			s.add(single.getTable());
 		}
-
-		s.add(getLtable());
-		s.add(getRtable());
+		s.add(getTable());
+		s.add(getOtherTable());
 				
 		return s;
 	}

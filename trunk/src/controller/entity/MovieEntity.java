@@ -1,5 +1,8 @@
 package controller.entity;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Movie entity
  * 
@@ -191,9 +194,7 @@ public class MovieEntity extends NamedEntity {
 	 */
 	@Override
 	public String getName() {
-		StringBuilder movieName;
-		
-		movieName = new StringBuilder(name);
+		StringBuilder movieName = new StringBuilder(name);
 		if (romanNotation != null)
 			movieName.append(" (").append(romanNotation).append(")");
 		if (madeFor != null)
@@ -201,13 +202,23 @@ public class MovieEntity extends NamedEntity {
 		
 		return movieName.toString();
 	}
-	
-
-	
+		
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
 		return "id: " + getId() + ". Name: " + getName() + ". Was filmed in: "
 				+ getFilmingLocations();
+	}
+
+	@Override
+	public List<String> toStringList() {
+		List<String> list = super.toStringList();
+		list.add(String.valueOf(getYear()));
+		list.add(String.valueOf(getColorInfo()));
+		list.add(String.valueOf(getRunningTime()));
+		list.add(getTaglines());
+		list.add(getPlot());
+		list.add(getFilmingLocations());
+		return list;
 	}
 }

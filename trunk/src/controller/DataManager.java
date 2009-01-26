@@ -41,17 +41,7 @@ public class DataManager {
 	public void clearAllNamedEntities() {
 		namedEntities.clear();
 	}
-	
-	/**
-	 * Delete a movie from the database
-	 * @param id - The id to delete
-	 * @return True - If delete succeeded, Else - Otherwise
-	 */
-	public boolean deleteMovie(int id) {
-		// Try to delete the movie
-		return DBManager.getInstance().sendMovieToDB(DBOperationEnum.DeleteMovie, new MovieEntity(id));
-	}
-	
+
 	/**
 	 * This function gets a list of named entities
 	 * It doesn't go to the db for every call, just one time 
@@ -125,8 +115,8 @@ public class DataManager {
 	 * @param dataObject - Data
 	 * @return - True if successfully inserted, False - Otherwise
 	 */
-	public Boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject) {
-		return db.insertMovieData(dataType, dataObject);
+	public boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject) {
+		return db.insertMovieData(dataType, dataObject, false);
 	}
 	
 	/**
@@ -136,28 +126,18 @@ public class DataManager {
 	 * @return - True if successfully inserted, False - Otherwise
 	 */
 	public boolean insertPersonData(PersonDataEnum dataType, AbsType dataObject) {
-		return db.insertPersonData(dataType, dataObject);
+		return db.insertPersonData(dataType, dataObject, false);
 	}
 
-	/**
-	 * Save the movie (Update or Insert according to movie id)
-	 * @param movie - The movie to update/insert
-	 * @return True - If update succeeded, Else - Otherwise
-	 */
-	public boolean saveMovie(MovieEntity movie) {
-		// If we have a movie id, then we need to update
-		if(movie.getId() != 0)
-		{
-			DBManager.getInstance().sendMovieToDB(DBOperationEnum.UpdateMovie, movie);
-		}
-		// Else - Insert a new movie into the DB
-		else
-		{
-			DBManager.getInstance().sendMovieToDB(DBOperationEnum.InsertMovie, movie);
-		}
-		return false;
+	public boolean updatePersonData(PersonDataEnum dataType, AbsType dataObject) {
+		return db.insertPersonData(dataType, dataObject, true);
 	}
 	
+
+	public boolean updateMovieData(MovieDataEnum dataType, AbsType dataObject) {
+		return db.insertMovieData(dataType, dataObject, true);
+	}
+
 	/**
 	 * Search function - Gets a list of filters and an entity
 	 * @param entity - The entity to search on
@@ -192,5 +172,9 @@ public class DataManager {
 	
 	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
 		return db.getSearchFilter(entity, value, value2);
+	}
+
+	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType entity) {
+		return db.deleteMovieEntity(dataType, entity);
 	}
 }

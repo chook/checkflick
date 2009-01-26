@@ -1,10 +1,10 @@
 package controller.filter;
 
 public enum FilterOptionEnum {
-	Number,
-	String,
-	Date,
-	StringArray,
-	NumberRange,
-	Boolean
+	NUMBER,
+	STRING,
+	DATE,
+	STRING_ARRAY,
+	NUMBER_RANGE,
+	BOOLEAN
 }

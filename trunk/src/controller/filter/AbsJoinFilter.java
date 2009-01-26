@@ -3,39 +3,51 @@ package controller.filter;
 public abstract class AbsJoinFilter extends AbsFilter {
 	protected AbsSingleFilter single = null;
 
-	protected String ltable;
-	protected String rtable;
-	protected String lcolumn;
-	protected String rcolumn;
-
-	/**
-	 * @return the ltable
-	 */
-	public String getLtable() {
-		return ltable;
-	}
+	protected String otable;
+	protected String ocolumn;
 
 	/**
 	 * @return the rtable
 	 */
-	public String getRtable() {
-		return rtable;
+	public String getOtherTable() {
+		return otable;
+	}
+
+	/**
+	 * @param otable
+	 *            the rtable to set
+	 */
+	protected void setOtherTable(String otable) {
+		this.otable = otable;
+	}
+
+	/**
+	 * @return the rcolumn
+	 */
+	public String getOtherColumn() {
+		return ocolumn;
+	}
+
+	/**
+	 * @param ocolumn
+	 *            the rcolumn to set
+	 */
+	protected void setOtherColumn(String ocolumn) {
+		this.ocolumn = ocolumn;
 	}
 
 	/**
 	 * @param single
-	 * @param ltable
-	 * @param rtable
-	 * @param lcolumn
-	 * @param rcolumn
+	 * @param table
+	 * @param column
+	 * @param otable
+	 * @param ocolumn
 	 */
-	public AbsJoinFilter(AbsSingleFilter single, String ltable, String lcolumn,
-			String rtable, String rcolumn) {
-		super();
+	protected AbsJoinFilter(AbsSingleFilter single, String table, String column,
+			String otable, String ocolumn) {
+		super(table, column);
+		this.otable = otable;
+		this.ocolumn = ocolumn;
 		this.single = single;
-		this.ltable = ltable;
-		this.lcolumn = lcolumn;
-		this.rtable = rtable;
-		this.rcolumn = rcolumn;
 	}
 }
