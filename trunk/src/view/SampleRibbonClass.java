@@ -43,6 +43,8 @@ public class SampleRibbonClass {
 	static Display display;
 	static Composite searchByMovie;
 	static Composite searchByPerson;
+	static Composite insertMovie;
+	static Composite insertPerson;
 	static Composite resultsMovieTable;
 	static Composite resultsPersonTable;
 	static RibbonTab movieTab;
@@ -139,20 +141,55 @@ public class SampleRibbonClass {
 		new RibbonGroupSeparator(searching);
 		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		
-		searchByMovie = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
+		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
 		searchByMovie.setBackground(shell.getShell().getBackground());
 		searchByMovie.setLocation(0, 145);
 		searchByMovie.setVisible(false);
-		searchByPerson = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
+		
+		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
 		//searchByPerson.setSize((shell.getShell().getSize().x)-5,(shell.getShell().getSize().y)/4);
 		searchByPerson.setBackground(shell.getShell().getBackground());
 		searchByPerson.setVisible(false);
-		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
+		
+		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE);
 		resultsMovieTable.setVisible(false);
-		resultsPersonTable = new Composite(shell.getShell(),SWT.NONE|SWT.NO_BACKGROUND);
+		resultsMovieTable.setBackground(shell.getShell().getBackground());
+		
+		resultsPersonTable = new Composite(shell.getShell(),SWT.NONE);
+		resultsPersonTable.setBackground(shell.getShell().getBackground());
 		resultsPersonTable.setVisible(false);
 		
+		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
+		insertMovie.setBackground(shell.getShell().getBackground());
+		insertMovie.setLocation(0, 145);
+		insertMovie.setVisible(false);
+		
+		insertPerson = new Composite(shell.getShell(),SWT.BORDER);
+		insertPerson.setBackground(shell.getShell().getBackground());
+		insertPerson.setLocation(0, 145);
+		insertPerson.setVisible(false);
+		
 		// listeners for the buttons in the search tab
+		
+		// The Insert Tab
+		// Insert Tab
+		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , toolTip);
+		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
+		new RibbonGroupSeparator(inserting);
+		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
+		RibbonGroup importing = new RibbonGroup(insertTab, "Import", toolTip);
+		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", RibbonButton.STYLE_TWO_LINE_TEXT);
+
+		
+		ButtonSelectGroup group = new ButtonSelectGroup();
+		
+	
+		movieInsert.setButtonSelectGroup(group);
+		personInsert.setButtonSelectGroup(group);
+		movieSearch.setButtonSelectGroup(group);
+		personSearch.setButtonSelectGroup(group);
+		importButton.setButtonSelectGroup(group);
+		
 		movieSearch.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {	
 			}
@@ -161,7 +198,11 @@ public class SampleRibbonClass {
 					searchByMovie.dispose();
 				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
 					searchByPerson.dispose();
-				searchByMovie = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
+				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
+					insertMovie.dispose();
+				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
+					insertPerson.dispose();
+				searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
 				searchByMovie.setBackground(shell.getShell().getBackground());
 				searchByMovie(searchByMovie);
 			}
@@ -175,30 +216,49 @@ public class SampleRibbonClass {
 					searchByMovie.dispose();
 				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
 					searchByPerson.dispose();
-				searchByPerson = new Composite(shell.getShell(),SWT.BORDER|SWT.NO_BACKGROUND);
+				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
+					insertMovie.dispose();
+				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
+					insertPerson.dispose();
+				searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
 				searchByPerson.setBackground(shell.getShell().getBackground());
 				searchByPerson(searchByPerson);
 			}	
 		});
-		// The Insert Tab
-		// Insert Tab
-		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , toolTip);
-		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
-		new RibbonGroupSeparator(inserting);
-		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
-		RibbonGroup importing = new RibbonGroup(insertTab, "Import", toolTip);
-		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", RibbonButton.STYLE_TWO_LINE_TEXT);
-
-
-
-		ButtonSelectGroup group = new ButtonSelectGroup();
-		
-	
-		movieInsert.setButtonSelectGroup(group);
-		personInsert.setButtonSelectGroup(group);
-		movieSearch.setButtonSelectGroup(group);
-		personSearch.setButtonSelectGroup(group);
-		importButton.setButtonSelectGroup(group);
+		movieInsert.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
+					searchByMovie.dispose();
+				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
+					searchByPerson.dispose();
+				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
+					insertMovie.dispose();
+				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
+					insertPerson.dispose();
+				insertMovie = new Composite(shell.getShell(),SWT.BORDER);
+				insertMovie.setBackground(shell.getShell().getBackground());
+				insertMovie(insertMovie);
+			}	
+		});
+		personInsert.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
+					searchByMovie.dispose();
+				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
+					searchByPerson.dispose();
+				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
+					insertMovie.dispose();
+				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
+					insertPerson.dispose();
+				insertPerson = new Composite(shell.getShell(),SWT.BORDER);
+				insertPerson.setBackground(shell.getShell().getBackground());
+				insertPerson(insertPerson);
+			}	
+		});
 	}				
 	
 	public static void searchByMovie(Composite search){
@@ -613,19 +673,18 @@ public class SampleRibbonClass {
 		item0.setImage(image);
 		item0.setExpanded(true);
 		
-		final Composite buttonsComp = new Composite(bar , SWT.FILL);
+		//final Composite buttonsComp = new Composite(bar , SWT.FILL);
 		//buttonsComp.setVisible(false);
 
 		aka.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				buttonsComp.setVisible(true);
+				//buttonsComp.setVisible(true);
 				List<AbsType> akas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movie.getId());
 				/*if ((buttonsComp!= null) && (!buttonsComp.isDisposed()))
 						buttonsComp.dispose();*/
-				//Composite buttonsComp = new Composite(bar , SWT.FILL);
-				
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("book_48.png");
 				if (akas.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -674,6 +733,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				List<AbsType> connections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movie.getId());
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("google_48.png");
 				if (connections.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -688,7 +748,7 @@ public class SampleRibbonClass {
 						column.setText (titles [i]);
 					}	
 					final int count = connections.size();
-					//System.out.println(count);
+					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
 						map = connections.get(i).toStringMap();
@@ -724,7 +784,7 @@ public class SampleRibbonClass {
 				//buttonsComp.setVisible(false);
 				List<AbsType> countries = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movie.getId());
 				
-				//Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("globe_48.png");
 				if (countries.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -742,10 +802,14 @@ public class SampleRibbonClass {
 					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
-						map = countries.get(i).toStringMap();
-						TableItem item = new TableItem (table, SWT.NONE);
-						item.setText (0, String.valueOf(i+1));
-						item.setText (1, getName(countriesList , map.get("name")));
+						if (countries.get(i)!= null){
+							map = countries.get(i).toStringMap();
+							TableItem item = new TableItem (table, SWT.NONE);
+							if (getName(countriesList , map.get("name"))!= null){
+								item.setText (0, String.valueOf(i+1));
+								item.setText (1, getName(countriesList , map.get("name")));
+							}
+						}
 					}
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
@@ -773,7 +837,8 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsType> languages = dm.getMovieData(MovieDataEnum.MOVIE_LANGUAGES, movie.getId());
+				List<AbsType> languages = dm.getMovieData(MovieDataEnum.MOVIE_LANGUAGES ,movie.getId());
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("furl_48.png");
 				if (languages.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -791,10 +856,14 @@ public class SampleRibbonClass {
 					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
-						map = languages.get(i).toStringMap();
-						TableItem item = new TableItem (table, SWT.NONE);
-						item.setText (0, String.valueOf(i+1));
-						item.setText (1, getName(langList , map.get("name")));
+						if (languages.get(i)!=null){
+							map = languages.get(i).toStringMap();
+							TableItem item = new TableItem (table, SWT.NONE);
+							if (getName(langList , map.get("name"))!= null){
+								item.setText (0, String.valueOf(i+1));
+								item.setText (1, getName(langList , map.get("name")));
+							}
+						}
 					}
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
@@ -822,7 +891,7 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
 				List<AbsType> goofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movie.getId());
-				//Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("smile_grin_48.png");
 				if (goofs.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -872,7 +941,7 @@ public class SampleRibbonClass {
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
 				List<AbsType> quotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, movie.getId());
-				//Composite buttonsComp = new Composite(bar , SWT.FILL);
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("speech_bubble_48.png");
 				if (quotes.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -921,6 +990,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				List<AbsType> genres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movie.getId());
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("pie_chart_48.png");
 				if (genres.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -938,10 +1008,14 @@ public class SampleRibbonClass {
 					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
-						map = genres.get(i).toStringMap();
-						TableItem item = new TableItem (table, SWT.NONE);
-						item.setText (0, String.valueOf(i+1));
-						item.setText (1, getName(genresList , map.get("name")));
+						if (genres.get(i)!=null){
+							map = genres.get(i).toStringMap();
+							TableItem item = new TableItem (table, SWT.NONE);
+							if (getName(genresList , map.get("name"))!= null){
+								item.setText (0, String.valueOf(i+1));
+								item.setText (1, getName(genresList , map.get("name")));
+							}
+						}
 					}
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
@@ -969,6 +1043,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				List<AbsType> persons = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movie.getId());
+				Composite buttonsComp = new Composite(bar , SWT.FILL);
 				Image image = ImageCache.getImage("users_two_48.png");
 				if (persons.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
@@ -990,7 +1065,7 @@ public class SampleRibbonClass {
 						TableItem item = new TableItem (table, SWT.NONE);
 						item.setText (0, String.valueOf(i+1));
 						item.setText (1, map.get("name"));
-						item.setText (2, map.get("rol"));
+						//item.setText (2, map.get("role"));
 					}
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
@@ -1027,7 +1102,7 @@ public class SampleRibbonClass {
 	
 	public static void ShowPersonResult(RibbonTab tab,final PersonEntity person){
 		searchByPerson.setVisible(false);
-		RibbonTooltip toolTip = new RibbonTooltip("Get More Information About This Person", "To get more information about this person\nplease click on one of the wanted buttons.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), ""); 
+		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
 
 		// Person Tab
 		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
@@ -1070,11 +1145,12 @@ public class SampleRibbonClass {
 		Label nicks = new Label(composite ,SWT.NONE);
 		nicks.setText("Nick Names:");
 		org.eclipse.swt.widgets.List nicksList = new org.eclipse.swt.widgets.List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-		if (person.getPersonNickNames()!= null){
+		/*if (person.getPersonNickNames()!= null){
 			String[] nicksString = person.getPersonNickNames().split("/X\\");
-			//nicksList.setBounds(50, 50, 75, 75);
+			nicksList.setBounds(50, 50, 75, 75);
 			for(int i=0; i<nicksString.length; i++) nicksList.add(nicksString[i]);
-		}
+		}*/
+		System.out.println(person.getPersonNickNames());
 		Label date = new Label(composite,SWT.NONE);
 		date.setText("Date Of Birth: ");
 		Text dateText = new Text(composite ,SWT.FILL);
@@ -1100,16 +1176,16 @@ public class SampleRibbonClass {
 		Text heightText = new Text(composite ,SWT.FILL);
 		if (person.getHeight()!= 0)
 			heightText.setText(String.valueOf(person.getHeight()));
+		Label trademark = new Label(composite, SWT.NONE);
+		trademark.setText("Trademark: ");
+		Text tmText = new Text(composite, SWT.MULTI);
+		if (person.getTrademark()!= null)	
+			tmText.setText(person.getTrademark());
 		Label bio = new Label(composite,SWT.NONE);
 		bio.setText("Biography: ");
 		Text bioText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL);
 		if (person.getBiography()!= null)	
 			bioText.setText(person.getBiography());
-		Label trademark = new Label(composite, SWT.NONE);
-		trademark.setText("Trademark: ");
-		Text tmText = new Text(composite, SWT.FILL);
-		if (person.getTrademark()!= null)	
-			tmText.setText(person.getTrademark());
 		
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Save");
@@ -1172,35 +1248,37 @@ public class SampleRibbonClass {
 				}
 			}			
 		});
-		movies.addSelectionListener(new SelectionListener() {
+		role.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				//buttonsComp.setVisible(false);
-				List<AbsType> movies = dm.getPersonData(PersonDataEnum.PERSON_ROLES, person.getId());
+				List<AbsType> roles = dm.getPersonData(PersonDataEnum.PERSON_ROLES, person.getId());
 				Composite buttonsComp = new Composite(bar , SWT.FILL);
-				Image image = ImageCache.getImage("camera_48.png");
-				if (movies.size()>0){
+				Image image = ImageCache.getImage("spanner_48.png");
+				if (roles.size()>0){
 					final Table table = new Table (buttonsComp, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 					table.setLinesVisible (true);
 					table.setHeaderVisible (true);
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 					data.heightHint = 200;
 					table.setLayoutData(data);
-					String[] titles = {" ", "Name", "Production Role"};
+					String[] titles = {" ", "Roles"};
 					for (int i=0; i<titles.length; i++) {
 						TableColumn column = new TableColumn (table, SWT.NONE);
 						column.setText (titles [i]);
 					}	
-					final int count = movies.size();
+					final int count = roles.size();
 					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
-						map = movies.get(i).toStringMap();
+						map = roles.get(i).toStringMap();
 						TableItem item = new TableItem (table, SWT.NONE);
-						item.setText (0, String.valueOf(i+1));
-						item.setText (1, map.get("name"));
-						item.setText (2, map.get("role"));
+						if (getName(rolesList , map.get("role"))!= null){
+							item.setText (0, String.valueOf(i+1));
+							item.setText (1, getName(rolesList , map.get("role")));
+						}
+						//item.setText (2, map.get("role"));
 					}
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
@@ -1210,14 +1288,14 @@ public class SampleRibbonClass {
 					layout.verticalSpacing = 10;
 					buttonsComp.setLayout(layout);
 					ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
-					item1.setText("The Films That This Person Participated In");
+					item1.setText("The Roles Of This Person");
 					item1.setHeight(buttonsComp.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 					item1.setControl(buttonsComp);
 					item1.setImage(image);
 					item1.setExpanded(true);
 				}
 				else{
-					switch(okMessageBox("No movies for this person.")){
+					switch(okMessageBox("No roles for this person.")){
     				case(SWT.OK):{}
 					}
 				}
@@ -1275,7 +1353,75 @@ public class SampleRibbonClass {
 		});
 		
 		bar.setSpacing(8);
-		movieDetails.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/3);
+		movieDetails.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
+		
+	}
+	
+	public void insertMovie(Composite insert){
+		Calendar toDay = Calendar.getInstance();
+		final int year = toDay.get(Calendar.YEAR);
+		insert.setLocation(0,145);
+		insert.setLayout(new FillLayout());
+		ExpandBar bar = new ExpandBar (insert, SWT.V_SCROLL);
+		Image image = ImageCache.getImage("add_48.png");
+		// First item
+		final Composite composite = new Composite (bar, SWT.NONE);
+		//composite.setSize(search.getSize());
+		//createMovieForm(composite);
+		GridLayout layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		Label label = new Label(composite,SWT.NONE);
+		label.setText("Movie Name");
+		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		label = new Label(composite,SWT.NONE);
+		label.setText("Movie Year:");
+		final Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		label= new Label(composite,SWT.NONE);
+		Label movieGenres = new Label(composite ,SWT.NONE);
+		movieGenres.setText("Movie Genre");
+		final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] genresString= new String[genresList.size()+1];
+		genresString[0]= "";
+		for (int i=0; i<genresList.size(); i++){
+			genresString[i+1]=genresList.get(i).getName();
+		}
+		genresCombo.setItems (genresString);
+		label = new Label(composite,SWT.NONE);
+		label.setText("Movie Language");
+		final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
+		String[] langString= new String[langList.size()+1];
+		langString[0]="";
+		for (int i=0; i<langList.size(); i++){
+			langString[i+1]=langList.get(i).getName();
+		}
+		langCombo.setItems(langString);
+		label = new Label(composite ,SWT.NONE);
+		label.setText("Color-Info");
+		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] colorString= new String[colorList.size()+1];
+		colorString[0]="";
+		for (int i=0; i<colorList.size(); i++){
+			colorString[i+1]=colorList.get(i).getName();
+		}
+		colorCombo.setItems (colorString);
+		Button button = new Button (composite, SWT.PUSH);
+		button.setText("Insert");
+		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
+		item0.setText("Insert New Movie");
+		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item0.setControl(composite);
+		item0.setImage(image);
+		
+		item0.setExpanded(true);
+		
+		
+		bar.setSpacing(8);
+		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-50);
+	//	MovieEntity movie = new MovieEntity(0, "name"); AbsType movie = new MovieEntity(....);
+	}
+	public void insertPerson(Composite composite){
 		
 	}
 	public void createMovieForm(Composite composite){
@@ -1370,12 +1516,15 @@ public class SampleRibbonClass {
 	}
 	static private String getName(List<NamedEntity> list , String id){
 		String name=null;
-		for (int i=0; i<list.size(); i++){
-			if (id.compareTo(String.valueOf(list.get(i).getId())) ==0){
-				name = String.valueOf(list.get(i).getName());
-				return name;
+		if (id != null){
+			for (int i=0; i<list.size(); i++){
+				if (id.compareTo(String.valueOf(list.get(i).getId())) ==0){
+					name = String.valueOf(list.get(i).getName());
+					return name;
+				}
 			}
 		}
+		//else return "";
 		return name;
 	}
 }
