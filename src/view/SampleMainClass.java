@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.xml.internal.ws.api.fastinfoset.FastInfosetFeature;
+
 import controller.*;
 import controller.entity.*;
 import controller.enums.MovieDataEnum;
@@ -32,7 +34,7 @@ public class SampleMainClass {
 //		dm.start();
 		//ControllerInterface c = new ControllerInterface();
 		//c.start();
-		
+				
 		Thread guiThread = new SampleRibbonThread();
 		guiThread.start();
 		try {

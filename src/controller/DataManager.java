@@ -1,6 +1,9 @@
 package controller;
 
 import java.util.*;
+
+import view.RibbonInterface;
+import view.SampleRibbonClass;
 import controller.entity.*;
 import controller.enums.MovieDataEnum;
 import controller.enums.NamedEntitiesEnum;
@@ -15,6 +18,7 @@ public class DataManager {
 	private static DataManager manager = null;
 	/**
 	 * This function retrieves the database object
+	 * @deprecated
 	 * @return data manager object initialized
 	 */
 	public static DataManager getInstance() {
@@ -25,12 +29,12 @@ public class DataManager {
 	}
 	private DBManager db = null;
 	
-	private Map<NamedEntitiesEnum, List<NamedEntity>> namedEntities;
+	private static Map<NamedEntitiesEnum, List<NamedEntity>> namedEntities;
 	
 	/**
 	 * Protected Constructor
 	 */
-	protected DataManager() {
+	public DataManager() {
 		db = DBManager.getInstance();
 		namedEntities = new TreeMap<NamedEntitiesEnum, List<NamedEntity>>();
 	}
@@ -38,7 +42,7 @@ public class DataManager {
 	/**
 	 * Clears all named entities, forces the data manager to query them again
 	 */
-	public void clearAllNamedEntities() {
+	public synchronized void clearAllNamedEntities() {
 		namedEntities.clear();
 	}
 
@@ -49,7 +53,7 @@ public class DataManager {
 	 * @param name
 	 * @return
 	 */
-	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
+	public synchronized List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
 		if(!namedEntities.containsKey(name))
 			namedEntities.put(name, db.getAllNamedEntities(name));
 		return namedEntities.get(name);
@@ -70,6 +74,20 @@ public class DataManager {
 		return getFilterFromDB(entity, value, value2);
 	}
 	
+	public static Runnable getMovieByIdNew(final int id) { 
+		return new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (id != 0)
+					RibbonInterface.settingShellText(DBManager.getInstance().getMovieById(id).getName());
+			}
+		};
+	}
 	public MovieEntity getMovieById(int id) {
 		if (id != 0)
 			return DBManager.getInstance().getMovieById(id);

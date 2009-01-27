@@ -37,6 +37,7 @@ import controller.enums.NamedEntitiesEnum;
 import controller.enums.PersonDataEnum;
 import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
+import controller.thread.ThreadPool;
 
 public class SampleRibbonClass {
 	static RibbonShell shell;
@@ -56,8 +57,10 @@ public class SampleRibbonClass {
 	static List<NamedEntity> langList;
 	static List<NamedEntity> rolesList;
 	static DataManager dm = DataManager.getInstance();
-	
+	static ThreadPool pool = null;
 	public static void main(String args []) {
+		pool = new ThreadPool(3);
+		
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
 		app.createShell();
@@ -70,6 +73,15 @@ public class SampleRibbonClass {
 		}
 		display.dispose();
 	}
+	
+	public static void updateShellText(final String text) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				shell.setText(text);		
+			}
+		});
+	}
+	
 	private void createShell() {
 		shell = new RibbonShell(display);
 		shell.setButtonImage(ImageCache.getImage("selection_recycle_24.png"));
@@ -87,6 +99,7 @@ public class SampleRibbonClass {
     				case(SWT.YES):{shell.getShell().dispose();}
     				case(SWT.NO):{e.doit = false;}
     			}
+    			pool.stopRequestAllWorkers();
 			}
 		});
 		
@@ -367,6 +380,7 @@ public class SampleRibbonClass {
 				if ((Integer.parseInt(yearFrom.getText())!= 1880) || ((Integer.parseInt(yearTo.getText())!= (year+100))))
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
 				System.out.println(list.toString());
+
 				//search for movies
 				List<DatedEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
 				//creating the search results table
@@ -408,6 +422,12 @@ public class SampleRibbonClass {
 									int index = table.indexOf(item);
 									int id = Integer.parseInt(table.getItem(index).getText(3));
 									movie = dm.getMovieById(id);
+									try {
+										pool.execute(DataManager.getMovieByIdNew(id));
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 								}
 							}
 							final RibbonTabFolder tabs = shell.getRibbonTabFolder();
