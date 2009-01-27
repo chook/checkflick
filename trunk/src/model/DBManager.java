@@ -52,7 +52,7 @@ public class DBManager {
 	 * 
 	 * @return a DB manager instance
 	 */
-	public static DBManager getInstance() {
+	public synchronized static DBManager getInstance() {
 		if (instance == null) {
 			instance = new DBManager();
 		}
