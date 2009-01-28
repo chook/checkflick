@@ -13,9 +13,9 @@ public class DBManager {
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 	private static int CONNECTION_MAX_CONNECTIONS = 6;
 /** Chen's home server 1	**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-	private static String CONNECTION_USERNAME = "chook";
-	private static String CONNECTION_PASSWORD = "shoochi";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+//	private static String CONNECTION_USERNAME = "chook";
+//	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
 //	private static String CONNECTION_USERNAME = "chenhare";
@@ -25,9 +25,9 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "nadavsh2";
-//	private static String CONNECTION_PASSWORD = "nadavsh2";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "nadavsh2";
+	private static String CONNECTION_PASSWORD = "nadavsh2";
 
 	// The strings for prepared statements
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
@@ -44,6 +44,9 @@ public class DBManager {
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
+	
+	private static String INSERT_MOVIE_LANGUAGES_TEST = "INSERT INTO %s (%s, %s) VALUES ((%s), (%s))";
+	private static String SELECT_GENERIC_DISTINCT = "SELECT DISTINCT %s FROM %s WHERE %s = ?";
 	
 	// Singleton instance
 	private static DBManager instance = null;
@@ -143,8 +146,8 @@ public class DBManager {
 	 * results that are sent are ordered beforehand by MOVIE_ID
 	 * Note: there is no way to return the whole movies list, and you must specify a bottomLimit (memory reasons)
 	 * Note: the rows starts with 1 and not 0 (meaning, topLimit = 0 returns exactly what topLimit = 1 returns)
-	 * @param topLimit the start of the limit
-	 * @param bottomLimit the end of the limit
+	 * @param topLimit the start of the limit (the beginning ROWNUM of the ResultSet returned)
+	 * @param bottomLimit the end of the limit (the ending ROWNUM of the ResultSet returned)
 	 * @return
 	 */
 	public Map<String, Integer> getAllMovies(int topLimit, int bottomLimit) {
@@ -152,22 +155,24 @@ public class DBManager {
 
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
+		// creating the generic statement that contains the table and field names
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
+		// creating the prepared statement template including the ROWNUM limits for the SELECT
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
+		
 		int tempMovieId, tempMovieDBYear;
 		String tempMovieDBName, tempMovieRomanNotation, tempMovieMadeFor, tempMovieYear, tempMovieName;
 		StringBuilder movieNameBuilder = null;
 		Map<String, Integer> moviesMap = null;
+		
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(1000);
 			moviesMap = new HashMap<String, Integer>();
+			// going over the movies retrieved from the DB to create the full movie name for comparison
 			while (set.next()) {
-				if (moviesMap.size() == 0)
-					System.out.println("moviesMap.size = 0");
-				if (moviesMap.size() == 100)
-					System.out.println("moviesMap.size = 100");
+				// retrieving the different fields
 				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
 				tempMovieDBName = set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
 				tempMovieDBYear = set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
@@ -178,7 +183,7 @@ public class DBManager {
 				else
 					tempMovieYear = String.valueOf(tempMovieDBYear);
 				
-				// rebuilding the movie name as it appears on the lists, for comparing
+				// rebuilding the movie name as it appears on the lists for comparison
 				movieNameBuilder = new StringBuilder(tempMovieDBName);
 				movieNameBuilder.append(" (").append(tempMovieYear);
 				if (tempMovieRomanNotation != null)
@@ -187,6 +192,7 @@ public class DBManager {
 				if (tempMovieMadeFor != null)
 					movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
 				tempMovieName = movieNameBuilder.toString();
+				// inserting the full movie name into the moviesMap
 				moviesMap.put(tempMovieName, tempMovieId);
 			}
 			set.close();
@@ -479,6 +485,49 @@ public class DBManager {
 		return bReturn;
 	}
 	
+	public boolean insertMovieLanguagesToDB(String[][] testArray, int stringArrayCount) {
+
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr, firstSelectForId, secondSelectForId;
+		
+		firstSelectForId = String.format(SELECT_GENERIC_DISTINCT,
+				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName(),
+				DBTablesEnum.MOVIES.getTableName(),
+				DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
+		secondSelectForId = String.format(SELECT_GENERIC_DISTINCT,
+				DBFieldsEnum.LANGUAGES_LANGUAGE_ID.getFieldName(),
+				DBTablesEnum.LANGUAGES.getTableName(),
+				DBFieldsEnum.LANGUAGES_LANGUAGE_NAME.getFieldName());
+		statementStr = String.format(INSERT_MOVIE_LANGUAGES_TEST, 
+				DBTablesEnum.MOVIE_LANGUAGES.getTableName(), 
+				DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
+				DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName(),
+				firstSelectForId,
+				secondSelectForId);
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (int i = 0; i < stringArrayCount; ++i) {
+
+//				System.out.println("SQL to be executed:");
+//				System.out.println(statementStr);
+				pstmt.setString(1, testArray[0][i]);
+				pstmt.setString(2, testArray[1][i]);
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("problematic SQL is:");
+			System.out.println(statementStr);
+		}
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		
+		return bReturn;
+	}
+	
 	/**
 	 * This function receives a set of values, and a definition of a table, and
 	 * adds all the values to the DB with one PreparedStatementBatch
@@ -522,7 +571,7 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;
 	}
-
+	
 	/**
 	 * This function inserts a person data into the DB
 	 * @param dataType - Which person data to insert
