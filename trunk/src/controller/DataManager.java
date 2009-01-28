@@ -74,7 +74,7 @@ public class DataManager {
 		return getFilterFromDB(entity, value, value2);
 	}
 	
-	public static Runnable getMovieByIdNew(final int id) { 
+	public static Runnable getMovieById(final int id) { 
 		return new Runnable() {
 			public void run() {
 				try {
@@ -90,7 +90,7 @@ public class DataManager {
 			}
 		};
 	}
-	public MovieEntity getMovieById(int id) {
+	public MovieEntity getMovieByIdOld(int id) {
 		if (id != 0)
 			return DBManager.getInstance().getMovieById(id);
 		else 
@@ -103,14 +103,44 @@ public class DataManager {
 	 * @param id - The movie id
 	 * @return A list of data objects
 	 */
-	public List<AbsType> getMovieData(MovieDataEnum dataType, int id) {
+	public List<AbsType> getMovieDataOld(MovieDataEnum dataType, int id) {
 		if (id != 0)
 			return db.getMovieData(dataType, String.valueOf(id));
 		else 
 			return null;
 	}
+	public static Runnable getMovieData(final MovieDataEnum dataType, final int id) {
+		return new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (id != 0){
+					RibbonInterface.drawMovieData(DBManager.getInstance().getMovieData(dataType, String.valueOf(id)), dataType);
+				}
+			}
+		};
+	}
 	
-	public PersonEntity getPersonById(int id) {
+	public static Runnable getPersonById(final int id) {
+		return new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (id != 0){
+					RibbonInterface.settingPersonTab(DBManager.getInstance().getPersonById(id));
+				}
+			}
+		};
+	}
+	public PersonEntity getPersonByIdOld(int id) {
 		if (id != 0)
 			return DBManager.getInstance().getPersonById(id);
 		else 
@@ -123,11 +153,26 @@ public class DataManager {
 	 * @param id - The person id
 	 * @return List of data objects
 	 */
-	public List<AbsType> getPersonData(PersonDataEnum dataType, int id) {
+	public List<AbsType> getPersonDataOld(PersonDataEnum dataType, int id) {
 		if (id != 0)
 			return db.getPersonData(dataType, String.valueOf(id));
 		else 
 			return null;
+	}
+	public static Runnable getPersonData(final PersonDataEnum dataType, final int id) {
+		return new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (id != 0){
+					RibbonInterface.drawPersonData(DBManager.getInstance().getPersonData(dataType, String.valueOf(id)), dataType);
+				}
+			}
+		};
 	}
 	/**
 	 * This function inserts a new movie data object
