@@ -272,7 +272,7 @@ public class SampleRibbonClass {
 					title = "Movie's Cast";
 					titles[1] = "Name";
 					titles[2] = "Production Role";
-					toGet = "role";
+					toGet = "type";
 					message ="No cast for this movie.";
 					break;
 				}
@@ -306,7 +306,8 @@ public class SampleRibbonClass {
 								//else item.setText(1, "null");
 							}
 							else
-								item.setText (1, map.get(toGet));
+								if (map.get("name")!=null)
+									item.setText (1, map.get("name"));
 							if (toGet!=null){
 								if (getName(rolesList , map.get(toGet))!=null)
 									item.setText (2, getName(rolesList , map.get(toGet)));
