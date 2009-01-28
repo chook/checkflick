@@ -14,11 +14,18 @@ public class Parser {
 	static String countriesListStartLine2 = "==============";
 	static String moviesListStartLine1 = "MOVIES LIST";
 	static String moviesListStartLine2 = "===========";
+	static String actorsListStartLine1 = "Name			Titles ";
+	static String actorsListStartLine2 = "----			------";
+	static String actorsListEndLine = "-----------------------------------------------------------------------------";
 	
 	private BufferedReader listFile;
-	private int currentLine;
 	private String listStartLine1;
 	private String listStartLine2;
+	private boolean hasEndLine;
+	private String listEndLine;
+	
+	private int currentLine;
+	private boolean isEOF;
 	
 	public Parser() {
 		
@@ -38,24 +45,36 @@ public class Parser {
 			InputStreamReader insr = new InputStreamReader(fstream);
 			listFile =  new BufferedReader(insr);
 			currentLine = 0;
+			isEOF = false;
+			listEndLine = "";
 			
 			switch (listType) {
 			
 			case LANGUAGES:
 				listStartLine1 = languagesListStartLine1;
 				listStartLine2 = languagesListStartLine2;
+				hasEndLine = false;
 				break;
 			case GENRES:
 				listStartLine1 = genresListStartLine1;
 				listStartLine2 = genresListStartLine2;
+				hasEndLine = false;
 				break;
 			case COUNTRIES:
 				listStartLine1 = countriesListStartLine1;
 				listStartLine2 = countriesListStartLine2;
+				hasEndLine = false;
 				break;
 			case MOVIES:
 				listStartLine1 = moviesListStartLine1;
 				listStartLine2 = moviesListStartLine2;
+				hasEndLine = false;
+				break;
+			case ACTORS:
+				listStartLine1 = actorsListStartLine1;
+				listStartLine2 = actorsListStartLine2;
+				hasEndLine = true;
+				listEndLine = actorsListEndLine;
 				break;
 			}
 		}
@@ -80,9 +99,10 @@ public class Parser {
 	 * @return boolean if the start of the list was found
 	 */
 	public boolean findStartOfList() {
-		if (findLine(listStartLine1) && findLine(listStartLine2))
+		if (findLine(listStartLine1) && findLine(listStartLine2)) {
+			checkIfEOF();
 			return true;
-		else
+		} else
 			return false;
 	}
 	/**
@@ -90,15 +110,32 @@ public class Parser {
 	 * @return String the line that was read
 	 */
 	public String readLine() {
+		String line;
 		try {
 			if (listFile.ready())
 				++currentLine;
-				return listFile.readLine();
+			line = listFile.readLine();
+			// checking if the line is the end of the needed list
+			if (hasEndLine && line.equals(listEndLine)) {
+				isEOF = true;
+				return null;
+			}
+			checkIfEOF();
 		}
 		catch (Exception e) {
 			System.err.println("File input error");
 		}
 		return null;
+	}
+	
+	private boolean checkIfEOF() {
+		try {
+			if (!(listFile.ready()))
+				isEOF = true;
+		} catch (Exception e) {
+			System.err.println("File input error");
+		}
+		return isEOF;
 	}
 	
 	/**
@@ -163,13 +200,7 @@ public class Parser {
 	 * @return boolean representing whether the EOF has been reached or the file isn't open
 	 */
 	public boolean isEOF() {
-		try {
-			return (!(listFile.ready()));
-		}
-		catch (Exception e) {
-			System.err.println("File input error");
-			return true;
-		}
+		return isEOF;
 	}
 	
 	/**
