@@ -889,7 +889,9 @@ public class SampleRibbonClass {
 		// Groups
 
 		// Movie tab
-		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
+		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info" , toolTip);
+		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonGroup results = new RibbonGroup(tab, "More Details" , toolTip);
 		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton connections = new RibbonButton(results, ImageCache.getImage("google_48.png"), " \nMovie Connections", RibbonButton.STYLE_TWO_LINE_TEXT);
@@ -903,7 +905,7 @@ public class SampleRibbonClass {
 		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonGroup personsGroup = new RibbonGroup(tab, "Movie Apearances" , toolTip);
+		RibbonGroup personsGroup = new RibbonGroup(tab, "Cast" , toolTip);
 		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		ButtonSelectGroup group = new ButtonSelectGroup();
 		aka.setButtonSelectGroup(group);
@@ -968,6 +970,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				movieButtonsResults(movie , MovieDataEnum.MOVIE_AKAS);
 			}
 		});
@@ -975,6 +978,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				//movieButtonsResults(movie , MovieDataEnum.MOVIE_CONNECTIONS);
 				//not working
 			}
@@ -983,6 +987,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				movieButtonsResults(movie , MovieDataEnum.MOVIE_COUNTRIES);
 			}
 		});
@@ -990,12 +995,14 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				movieButtonsResults(movie , MovieDataEnum.MOVIE_LANGUAGES);
 		}});
 		goofs.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				movieButtonsResults(movie , MovieDataEnum.MOVIE_GOOFS);
 			}			
 		});
@@ -1003,6 +1010,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				movieButtonsResults(movie , MovieDataEnum.MOVIE_QUOTES);
 			}
 		});
@@ -1010,6 +1018,7 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				entityDetails.setVisible(true);
 				movieButtonsResults(movie , MovieDataEnum.MOVIE_GENRES);
 			}
 		});
@@ -1017,7 +1026,8 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				//movieButtonsResults(movie , MovieDataEnum.MOVIE_CAST);
+				entityDetails.setVisible(true);
+				movieButtonsResults(movie , MovieDataEnum.MOVIE_CAST);
 				//not working
 			}
 		});
@@ -1029,8 +1039,7 @@ public class SampleRibbonClass {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
-				entityDetails.dispose();
-				searchByMovie.dispose();
+				entityDetails.setVisible(false);
 				shell.getRibbonTabFolder().selectPrevTab();
 				List<RibbonTab> tabList = shell.getRibbonTabFolder().getTabs();
 				tabList.remove(current.getIndex());
