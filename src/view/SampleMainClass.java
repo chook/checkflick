@@ -69,15 +69,15 @@ public class SampleMainClass {
 		/**
 		 * Get person entity
 		 */
-		PersonEntity p = dm.getPersonById(searched.get(0).getId());
+		PersonEntity p = dm.getPersonByIdOld(searched.get(0).getId());
 		System.out.println(p);
 		System.out.println("Count:" + DBTablesEnum.getCounter());
 		
 		//AbsFilter prrFilter = dm.getFilter(SearchEntitiesEnum.PERSON_PRODUCTION_ROLE, "1");
-		List<AbsType> pmovies = dm.getPersonData(PersonDataEnum.PERSON_ROLES, 7);
+		List<AbsType> pmovies = dm.getPersonDataOld(PersonDataEnum.PERSON_ROLES, 7);
 		System.out.println("person movies " + pmovies.toString());
 		
-		List<AbsType> ptrivia = dm.getPersonData(PersonDataEnum.PERSON_TRIVIA, 5);
+		List<AbsType> ptrivia = dm.getPersonDataOld(PersonDataEnum.PERSON_TRIVIA, 5);
 		System.out.println("person trivia " + ptrivia.toString());
 		
 		/**
@@ -101,7 +101,7 @@ public class SampleMainClass {
 		/**
 		 * Get Movie entity
 		 */
-		MovieEntity m = dm.getMovieById(searched.get(0).getId());
+		MovieEntity m = dm.getMovieByIdOld(searched.get(0).getId());
 		System.out.println(m);
 
 		/**
@@ -127,13 +127,13 @@ public class SampleMainClass {
 		/**
 		 * Getting movie countries revised 2
 		 */
-		List<AbsType> countriesGood = dm.getMovieData(MovieDataEnum.MOVIE_COUNTRIES, movieId);
+		List<AbsType> countriesGood = dm.getMovieDataOld(MovieDataEnum.MOVIE_COUNTRIES, movieId);
 		System.out.println("countries revised count " + countriesGood.toString());
 		
-		List<AbsType> mgenres = dm.getMovieData(MovieDataEnum.MOVIE_GENRES, movieId);
+		List<AbsType> mgenres = dm.getMovieDataOld(MovieDataEnum.MOVIE_GENRES, movieId);
 		System.out.println("countries revised count " + mgenres.toString());
 		
-		List<AbsType> mgoofs = dm.getMovieData(MovieDataEnum.MOVIE_GOOFS, movieId);
+		List<AbsType> mgoofs = dm.getMovieDataOld(MovieDataEnum.MOVIE_GOOFS, movieId);
 		System.out.println("good goofs " + mgoofs.toString());
 		
 		for (AbsType t: mgoofs) {
@@ -141,21 +141,21 @@ public class SampleMainClass {
 			System.out.println("name of goof is " + mgoofsmap.get("name"));
 		}
 		
-		List<AbsType> makas = dm.getMovieData(MovieDataEnum.MOVIE_AKAS, movieId);
+		List<AbsType> makas = dm.getMovieDataOld(MovieDataEnum.MOVIE_AKAS, movieId);
 		System.out.println("good makas " + makas.toString());
 		
-		List<AbsType> mconnections = dm.getMovieData(MovieDataEnum.MOVIE_CONNECTIONS, movieId);
+		List<AbsType> mconnections = dm.getMovieDataOld(MovieDataEnum.MOVIE_CONNECTIONS, movieId);
 		System.out.println("good connections :" + mconnections.toString());
 		
 		
-		List<AbsType> mquotes = dm.getMovieData(MovieDataEnum.MOVIE_QUOTES, 43);
+		List<AbsType> mquotes = dm.getMovieDataOld(MovieDataEnum.MOVIE_QUOTES, 43);
 		System.out.println("good quotes :" + mquotes.toString());
 		
 		
-		List<AbsType> mappear = dm.getMovieData(MovieDataEnum.MOVIE_CAST, movieId);
+		List<AbsType> mappear = dm.getMovieDataOld(MovieDataEnum.MOVIE_CAST, movieId);
 		System.out.println("good cast of movie:" + mappear.toString());
 
-		List<AbsType> pappear = dm.getPersonData(PersonDataEnum.PERSON_ROLES, 7);
+		List<AbsType> pappear = dm.getPersonDataOld(PersonDataEnum.PERSON_ROLES, 7);
 		System.out.println("good movies of person:" + pappear.toString());
 
 		//List<AbsType> mcast = dm.getMovieData(MovieDataEnum.MOVIE_CAST, id)
