@@ -97,8 +97,8 @@ public class CastingRelation extends CategorizedRelation {
 	public Map<String, String> toStringMap() {
 		Map<String, String> map = super.toStringMap();
 		map.put("actor", String.valueOf(actor));
-		map.put("role", actorRole);
-		map.put("creditRank", String.valueOf(actorCreditRank));
+		map.put("actorrole", actorRole);
+		map.put("actorcreditrank", String.valueOf(actorCreditRank));
 		return map;
 	}
 }
