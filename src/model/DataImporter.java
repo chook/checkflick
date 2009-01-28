@@ -395,7 +395,7 @@ public boolean getMovies2() {
 	public boolean getMoviesLanguages() {
 		
 		Parser parser = new Parser();
-		Map<String, Integer> moviesMap = new HashMap<String, Integer>();
+		Map<String, Integer> moviesMap = new WeakHashMap<String, Integer>();
 		Map<String, Integer> languagesMap = new HashMap<String, Integer>();
 		Set<NamedRelation> movieLanguagesSet = new LinkedHashSet<NamedRelation>();
 		ResultSet moviesResultSet;
@@ -543,6 +543,13 @@ public boolean getMovies2() {
 			parser.closeFile();
 			//moviesMap.clear();
 			System.gc();
+//			System.out.println("about to iterate over moviesMap and assign NULL to all the entries");
+//			moviesMap.entrySet().removeAll();
+//			for (Map.Entry<String, Integer> entry : moviesMap.entrySet()) {
+//				moviesMap.entrySet().iterator().remove();				
+//			}
+//			System.out.println("finished assigning NULLs to moviesMap");
+				
 		} while (!isEmpty);
 
 		return true;
