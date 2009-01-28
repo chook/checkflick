@@ -49,7 +49,7 @@ public class DataImporter {
 	static String moviesLanguagesPattern = "([^\"].*)\\s\\(([\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesLanguages2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:(?:[IVX])+))?\\)\\s?(?:\\(?:..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesNameDBPattern = "([^\"](.)+)(?:\\(((?:[IVX])+)\\))?\\s?(\\(..*\\))?";
-	static String actorsPattern = "(.)+\\t+.+";
+	static String actorsPattern = "((?:[^\\t])+)\\t+.+";
 	
 	
 	/**
@@ -352,27 +352,27 @@ public class DataImporter {
 				matcher = pattern.matcher(lineFromFile);
 				matchFound = matcher.matches();
 				if (!matchFound) {
-					if (lineFromFile.length() > 0) {
-						System.out.println("couldn't found a match on line " + parser.getLineNumber() + "!");
-						System.out.println(lineFromFile);
-					}
+//					if (lineFromFile.length() > 0) {
+//						System.out.println("couldn't find a match on line " + parser.getLineNumber() + "!");
+//						System.out.println(lineFromFile);
+//					}
 				} else {
 					personName = matcher.group(1);
-					System.out.println("found name: " + personName);
+//					System.out.println("found name: " + personName);
 					personsSet.add(new NamedEntity(personName));
 				}
 				// every a certain amount of persons entered to the set, flush the results via one prepared statement batch to the DB 
 				if ((personsSet.size() > 0) && (personsSet.size() % PSTMT_BATCH_SIZE == 0)) {
 					System.out.println("got to line " + parser.getLineNumber() + ", uploading to DB...");
 					System.out.println("Inserting " + personsSet.size() + " elements to the DB");
-//					DBManager.getInstance().insertNamedEntitySetToDB(personsSet);
+					DBManager.getInstance().insertNamedEntitySetToDB(personsSet);
 					totalElementsNum += personsSet.size();
 					personsSet.clear();
 				}
 			}
 
 			System.out.println("Inserting " + personsSet.size() + " elements to the DB");
-//			DBManager.getInstance().insertNamedEntitySetToDB(personsSet);
+			DBManager.getInstance().insertNamedEntitySetToDB(personsSet);
 			totalElementsNum += personsSet.size();
 
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);

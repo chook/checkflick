@@ -16,7 +16,7 @@ public class Parser {
 	static String moviesListStartLine2 = "===========";
 	static String actorsListStartLine1 = "Name			Titles ";
 	static String actorsListStartLine2 = "----			------";
-	static String actorsListEndLine = "-----------------------------------------------------------------------------";
+	static String actorsListEndLine = "SUBMITTING UPDATES";
 	
 	private BufferedReader listFile;
 	private String listStartLine1;
@@ -112,20 +112,22 @@ public class Parser {
 	public String readLine() {
 		String line;
 		try {
-			if (listFile.ready())
+			if (listFile.ready()) {
 				++currentLine;
-			line = listFile.readLine();
-			// checking if the line is the end of the needed list
-			if (hasEndLine && line.equals(listEndLine)) {
-				isEOF = true;
-				return null;
+				line = listFile.readLine();
+				// checking if the line is the end of the needed list
+				if (hasEndLine && line.equals(listEndLine)) {
+					isEOF = true;
+					return "";
+				}
+				checkIfEOF();
+				return line;
 			}
-			checkIfEOF();
 		}
 		catch (Exception e) {
 			System.err.println("File input error");
 		}
-		return null;
+		return "";
 	}
 	
 	private boolean checkIfEOF() {
