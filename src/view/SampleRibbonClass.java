@@ -1175,10 +1175,12 @@ public class SampleRibbonClass {
 		final int year = toDay.get(Calendar.YEAR);
 		insert.setLocation(2,145);
 		insert.setLayout(new FillLayout());
-		ExpandBar bar = new ExpandBar (insert, SWT.V_SCROLL);
+		if ((bar!= null) && !(bar.isDisposed()))
+			bar.dispose();
+		bar = new ExpandBar (insert, SWT.V_SCROLL);
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
-		final Composite composite = new Composite (bar, SWT.NONE);
+		Composite composite = new Composite (bar, SWT.NONE);
 		//composite.setSize(search.getSize());
 		//createMovieForm(composite);
 		GridLayout layout = new GridLayout (6,false);
@@ -1186,30 +1188,17 @@ public class SampleRibbonClass {
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout); 
 		Label label = new Label(composite,SWT.NONE);
-		label.setText("Movie Name");
+		label.setText("Movie Name:");
 		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Year:");
 		final Text yearText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label= new Label(composite,SWT.NONE);
-		Label movieGenres = new Label(composite ,SWT.NONE);
-		movieGenres.setText("Movie Genre");
-		final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] genresString= new String[genresList.size()+1];
-		genresString[0]= "";
-		for (int i=0; i<genresList.size(); i++){
-			genresString[i+1]=genresList.get(i).getName();
-		}
-		genresCombo.setItems (genresString);
 		label = new Label(composite,SWT.NONE);
-		label.setText("Movie Language");
-		final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
-		String[] langString= new String[langList.size()+1];
-		langString[0]="";
-		for (int i=0; i<langList.size(); i++){
-			langString[i+1]=langList.get(i).getName();
-		}
-		langCombo.setItems(langString);
+		label.setText("Running Time:");
+		final Text timeText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		label = new Label(composite,SWT.NONE);
+		label.setText("Plot:");
+		final Text plotText = new Text(composite ,SWT.MULTI|SWT.BORDER| SWT.V_SCROLL);
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Color-Info");
 		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
@@ -1219,6 +1208,8 @@ public class SampleRibbonClass {
 			colorString[i+1]=colorList.get(i).getName();
 		}
 		colorCombo.setItems (colorString);
+		label = new Label(composite,SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Insert");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -1228,11 +1219,93 @@ public class SampleRibbonClass {
 		item0.setImage(image);
 		
 		item0.setExpanded(true);
+		//genres- 2nd item
+		composite = new Composite (bar, SWT.NONE);
+		layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		label = new Label(composite ,SWT.NONE);
+		label.setText("Genre:");
+		final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] genresString= new String[genresList.size()];
+		for (int i=0; i<genresList.size(); i++){
+			genresString[i]=genresList.get(i).getName();
+		}
+		genresCombo.setItems (genresString);
+		Button genreButton = new Button (composite, SWT.PUSH);
+		genreButton.setText("Add");
+		ExpandItem item1 = new ExpandItem(bar, SWT.NONE, 1);
+		item1.setText("Insert Movie's Genres");
+		item1.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item1.setControl(composite);
+		item1.setImage(image);
 		
+		item1.setExpanded(false);
+		
+		//languages- 3rd item
+		composite = new Composite (bar, SWT.NONE);
+		layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		label = new Label(composite,SWT.NONE);
+		label.setText("Language:");
+		final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
+		String[] langString= new String[langList.size()];
+		for (int i=0; i<langList.size(); i++){
+			langString[i]=langList.get(i).getName();
+		}
+		langCombo.setItems(langString);
+		Button langButton = new Button (composite, SWT.PUSH);
+		langButton.setText("Add");
+		ExpandItem item2 = new ExpandItem(bar, SWT.NONE, 2);
+		item2.setText("Insert Movie's Languages");
+		item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item2.setControl(composite);
+		item2.setImage(image);
+		
+		item2.setExpanded(false);
+		//countries - 4th item
+		composite = new Composite (bar, SWT.NONE);
+		layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		label = new Label(composite,SWT.NONE);
+		label.setText("Country:");
+		final Combo countryCombo = new Combo(composite ,SWT.READ_ONLY);
+		String[] countryString= new String[countriesList.size()];
+		for (int i=0; i<countriesList.size(); i++){
+			countryString[i]=countriesList.get(i).getName();
+		}
+		countryCombo.setItems(countryString);
+		Button countryButton = new Button (composite, SWT.PUSH);
+		countryButton.setText("Add");
+		ExpandItem item3 = new ExpandItem(bar, SWT.NONE, 2);
+		item3.setText("Insert Movie's Countries");
+		item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item3.setControl(composite);
+		item3.setImage(image);
+		
+		item3.setExpanded(false);
+		//goofs - 5th item
+		//quotes - 6th item
+		//aka names - 7th item
+		//connections
+		//cast
 		
 		bar.setSpacing(8);
-		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-50);
+		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
 	//	MovieEntity movie = new MovieEntity(0, "name"); AbsType movie = new MovieEntity(....);
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				
+				
+			}
+		});
 	}
 	public void insertPerson(Composite composite){
 		
