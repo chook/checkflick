@@ -11,48 +11,48 @@ import java.util.Map;
  *
  */
 public class NamedCastingRelation extends CastingRelation {
-	private String searchName;
+	private String name;
 
 	/**
 	 * @return the searchName
 	 */
-	public String getSearchName() {
-		return searchName;
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * @param searchName
+	 * @param name
 	 *            the searchName to set
 	 */
-	protected void setSearchName(String searchName) {
-		this.searchName = searchName;
+	protected void setName(String name) {
+		this.name = name;
 	}
 
 	public NamedCastingRelation(int id, int secondaryId, int productionRole,
 			boolean actor, String actorRole, int actorCreditRank,
-			String searchName) {
+			String name) {
 		super(id, secondaryId, productionRole, actor, actorRole,
 				actorCreditRank);
-		this.searchName = searchName;
+		this.name = name;
 	}
 
 	
 	@Override
 	public String toString() {
-		return super.toString() + " SEARCH NAME: " + getSearchName();
+		return super.toString() + " NAME: " + getName();
 	}
 
 	@Override
 	public List<String> toStringList() {
 		List<String> list = super.toStringList();
-		list.add(getSearchName());
+		list.add(getName());
 		return list;
 	}
 
 	@Override
 	public Map<String, String> toStringMap() {
 		Map<String, String> map = super.toStringMap();
-		map.put("searchName", getSearchName());
+		map.put("name", getName());
 		return map;
 	}
 }
