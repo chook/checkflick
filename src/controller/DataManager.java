@@ -77,12 +77,12 @@ public class DataManager {
 	public static Runnable getMovieById(final int id) { 
 		return new Runnable() {
 			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					Thread.sleep(2000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				if (id != 0){
 					//RibbonInterface.settingShellText(DBManager.getInstance().getMovieById(id).getName());
 					RibbonInterface.settingMovieTab(DBManager.getInstance().getMovieById(id));
@@ -112,12 +112,12 @@ public class DataManager {
 	public static Runnable getMovieData(final MovieDataEnum dataType, final int id) {
 		return new Runnable() {
 			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					Thread.sleep(2000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				if (id != 0){
 					RibbonInterface.drawMovieData(DBManager.getInstance().getMovieData(dataType, String.valueOf(id)), dataType);
 				}
@@ -128,12 +128,12 @@ public class DataManager {
 	public static Runnable getPersonById(final int id) {
 		return new Runnable() {
 			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					Thread.sleep(2000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				if (id != 0){
 					RibbonInterface.settingPersonTab(DBManager.getInstance().getPersonById(id));
 				}
@@ -162,12 +162,12 @@ public class DataManager {
 	public static Runnable getPersonData(final PersonDataEnum dataType, final int id) {
 		return new Runnable() {
 			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					Thread.sleep(2000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				if (id != 0){
 					RibbonInterface.drawPersonData(DBManager.getInstance().getPersonData(dataType, String.valueOf(id)), dataType);
 				}
