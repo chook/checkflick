@@ -90,8 +90,9 @@ public class SampleRibbonClass {
 	protected static void updateMovieTab(final MovieEntity movie){
 		display.asyncExec(new Runnable() {
 			public void run() {
+				String tabName= movie.getName().substring(0, 6);
 				final RibbonTabFolder tabs = shell.getRibbonTabFolder();
-				movieTab = new RibbonTab(tabs, "Movie");
+				movieTab = new RibbonTab(tabs,tabName);
 				ShowMovieResult(movieTab , movie);
 				tabs.selectTab(movieTab);
 				resultsMovieTable.setVisible(false);
@@ -398,7 +399,7 @@ public class SampleRibbonClass {
 		// Tabs
 		RibbonTab searchTab = new RibbonTab(tabs, "Search");
 		RibbonTab insertTab = new RibbonTab(tabs, "Insert");	
-		RibbonTab triviaTab = new RibbonTab(tabs, "Trivia");
+		//RibbonTab triviaTab = new RibbonTab(tabs, "Trivia");
 		
 		// Tooltip
 		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
@@ -951,6 +952,8 @@ public class SampleRibbonClass {
 		
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Save");
+		Button close = new Button(composite , SWT.PUSH);
+		close.setText("Close Tab");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
 		item0.setText("General Information About The Movie");
 		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -1021,7 +1024,19 @@ public class SampleRibbonClass {
 
 		bar.setSpacing(8);
 		entityDetails.setSize(shell.getShell().getSize().x-5, (shell.getShell().getSize().y)-150);
-		
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
+				entityDetails.dispose();
+				searchByMovie.dispose();
+				shell.getRibbonTabFolder().selectPrevTab();
+				List<RibbonTab> tabList = shell.getRibbonTabFolder().getTabs();
+				tabList.remove(current.getIndex());
+                shell.getRibbonTabFolder().redraw();;
+			}			
+		});
 	/*	tab.getTabFolder().addListener(SWT.MouseDown, new Listener(){
 			public void handleEvent(Event e){
 				if (tab.isSelected())
