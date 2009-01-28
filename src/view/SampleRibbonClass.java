@@ -81,6 +81,13 @@ public class SampleRibbonClass {
 			}
 		});
 	}
+	public static void updateMovieTab(final MovieEntity movie){
+		final RibbonTabFolder tabs = shell.getRibbonTabFolder();
+		movieTab = new RibbonTab(tabs, "Movie");
+		ShowMovieResult(movieTab , movie);
+		tabs.selectTab(movieTab);
+		resultsMovieTable.setVisible(false);
+	}
 	
 	private void createShell() {
 		shell = new RibbonShell(display);
@@ -421,7 +428,7 @@ public class SampleRibbonClass {
 								if (rect.contains(pt)) {
 									int index = table.indexOf(item);
 									int id = Integer.parseInt(table.getItem(index).getText(3));
-									movie = dm.getMovieById(id);
+									//movie = dm.getMovieById(id);
 									try {
 										pool.execute(DataManager.getMovieByIdNew(id));
 									} catch (InterruptedException e) {
@@ -430,11 +437,11 @@ public class SampleRibbonClass {
 									}
 								}
 							}
-							final RibbonTabFolder tabs = shell.getRibbonTabFolder();
-							movieTab = new RibbonTab(tabs, "Movie");
-							ShowMovieResult(movieTab , movie);
-							tabs.selectTab(movieTab);
-							resultsMovieTable.setVisible(false);
+							//final RibbonTabFolder tabs = shell.getRibbonTabFolder();
+							//movieTab = new RibbonTab(tabs, "Movie");
+							//ShowMovieResult(movieTab , movie);
+							//tabs.selectTab(movieTab);
+							//resultsMovieTable.setVisible(false);
 						}
 					});
 					resultsMovieTable.setLocation(0,  145+ shell.getShell().getSize().y/4);
