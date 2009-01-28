@@ -82,11 +82,15 @@ public class SampleRibbonClass {
 		});
 	}
 	public static void updateMovieTab(final MovieEntity movie){
-		final RibbonTabFolder tabs = shell.getRibbonTabFolder();
-		movieTab = new RibbonTab(tabs, "Movie");
-		ShowMovieResult(movieTab , movie);
-		tabs.selectTab(movieTab);
-		resultsMovieTable.setVisible(false);
+		display.asyncExec(new Runnable() {
+			public void run() {
+				final RibbonTabFolder tabs = shell.getRibbonTabFolder();
+				movieTab = new RibbonTab(tabs, "Movie");
+				ShowMovieResult(movieTab , movie);
+				tabs.selectTab(movieTab);
+				resultsMovieTable.setVisible(false);
+			}
+		});
 	}
 	
 	private void createShell() {
