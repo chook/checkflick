@@ -83,8 +83,10 @@ public class DataManager {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if (id != 0)
-					RibbonInterface.settingShellText(DBManager.getInstance().getMovieById(id).getName());
+				if (id != 0){
+					//RibbonInterface.settingShellText(DBManager.getInstance().getMovieById(id).getName());
+					RibbonInterface.settingMovieTab(DBManager.getInstance().getMovieById(id));
+				}
 			}
 		};
 	}
