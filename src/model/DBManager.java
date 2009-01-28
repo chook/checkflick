@@ -572,6 +572,31 @@ public class DBManager {
 		return bReturn;
 	}
 	
+	public boolean insertNamedEntitySetToDB(Set<NamedEntity> set) {
+
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr;
+		statementStr = String.format(INSERT_SINGLE_DATATYPE, 
+										DBTablesEnum.PERSONS.getTableName(), 
+										DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName());
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (NamedEntity setEntity : set) {
+				pstmt.setString(1, setEntity.getName());
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
+	}
+	
 	/**
 	 * This function inserts a person data into the DB
 	 * @param dataType - Which person data to insert

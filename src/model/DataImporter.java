@@ -49,6 +49,7 @@ public class DataImporter {
 	static String moviesLanguagesPattern = "([^\"].*)\\s\\(([\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesLanguages2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:(?:[IVX])+))?\\)\\s?(?:\\(?:..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesNameDBPattern = "([^\"](.)+)(?:\\(((?:[IVX])+)\\))?\\s?(\\(..*\\))?";
+	static String actorsPattern = "(.)+\\t+.+";
 	
 	
 	/**
@@ -74,6 +75,7 @@ public class DataImporter {
 		ih.addListFile(ListFilesEnum.GENRES, "lists\\genres.list");
 		ih.addListFile(ListFilesEnum.COUNTRIES, "lists\\countries.list");
 		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
+		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
 		
 		// run the importing
 		ih.importIntoDB();
@@ -235,23 +237,23 @@ public class DataImporter {
 					moviesSet.clear();
 				}
 			}
-			
+
 			System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
 			DBManager.getInstance().insertMoviesSetToDB(moviesSet);
 			totalElementsNum += moviesSet.size();
-			
+
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
 		} else
 			return false;
-		
+
 		parser.closeFile();
-		
+
 		return true;
 	}
-	
-public boolean getMovies2() {
-		
+
+	public boolean getMovies2() {
+
 		Parser parser = new Parser();
 		Set<MovieEntity> moviesSet = new LinkedHashSet<MovieEntity>();
 		String lineFromFile;
@@ -264,16 +266,16 @@ public boolean getMovies2() {
 		Matcher matcher;
 		boolean matchFound;
 		int totalElementsNum = 0;
-		
+
 		parser.loadFile(listfilesMap.get(ListFilesEnum.MOVIES), ListFilesEnum.MOVIES);
 		patternRegExp = movies2Pattern;
-			
+
 		// Making sure we find the start of the list
 		if (parser.findStartOfList()) {
 			System.out.println("Found the start of the list!");
-			
+
 			pattern = Pattern.compile(patternRegExp);
-			
+
 			while (!parser.isEOF()) {
 				lineFromFile = parser.readLine();
 				matcher = pattern.matcher(lineFromFile);
@@ -308,18 +310,78 @@ public boolean getMovies2() {
 					moviesSet.clear();
 				}
 			}
-			
+
 			System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
 			DBManager.getInstance().insertMoviesSetToDB(moviesSet);
 			totalElementsNum += moviesSet.size();
-			
+
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
 		} else
 			return false;
-		
+
 		parser.closeFile();
-		
+
+		return true;
+	}
+
+	public boolean getPersons() {
+		// for now, this retrieves only the actors (male)
+
+		Parser parser = new Parser();
+		Set<NamedEntity> personsSet = new HashSet<NamedEntity>();
+		String lineFromFile;
+		String patternRegExp = null;
+		String personName;
+		Pattern pattern;
+		Matcher matcher;
+		boolean matchFound;
+		int totalElementsNum = 0;
+
+		parser.loadFile(listfilesMap.get(ListFilesEnum.ACTORS), ListFilesEnum.ACTORS);
+		patternRegExp = actorsPattern;
+
+		// Making sure we find the start of the list
+		if (parser.findStartOfList()) {
+			System.out.println("Found the start of the list!");
+
+			pattern = Pattern.compile(patternRegExp);
+
+			while (!parser.isEOF()) {
+				lineFromFile = parser.readLine();
+				matcher = pattern.matcher(lineFromFile);
+				matchFound = matcher.matches();
+				if (!matchFound) {
+					if (lineFromFile.length() > 0) {
+						System.out.println("couldn't found a match on line " + parser.getLineNumber() + "!");
+						System.out.println(lineFromFile);
+					}
+				} else {
+					personName = matcher.group(1);
+					System.out.println("found name: " + personName);
+					personsSet.add(new NamedEntity(personName));
+				}
+				// every a certain amount of persons entered to the set, flush the results via one prepared statement batch to the DB 
+				if ((personsSet.size() > 0) && (personsSet.size() % PSTMT_BATCH_SIZE == 0)) {
+					System.out.println("got to line " + parser.getLineNumber() + ", uploading to DB...");
+					System.out.println("Inserting " + personsSet.size() + " elements to the DB");
+//					DBManager.getInstance().insertNamedEntitySetToDB(personsSet);
+					totalElementsNum += personsSet.size();
+					personsSet.clear();
+				}
+			}
+
+			System.out.println("Inserting " + personsSet.size() + " elements to the DB");
+//			DBManager.getInstance().insertNamedEntitySetToDB(personsSet);
+			totalElementsNum += personsSet.size();
+
+			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
+
+		} else
+			return false;
+
+		parser.closeFile();
+
 		return true;
 	}
 
