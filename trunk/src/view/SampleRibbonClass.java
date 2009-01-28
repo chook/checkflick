@@ -1282,7 +1282,7 @@ public class SampleRibbonClass {
 		countryCombo.setItems(countryString);
 		Button countryButton = new Button (composite, SWT.PUSH);
 		countryButton.setText("Add");
-		ExpandItem item3 = new ExpandItem(bar, SWT.NONE, 2);
+		ExpandItem item3 = new ExpandItem(bar, SWT.NONE, 3);
 		item3.setText("Insert Movie's Countries");
 		item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 		item3.setControl(composite);
@@ -1290,8 +1290,43 @@ public class SampleRibbonClass {
 		
 		item3.setExpanded(false);
 		//goofs - 5th item
+		composite = new Composite (bar, SWT.NONE);
+		layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		label = new Label(composite,SWT.NONE);
+		label.setText("Goof:");
+		final Text goofText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		Button goofButton = new Button (composite, SWT.PUSH);
+		goofButton.setText("Add");
+		ExpandItem item4 = new ExpandItem(bar, SWT.NONE, 4);
+		item4.setText("Insert Movie's Goofs");
+		item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item4.setControl(composite);
+		item4.setImage(image);
+		
+		item4.setExpanded(false);
 		//quotes - 6th item
+		composite = new Composite (bar, SWT.NONE);
+		layout = new GridLayout (6,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		label = new Label(composite,SWT.NONE);
+		label.setText("Quote:");
+		final Text quoteText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		Button quoteButton = new Button (composite, SWT.PUSH);
+		quoteButton.setText("Add");
+		ExpandItem item5 = new ExpandItem(bar, SWT.NONE, 5);
+		item5.setText("Insert Movie's Quotes");
+		item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item5.setControl(composite);
+		item5.setImage(image);
+		
+		item5.setExpanded(false);
 		//aka names - 7th item
+		
 		//connections
 		//cast
 		
