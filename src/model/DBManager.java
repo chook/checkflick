@@ -25,7 +25,11 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
+//	private static String CONNECTION_USERNAME = "nadavsh2";
+//	private static String CONNECTION_PASSWORD = "nadavsh2";
+/** Nadav's TAU server - Local connection 	**/
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
 	private static String CONNECTION_USERNAME = "nadavsh2";
 	private static String CONNECTION_PASSWORD = "nadavsh2";
 
@@ -38,7 +42,7 @@ public class DBManager {
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
-	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT * FROM %s ORDER BY %s";
+	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT (%s) FROM %s ORDER BY %s";
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
@@ -156,7 +160,7 @@ public class DBManager {
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
 		// creating the generic statement that contains the table and field names
-		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
+		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, "*", DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
 		// creating the prepared statement template including the ROWNUM limits for the SELECT
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
 		
@@ -205,6 +209,55 @@ public class DBManager {
 		
 		pool.returnConnection(conn);
 		return moviesMap;
+	}
+	
+	/**
+	 * returns a map of persons selected from the DB, that were limited by (top, bottom) limit on the SELECT
+	 * results that are sent are ordered beforehand by MOVIE_ID
+	 * Note: there is no way to return the whole movies list, and you must specify a bottomLimit (memory reasons)
+	 * Note: the rows starts with 1 and not 0 (meaning, topLimit = 0 returns exactly what topLimit = 1 returns)
+	 * @param topLimit the start of the limit (the beginning ROWNUM of the ResultSet returned)
+	 * @param bottomLimit the end of the limit (the ending ROWNUM of the ResultSet returned)
+	 * @return
+	 */
+	public Map<String, Integer> getAllPersons(int topLimit, int bottomLimit) {
+		ResultSet set = null;
+
+		PreparedStatement pstmt = null;
+		Connection conn = pool.getConnection();
+		// creating the generic statement that contains the table and field names
+		String fields = DBFieldsEnum.PERSONS_PERSON_ID + "," + DBFieldsEnum.PERSONS_PERSON_NAME;
+		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, fields, DBTablesEnum.PERSONS, DBFieldsEnum.PERSONS_PERSON_NAME);
+		// creating the prepared statement template including the ROWNUM limits for the SELECT
+		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
+		
+		int tempPersonId;
+		String tempPersonName;
+		Map<String, Integer> personsMap = null;
+		
+		try {
+			pstmt = conn.prepareStatement(pstmtStr);
+			set = pstmt.executeQuery();
+			set.setFetchSize(1000);
+			personsMap = new HashMap<String, Integer>();
+			// adding the persons retrieved to the map
+			while (set.next()) {
+				// retrieving the different fields
+				tempPersonId = set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName());
+				tempPersonName = set.getString(DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName());
+				// inserting the full movie name into the moviesMap
+				personsMap.put(tempPersonName, tempPersonId);
+			}
+			set.close();
+			pstmt.close();
+		} catch (SQLException e) {
+			System.out.println("Error in searchMovies");
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer in searchMovies");
+		}
+		
+		pool.returnConnection(conn);
+		return personsMap;
 	}
 	
 	/**
