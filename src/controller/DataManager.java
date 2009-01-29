@@ -180,7 +180,14 @@ public class DataManager {
 	 * @param dataObject - Data
 	 * @return - True if successfully inserted, False - Otherwise
 	 */
-	public boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject) {
+	public static Runnable insertMovieData(final MovieDataEnum dataType, final AbsType dataObject) {
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.InsertMovie(DBManager.getInstance().insertMovieData(dataType, dataObject, false));
+			}
+		};
+	}
+	public boolean insertMovieDataOld(MovieDataEnum dataType, AbsType dataObject) {
 		return db.insertMovieData(dataType, dataObject, false);
 	}
 	
