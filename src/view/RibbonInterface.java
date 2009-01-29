@@ -36,6 +36,9 @@ public class RibbonInterface {
 	public static void InsertMovie(int id){
 		SampleRibbonClass.drawMoreInsertMovie(id);
 	}
+	public static void InsertPerson(int id){
+		SampleRibbonClass.drawMoreInsertPerson(id);
+	}
 	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
 		SampleRibbonClass.setList(list, type);
 	}
