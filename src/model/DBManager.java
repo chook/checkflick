@@ -13,9 +13,9 @@ public class DBManager {
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 	private static int CONNECTION_MAX_CONNECTIONS = 6;
 /** Chen's home server 1	**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-//	private static String CONNECTION_USERNAME = "chook";
-//	private static String CONNECTION_PASSWORD = "shoochi";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+	private static String CONNECTION_USERNAME = "chook";
+	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
 //	private static String CONNECTION_USERNAME = "chenhare";
@@ -25,13 +25,9 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
 //	private static String CONNECTION_USERNAME = "nadavsh2";
 //	private static String CONNECTION_PASSWORD = "nadavsh2";
-/** Nadav's TAU server - Local connection 	**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
-	private static String CONNECTION_USERNAME = "nadavsh2";
-	private static String CONNECTION_PASSWORD = "nadavsh2";
 
 	// The strings for prepared statements
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
@@ -459,7 +455,7 @@ public class DBManager {
 	 * @param dataObject - The movie data itself
 	 * @return
 	 */
-	public boolean insertMovieData(MovieDataEnum dataType, AbsType dataObject, boolean update) {
+	public int insertMovieData(MovieDataEnum dataType, AbsType dataObject, boolean update) {
 		List<AbsSingleFilter> filterList = filters.getMovieInsertFilter(dataType, dataObject);
 		EntityEnum entity = null;
 		switch(dataType) {
@@ -656,7 +652,7 @@ public class DBManager {
 	 * @param dataObject - The person data itself
 	 * @return
 	 */
-	public boolean insertPersonData(PersonDataEnum dataType, AbsType dataObject, boolean update) {
+	public int insertPersonData(PersonDataEnum dataType, AbsType dataObject, boolean update) {
 		List<AbsSingleFilter> filterList = filters.getPersonInsertFilter(dataType, dataObject);
 		EntityEnum entity = null;
 		switch(dataType) {
@@ -898,7 +894,7 @@ public class DBManager {
 	 * @param filterList - The filter list
 	 * @return
 	 */
-	private Boolean insertAbsDataType(EntityEnum entity,
+	private int insertAbsDataType(EntityEnum entity,
 									  List<AbsSingleFilter> filterList) {
 		Connection conn = pool.getConnection();
 		Statement stmt = null;
@@ -907,6 +903,8 @@ public class DBManager {
 		StringBuffer strFields = new StringBuffer();
 		StringBuffer strValues = new StringBuffer();
 		String strTable = "";
+		ResultSet set = null;
+		int returnValue = 0;
 		
 		// Trying to get a connection statement
 		try {
@@ -933,12 +931,14 @@ public class DBManager {
 			stbQuery.append("(").append(strFields).append(")");
 			stbQuery.append(" VALUES ");
 			stbQuery.append("(").append(strValues).append(")");
-			stmt.executeUpdate(stbQuery.toString());
+			stmt.executeUpdate(stbQuery.toString(), Statement.RETURN_GENERATED_KEYS);
+			set = stmt.getGeneratedKeys();
+			returnValue = set.getInt(1);
 		} catch (SQLException e) {
-			return false;
+			return -1;
 		}
 		pool.returnConnection(conn);
-		return true;
+		return returnValue;
 	}
 
 	/**
@@ -1017,13 +1017,15 @@ public class DBManager {
 		return null;
 	}
 
-	private boolean updateAbsDataType(EntityEnum entity,
+	private int updateAbsDataType(EntityEnum entity,
 			  						List<AbsSingleFilter> filterList) {							
 		Connection conn = pool.getConnection();
 		Statement stmt = null;
 		StringBuffer stbQuery = new StringBuffer();
 		StringBuffer stbWhere = new StringBuffer();
 		int i = 0;
+		ResultSet set = null;
+		int returnValue = 0;
 		
 		// Trying to get a connection statement
 		try {
@@ -1054,12 +1056,14 @@ public class DBManager {
 				}
 			}
 			stbQuery.append(stbWhere);
-			stmt.executeUpdate(stbQuery.toString());
+			stmt.executeUpdate(stbQuery.toString(), Statement.RETURN_GENERATED_KEYS);
+			set = stmt.getGeneratedKeys();
+			returnValue = set.getInt(1);
 		} catch (SQLException e) {
-			return false;
+			return -1;
 		}
 		pool.returnConnection(conn);
-		return true;
+		return returnValue;
 	}
 
 	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType dataObject) {
