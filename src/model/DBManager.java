@@ -13,13 +13,13 @@ public class DBManager {
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 	private static int CONNECTION_MAX_CONNECTIONS = 6;
 /** Chen's home server 1	**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-	private static String CONNECTION_USERNAME = "chook";
-	private static String CONNECTION_PASSWORD = "shoochi";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+//	private static String CONNECTION_USERNAME = "chook";
+//	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "chenhare";
-//	private static String CONNECTION_PASSWORD = "Shoochi0";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "chenhare";
+	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "checkflick";
@@ -66,9 +66,9 @@ public class DBManager {
 		}
 		return instance;
 	}
-	private DBConnectionPool pool = null;
+	private static DBConnectionPool pool = null;
 	
-	private OracleFilterManager filters = null;
+	private static OracleFilterManager filters = null;
 
 	/**
 	 * Default Constructor - Initiates the connection pool
@@ -326,7 +326,7 @@ public class DBManager {
 	 * @param entity - The entity to retrieve 
 	 * @return a list of named entities
 	 */
-	public List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum entity) {
+	public static List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum entity) {
 		Connection c = pool.getConnection();
 		List<NamedEntity> list = new ArrayList<NamedEntity>();
 		Statement s;
@@ -993,7 +993,7 @@ public class DBManager {
 	 * @return
 	 */
 	private int insertAbsDataType(EntityEnum entity,
-									  List<AbsSingleFilter> filterList) {
+								  List<AbsSingleFilter> filterList) {
 		Connection conn = pool.getConnection();
 		Statement stmt = null;
 		StringBuffer stbQuery = new StringBuffer();
@@ -1025,15 +1025,22 @@ public class DBManager {
 					strTable = filter.getTable();
 				}
 			}
+			
 			stbQuery.append(strTable);
 			stbQuery.append("(").append(strFields).append(")");
 			stbQuery.append(" VALUES ");
 			stbQuery.append("(").append(strValues).append(")");
-			stmt.executeUpdate(stbQuery.toString(), Statement.RETURN_GENERATED_KEYS);
+			stmt.executeUpdate(stbQuery.toString(), new String[] {filterList.get(0).getColumn()});
 			set = stmt.getGeneratedKeys();
+			set.next();
 			returnValue = set.getInt(1);
 		} catch (SQLException e) {
-			return -1;
+			try {
+				// If the return of the key failed, send the statement without return value and return 0
+				stmt.executeUpdate(stbQuery.toString());
+			} catch (SQLException e2) {
+				returnValue = -1;
+			}
 		}
 		pool.returnConnection(conn);
 		return returnValue;
@@ -1103,10 +1110,13 @@ public class DBManager {
 			case NAMED_CASTING_RELATION:
 				return new NamedCastingRelation(rs.getInt(1), rs.getInt(2),
 						rs.getInt(3),(rs.getString(4).equals("Y") ? true : false), rs.getString(5), rs.getInt(6),rs.getString(8));
+			case RELATION:
+				return new Relation(rs.getInt(1), rs.getInt(2));
 			case MOVIE_ENTITY:
 				return fillMovieFromSet(rs);
 			case PERSON_ENTITY:
 				return fillPersonFromSet(rs);
+
 			}
 		}
 		catch (SQLException e) {

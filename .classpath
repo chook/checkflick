@@ -3,8 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/ojdbc5.jar"/>
-	<classpathentry kind="lib" path="lib/com.hexapixel.widgets.ribbon.alphatest.jar"/>
 	<classpathentry kind="lib" path="lib/swt/win x64/swt.jar"/>
 	<classpathentry kind="lib" path="images/icons"/>
+	<classpathentry kind="lib" path="lib/com.hexapixel.widgets.ribbon.alphatest.src.jar"/>
+	<classpathentry kind="lib" path="lib/com.hexapixel.widgets.ribbon.alphatest.jar" sourcepath="lib/com.hexapixel.widgets.ribbon.alphatest.src.jar"/>
+	<classpathentry kind="lib" path="lib/ini4j-0.3.2.jar"/>
+	<classpathentry kind="lib" path="ini"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

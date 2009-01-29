@@ -56,7 +56,7 @@ public class DataManager {
 	public static Runnable getAllNamedEntities(final NamedEntitiesEnum name) {
 		return new Runnable() {
 			public void run() {
-				RibbonInterface.SetNamedList(DBManager.getInstance().getAllNamedEntities(name), name);		
+				RibbonInterface.SetNamedList(DBManager.getAllNamedEntities(name), name);		
 			}
 		};
 	}
@@ -191,7 +191,10 @@ public class DataManager {
 	public static Runnable insertMovieData(final MovieDataEnum dataType, final AbsType dataObject) {
 		return new Runnable() {
 			public void run() {
-				RibbonInterface.InsertMovie(DBManager.getInstance().insertMovieData(dataType, dataObject, false));
+				if(dataType == MovieDataEnum.MOVIE)
+					RibbonInterface.InsertMovie(DBManager.getInstance().insertMovieData(dataType, dataObject, false));
+				else
+					RibbonInterface.InsertMovieExtraData(DBManager.getInstance().insertMovieData(dataType, dataObject, false));
 			}
 		};
 	}
@@ -248,7 +251,6 @@ public class DataManager {
 				}
 			}
 		};
-		
 	}
 	
 	/**
