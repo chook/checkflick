@@ -206,10 +206,16 @@ public class DataManager {
 	 * @param dataObject - Data
 	 * @return - True if successfully inserted, False - Otherwise
 	 */
-	public int insertPersonData(PersonDataEnum dataType, AbsType dataObject) {
+	public int insertPersonDataOld(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, false);
 	}
-
+	public static Runnable insertPersonData(final PersonDataEnum dataType, final AbsType dataObject) {
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.InsertPerson(DBManager.getInstance().insertPersonData(dataType, dataObject, false));
+			}
+		};
+	}
 	public int updatePersonData(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, true);
 	}
