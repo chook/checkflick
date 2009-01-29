@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.callback.LanguageCallback;
+
 import oracle.net.aso.i;
 
 import org.eclipse.swt.SWT;
@@ -29,12 +31,14 @@ import com.hexapixel.widgets.ribbon.RibbonTab;
 import com.hexapixel.widgets.ribbon.RibbonTabFolder;
 import com.hexapixel.widgets.ribbon.RibbonTooltip;
 
+import controller.AppData;
 import controller.DataManager;
 import controller.entity.AbsType;
 import controller.entity.DatedEntity;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
 import controller.entity.PersonEntity;
+import controller.entity.Relation;
 import controller.enums.MovieDataEnum;
 import controller.enums.NamedEntitiesEnum;
 import controller.enums.PersonDataEnum;
@@ -67,11 +71,34 @@ public class SampleRibbonClass {
 	static ThreadPool pool = null;
 	static ExpandBar bar;
 	static ExpandItem otherResults;
-	
+	static AppData settings = null;
 	public static void main(String args []) {
-		pool = new ThreadPool(5);
+		AppData.getInstance().parseINIFile("ini\\checkflick.ini");
+		pool = new ThreadPool(AppData.getInstance().getMaxThreads());
 		dm = new DataManager();
 		display = new Display();
+		try {
+			genresList = new ArrayList<NamedEntity>();
+			genresList.add(new NamedEntity(0,""));
+			colorList = new ArrayList<NamedEntity>();
+			colorList.add(new NamedEntity(0,""));
+			countriesList = new ArrayList<NamedEntity>();
+			countriesList.add(new NamedEntity(0,""));
+			langList = new ArrayList<NamedEntity>();
+			langList.add(new NamedEntity(0,""));
+			rolesList = new ArrayList<NamedEntity>();
+			rolesList.add(new NamedEntity(0,""));
+			
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS));
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES));
+			pool.stopRequestIdleWorkers();
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.GENRES));
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES));
+			pool.stopRequestIdleWorkers();
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES));
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		SampleRibbonClass app = new SampleRibbonClass();
 		app.createShell();
 		
@@ -94,7 +121,7 @@ public class SampleRibbonClass {
 	protected static void updateMovieTab(final MovieEntity movie){
 		display.asyncExec(new Runnable() {
 			public void run() {
-				String tabName= movie.getName().substring(0, 6);
+				String tabName = movie.getName().substring(0, Math.min(movie.getName().length(), 8));
 				final RibbonTabFolder tabs = shell.getRibbonTabFolder();
 				movieTab = new RibbonTab(tabs,tabName);
 				ShowMovieResult(movieTab , movie);
@@ -220,59 +247,52 @@ public class SampleRibbonClass {
 				String message = "";
 				List<NamedEntity> list = null;
 				switch(type){
-				case MOVIE_AKAS:{
+				case MOVIE_AKAS:
 					image = ImageCache.getImage("book_48.png");
 					title = "AKA Names For The Movie";
 					titles[1] = "Name";
 					message = "No AKA names for this movie.";
 					break;
-				}
-				case MOVIE_CONNECTIONS:{ 
+				case MOVIE_CONNECTIONS:
 					image = ImageCache.getImage("google_48.png");
 					title = "Movie's Connections To Other Movies";
 					titles[1]="Name";
 					message = "This movie is not connected to any other movie.";
 					break;
-				}
-				case MOVIE_COUNTRIES:{
+				case MOVIE_COUNTRIES:
 					list = countriesList;
 					image = ImageCache.getImage("globe_48.png");
 					title ="Movie's Countries";
 					titles[1]="Country";
 					message = "No countries for this movie.";
 					break;
-				}
-				case MOVIE_LANGUAGES:{
+				case MOVIE_LANGUAGES:
 					list = langList;
 					image = ImageCache.getImage("furl_48.png");
 					title = "Movie's Languages";
 					titles[1] = "Language";
 					message = "No languages for this movie.";
 					break;
-				}
-				case MOVIE_GOOFS:{
+				case MOVIE_GOOFS:
 					image = ImageCache.getImage("smile_grin_48.png");
 					title = "Movie's Goofs";
 					titles[1] = "Goof";
 					message = "No goofs for this movie.";
 					break;
-				}
-				case MOVIE_QUOTES:{
+				case MOVIE_QUOTES:
 					image = ImageCache.getImage("speech_bubble_48.png");
 					title = "Famous Quotes From The Movie";
 					titles[1] = "Quote";
 					message = "No quotes for this movie.";
 					break;
-				}
-				case MOVIE_GENRES:{
+				case MOVIE_GENRES:
 					list = genresList;
 					image = ImageCache.getImage("pie_chart_48.png");
 					title = "Movie's Genres";
 					titles[1] = "Genre";
 					message = "No genres for this movie.";
 					break;
-				}
-				case MOVIE_CAST:{
+				case MOVIE_CAST:
 					image = ImageCache.getImage("users_two_48.png");
 					title = "Movie's Cast";
 					titles[1] = "Name";
@@ -280,7 +300,6 @@ public class SampleRibbonClass {
 					toGet = "type";
 					message ="No cast for this movie.";
 					break;
-				}
 				}
 				if ((movieButtons != null) && !(movieButtons.isDisposed())){
 					movieButtons.dispose();
@@ -295,7 +314,7 @@ public class SampleRibbonClass {
 					table.setLayoutData(data);
 					for (int i=0; i<titles.length; i++) {
 						TableColumn column = new TableColumn (table, SWT.NONE);
-						column.setText (titles [i]);
+						column.setText(titles[i]);
 					}	
 					final int count = result.size();
 					System.out.println(count);
@@ -419,16 +438,6 @@ public class SampleRibbonClass {
 		});		
 		//getting the lists from the DB
 		//DataManager dm = DataManager.getInstance();
-		try {
-			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS));
-			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES));
-			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.GENRES));
-			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES));
-			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES));
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
@@ -1631,134 +1640,183 @@ public class SampleRibbonClass {
 				//genres- 2nd item
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
-				okMessageBox("id "+String.valueOf(id));
-				moreInsert = new ExpandBar(insertMovie, SWT.V_SCROLL);
-				Composite composite = new Composite (moreInsert, SWT.NONE);
-				GridLayout layout = new GridLayout (6,false);
-				Image image = ImageCache.getImage("add_48.png");
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				Label label = new Label(composite ,SWT.NONE);
-				label.setText("Genre:");
-				final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
-				String[] genresString= new String[genresList.size()];
-				for (int i=0; i<genresList.size(); i++){
-					genresString[i]=genresList.get(i).getName();
+				
+				if(id == -1) {
+					okMessageBox("There was a problem inserting the movie");
+				} else {
+					moreInsert = new ExpandBar(insertMovie, SWT.V_SCROLL);
+					Composite composite = new Composite (moreInsert, SWT.NONE);
+					GridLayout layout = new GridLayout (6,false);
+					Image image = ImageCache.getImage("add_48.png");
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					Label label = new Label(composite ,SWT.NONE);
+					label.setText("Genre:");
+					final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
+					String[] genresString= new String[genresList.size()];
+					for (int i=0; i<genresList.size(); i++){
+						genresString[i]=genresList.get(i).getName();
+					}
+					genresCombo.setItems (genresString);
+					Button genreButton = new Button (composite, SWT.PUSH);
+					genreButton.setText("Add");
+					genreButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(genresCombo.getText() != null && genresCombo.getText() != "") {
+								AbsType t = new Relation(id, Integer.parseInt(getID(genresList, genresCombo.getText())));
+								try {
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GENRES, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
+					
+					ExpandItem item1 = new ExpandItem(moreInsert, SWT.NONE, 0);
+					item1.setText("Insert Movie's Genres");
+					item1.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(composite);
+					item1.setImage(image);
+					item1.setExpanded(false);
+					
+					//languages- 3rd item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Language:");
+					final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
+					String[] langString= new String[langList.size()];
+					for (int i=0; i<langList.size(); i++){
+						langString[i]=langList.get(i).getName();
+					}
+					langCombo.setItems(langString);
+					Button langButton = new Button (composite, SWT.PUSH);
+					langButton.setText("Add");
+					langButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(langCombo.getText() != null && langCombo.getText() != "") {
+								AbsType t = new Relation(id, Integer.parseInt(getID(langList, langCombo.getText())));
+								try {
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_LANGUAGES, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
+					
+					ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 1);
+					item2.setText("Insert Movie's Languages");
+					item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item2.setControl(composite);
+					item2.setImage(image);
+					item2.setExpanded(false);
+					
+					//countries - 4th item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Country:");
+					final Combo countryCombo = new Combo(composite ,SWT.READ_ONLY);
+					String[] countryString= new String[countriesList.size()];
+					for (int i=0; i<countriesList.size(); i++){
+						countryString[i]=countriesList.get(i).getName();
+					}
+					countryCombo.setItems(countryString);
+					Button countryButton = new Button (composite, SWT.PUSH);
+					countryButton.setText("Add");
+					countryButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(countryCombo.getText() != null && countryCombo.getText() != "") {
+								AbsType t = new Relation(id, Integer.parseInt(getID(countriesList, countryCombo.getText())));
+								try {
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_COUNTRIES, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
+					
+					ExpandItem item3 = new ExpandItem(moreInsert, SWT.NONE, 2);
+					item3.setText("Insert Movie's Countries");
+					item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item3.setControl(composite);
+					item3.setImage(image);
+					item3.setExpanded(false);
+					
+					//goofs - 5th item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Goof:");
+					final Text goofText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+					Button goofButton = new Button (composite, SWT.PUSH);
+					goofButton.setText("Add");
+					ExpandItem item4 = new ExpandItem(moreInsert, SWT.NONE, 3);
+					item4.setText("Insert Movie's Goofs");
+					item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item4.setControl(composite);
+					item4.setImage(image);
+					item4.setExpanded(false);
+					
+					//quotes - 6th item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Quote:");
+					final Text quoteText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+					Button quoteButton = new Button (composite, SWT.PUSH);
+					quoteButton.setText("Add");
+					ExpandItem item5 = new ExpandItem(moreInsert, SWT.NONE, 4);
+					item5.setText("Insert Movie's Quotes");
+					item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item5.setControl(composite);
+					item5.setImage(image);
+					item5.setExpanded(false);
+					
+					//aka names - 7th item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("AKA Name:");
+					final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+					Button akaButton = new Button (composite, SWT.PUSH);
+					akaButton.setText("Add");
+					ExpandItem item6 = new ExpandItem(moreInsert, SWT.NONE, 5);
+					item6.setText("Insert Movie's AKA Names");
+					item6.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item6.setControl(composite);
+					item6.setImage(image);
+					item6.setExpanded(false);
+					//connections
+					//cast
+					moreInsert.setSpacing(8);
+					insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
 				}
-				genresCombo.setItems (genresString);
-				Button genreButton = new Button (composite, SWT.PUSH);
-				genreButton.setText("Add");
-				ExpandItem item1 = new ExpandItem(moreInsert, SWT.NONE, 0);
-				item1.setText("Insert Movie's Genres");
-				item1.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(composite);
-				item1.setImage(image);
-				item1.setExpanded(false);
-				
-				//languages- 3rd item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Language:");
-				final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
-				String[] langString= new String[langList.size()];
-				for (int i=0; i<langList.size(); i++){
-					langString[i]=langList.get(i).getName();
-				}
-				langCombo.setItems(langString);
-				Button langButton = new Button (composite, SWT.PUSH);
-				langButton.setText("Add");
-				ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 1);
-				item2.setText("Insert Movie's Languages");
-				item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item2.setControl(composite);
-				item2.setImage(image);
-				item2.setExpanded(false);
-				
-				//countries - 4th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Country:");
-				final Combo countryCombo = new Combo(composite ,SWT.READ_ONLY);
-				String[] countryString= new String[countriesList.size()];
-				for (int i=0; i<countriesList.size(); i++){
-					countryString[i]=countriesList.get(i).getName();
-				}
-				countryCombo.setItems(countryString);
-				Button countryButton = new Button (composite, SWT.PUSH);
-				countryButton.setText("Add");
-				ExpandItem item3 = new ExpandItem(moreInsert, SWT.NONE, 2);
-				item3.setText("Insert Movie's Countries");
-				item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item3.setControl(composite);
-				item3.setImage(image);
-				item3.setExpanded(false);
-				
-				//goofs - 5th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Goof:");
-				final Text goofText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-				Button goofButton = new Button (composite, SWT.PUSH);
-				goofButton.setText("Add");
-				ExpandItem item4 = new ExpandItem(moreInsert, SWT.NONE, 3);
-				item4.setText("Insert Movie's Goofs");
-				item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item4.setControl(composite);
-				item4.setImage(image);
-				item4.setExpanded(false);
-				
-				//quotes - 6th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Quote:");
-				final Text quoteText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-				Button quoteButton = new Button (composite, SWT.PUSH);
-				quoteButton.setText("Add");
-				ExpandItem item5 = new ExpandItem(moreInsert, SWT.NONE, 4);
-				item5.setText("Insert Movie's Quotes");
-				item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item5.setControl(composite);
-				item5.setImage(image);
-				item5.setExpanded(false);
-				
-				//aka names - 7th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("AKA Name:");
-				final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-				Button akaButton = new Button (composite, SWT.PUSH);
-				akaButton.setText("Add");
-				ExpandItem item6 = new ExpandItem(moreInsert, SWT.NONE, 5);
-				item6.setText("Insert Movie's AKA Names");
-				item6.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item6.setControl(composite);
-				item6.setImage(image);
-				item6.setExpanded(false);
-				//connections
-				//cast
-				moreInsert.setSpacing(8);
-				insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
 			}
 		});
 	}
@@ -1896,6 +1954,14 @@ public class SampleRibbonClass {
 				//cast
 				moreInsert.setSpacing(8);
 				insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
+			}
+		});
+	}
+
+	public static void drawInsertMovieDataSuccess() {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				okMessageBox("Successfuly added to movie");		
 			}
 		});
 	}

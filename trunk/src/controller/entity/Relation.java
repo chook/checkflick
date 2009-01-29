@@ -43,7 +43,7 @@ public class Relation extends AbsType {
 
 	@Override
 	public String toString() {
-		return super.toString() + " secondery id: " + getSecondaryId();
+		return super.toString() + " secondary id: " + getSecondaryId();
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class Relation extends AbsType {
 	@Override
 	public Map<String, String> toStringMap() {
 		Map<String, String> map = super.toStringMap();
-		map.put("seconderyId", String.valueOf(getSecondaryId()));
+		map.put("secondaryId", String.valueOf(getSecondaryId()));
 		return map;
 	}
 }

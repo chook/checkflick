@@ -22,10 +22,10 @@ public class RibbonInterface {
 		SampleRibbonClass.updatePersonTab(person);
 	}
 	public static void drawPersonData(List<AbsType> result , PersonDataEnum type){
-		SampleRibbonClass.drawPersonData(result , type);
+		SampleRibbonClass.drawPersonData(result, type);
 	}
 	public static void drawMovieData(List<AbsType> result , MovieDataEnum type){
-		SampleRibbonClass.drawMovieData(result , type);
+		SampleRibbonClass.drawMovieData(result, type);
 	}
 	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
 		SampleRibbonClass.drawSearchMovieTable(list, search);
@@ -36,6 +36,11 @@ public class RibbonInterface {
 	public static void InsertMovie(int id){
 		SampleRibbonClass.drawMoreInsertMovie(id);
 	}
+	
+	public static void InsertMovieExtraData(int id){
+		SampleRibbonClass.drawInsertMovieDataSuccess();
+	}
+	
 	public static void InsertPerson(int id){
 		SampleRibbonClass.drawMoreInsertPerson(id);
 	}

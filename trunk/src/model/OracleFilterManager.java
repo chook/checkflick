@@ -59,6 +59,11 @@ public class OracleFilterManager {
 					DBTablesEnum.MOVIE_GENRES.getTableName(),
 					DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(), id);
 			break;
+		case MOVIE_LANGUAGES:
+			filter = new OracleSingleFilter(FilterOptionEnum.NUMBER,
+					DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+					DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(), id);
+			break;
 		case MOVIE_QUOTES:
 			filter = new OracleSingleFilter(FilterOptionEnum.NUMBER,
 					DBTablesEnum.MOVIE_QUOTES.getTableName(),
