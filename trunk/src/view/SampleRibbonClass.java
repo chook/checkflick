@@ -62,14 +62,14 @@ public class SampleRibbonClass {
 	static List<NamedEntity> countriesList;
 	static List<NamedEntity> langList;
 	static List<NamedEntity> rolesList;
-	static DataManager dm = DataManager.getInstance();
+	static DataManager dm = null;//DataManager.getInstance();
 	static ThreadPool pool = null;
 	static ExpandBar bar;
 	static ExpandItem otherResults;
 	
 	public static void main(String args []) {
-		pool = new ThreadPool(3);
-		
+		pool = new ThreadPool(5);
+		dm = new DataManager();
 		display = new Display();
 		SampleRibbonClass app = new SampleRibbonClass();
 		app.createShell();
@@ -470,6 +470,33 @@ public class SampleRibbonClass {
 		//cast
 		insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
 	}
+	
+	protected static void setList(List<NamedEntity> list, NamedEntitiesEnum type) {
+		System.out.println("Got list: " + type.toString());
+		switch(type) {
+		case GENRES:
+			genresList = list;
+			break;
+		case COLOR_INFOS:
+			colorList = list;
+			break;
+		case COUNTRIES:
+			countriesList = list;
+			break;
+		case PRODUCTION_ROLES:
+			rolesList = list;
+			break;
+		case LANGUAGES:
+			langList = list;
+			break;
+		}
+		/*genresList = dm.getAllNamedEntities(NamedEntitiesEnum.GENRES);
+		colorList = dm.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS);
+		langList = dm.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES);
+		rolesList =dm.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES);
+		countriesList = dm.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES);*/
+	}
+	
 	private void createShell() {
 		shell = new RibbonShell(display);
 		shell.setButtonImage(ImageCache.getImage("selection_recycle_24.png"));
@@ -513,12 +540,17 @@ public class SampleRibbonClass {
 			
 		});		
 		//getting the lists from the DB
-		DataManager dm = DataManager.getInstance();
-		genresList = dm.getAllNamedEntities(NamedEntitiesEnum.GENRES);
-		colorList = dm.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS);
-		langList = dm.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES);
-		rolesList =dm.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES);
-		countriesList = dm.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES);
+		//DataManager dm = DataManager.getInstance();
+		try {
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS));
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES));
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.GENRES));
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES));
+			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES));
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
@@ -781,61 +813,10 @@ public class SampleRibbonClass {
 				System.out.println(list.toString());
 
 				//search for movies
-				List<DatedEntity> searched = dm.search(SearchEntitiesEnum.MOVIES, list);
-				//creating the search results table
-				final int count = searched.size();
-				System.out.println(count);
-				if (count > 0){
-					final Table table = new Table (resultsMovieTable, SWT.MULTI| SWT.BORDER|SWT.FULL_SELECTION);
-					table.setLinesVisible (true);
-					table.setHeaderVisible (true);
-					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-					data.heightHint = 200;
-					table.setLayoutData(data);
-					String[] titles = {" ", "Name", "Year", "ID"};
-					for (int i=0; i<titles.length; i++) {
-						TableColumn column = new TableColumn (table, SWT.NONE);
-						column.setText (titles [i]);
-					}	
-					for (int i=0; i<count; i++) {
-						TableItem item = new TableItem (table, SWT.NONE);
-						item.setText (0, String.valueOf(i+1));
-						item.setText (1, searched.get(i).getName());
-						item.setText (2, String.valueOf(searched.get(i).getYear()));
-						item.setText (3, String.valueOf(searched.get(i).getId()));
-					}
-					for (int i=0; i<titles.length; i++) {
-						table.getColumn (i).pack ();
-					}
-				
-					table.addListener(SWT.MouseDoubleClick, new Listener() {
-						public void handleEvent(Event event) {
-							Point pt = new Point(event.x, event.y);
-							TableItem item = table.getItem(pt);
-							if (item == null)
-								return;
-							for (int i = 0; i < count; i++) {
-								Rectangle rect = item.getBounds(i);
-								if (rect.contains(pt)) {
-									int index = table.indexOf(item);
-									int id = Integer.parseInt(table.getItem(index).getText(3));
-									try {
-										pool.execute(DataManager.getMovieById(id));
-									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}
-						}
-					});
-					resultsMovieTable.setLocation(2,  145+ shell.getShell().getSize().y/4);
-					resultsMovieTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
-				}
-				else{ // if there were no results
-					switch(okMessageBox("No results. Please change your choises and try again.")){
-    				case(SWT.OK):{}
-					}
+				try {
+					pool.execute(DataManager.search(SearchEntitiesEnum.MOVIES, list));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -936,59 +917,11 @@ public class SampleRibbonClass {
 					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_AGE, ageFrom.getText() , ageTo.getText()));
 				System.out.println(list.toString());
 				//search for persons
-				List<DatedEntity> searched = dm.search(SearchEntitiesEnum.PERSONS, list);
-				final int count = searched.size();
-				//creating the search results table
-				if (count > 0){
-					final Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
-					table.setLinesVisible (true);
-					table.setHeaderVisible (true);
-					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-					data.heightHint = 200;
-					table.setLayoutData(data);
-					String[] titles = {" ", "Name", "Age", "ID"};
-					for (int i=0; i<titles.length; i++) {
-						TableColumn column = new TableColumn (table, SWT.NONE);
-						column.setText (titles [i]);
-					}	
-					for (int i=0; i<count; i++) {
-						TableItem item = new TableItem (table, SWT.NONE);
-						item.setText (0, String.valueOf(i+1));
-						item.setText (1, searched.get(i).getName());
-						item.setText (2, String.valueOf(searched.get(i).getYear()));
-						item.setText (3, String.valueOf(searched.get(i).getId()));
-					}
-					for (int i=0; i<titles.length; i++) {
-						table.getColumn (i).pack ();
-					}	
-					table.addListener(SWT.MouseDoubleClick, new Listener() {
-						public void handleEvent(Event event) {
-							Point pt = new Point(event.x, event.y);
-							TableItem item = table.getItem(pt);
-							if (item == null)
-								return;
-							for (int i = 0; i < count; i++) {
-								Rectangle rect = item.getBounds(i);
-								if (rect.contains(pt)) {
-									int index = table.indexOf(item);
-									int id = Integer.parseInt(table.getItem(index).getText(3));
-									try {
-										pool.execute(DataManager.getPersonById(id));
-									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}
-						}
-					});
-					resultsPersonTable.setLocation(2,  145+ shell.getShell().getSize().y/4);
-					resultsPersonTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
-				}
-				else{ // if there were no results
-					switch(okMessageBox("No results. Please change your choises and try again.")){
-    				case(SWT.OK):{}
-					}
+				
+				try {
+					pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
 			}			
 		});
@@ -1544,5 +1477,129 @@ public class SampleRibbonClass {
 		}
 		//else return "";
 		return name;
+	}
+
+	public static void drawSearchMovieTable(final List<DatedEntity> searched,
+			final SearchEntitiesEnum search) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				//creating the search results table
+				final int count = searched.size();
+				System.out.println(count);
+				if (count > 0){
+					final Table table = new Table (resultsMovieTable, SWT.MULTI| SWT.BORDER|SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name", "Year", "ID"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					for (int i=0; i<count; i++) {
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, searched.get(i).getName());
+						item.setText (2, String.valueOf(searched.get(i).getYear()));
+						item.setText (3, String.valueOf(searched.get(i).getId()));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}
+				
+					table.addListener(SWT.MouseDoubleClick, new Listener() {
+						public void handleEvent(Event event) {
+							Point pt = new Point(event.x, event.y);
+							TableItem item = table.getItem(pt);
+							if (item == null)
+								return;
+							for (int i = 0; i < count; i++) {
+								Rectangle rect = item.getBounds(i);
+								if (rect.contains(pt)) {
+									int index = table.indexOf(item);
+									int id = Integer.parseInt(table.getItem(index).getText(3));
+									try {
+										pool.execute(DataManager.getMovieById(id));
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}
+						}
+					});
+					resultsMovieTable.setLocation(2,  145+ shell.getShell().getSize().y/4);
+					resultsMovieTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
+				}
+				else{ // if there were no results
+					switch(okMessageBox("No results. Please change your choises and try again.")){
+    				case(SWT.OK):{}
+					}
+				}
+			}
+		});
+	}
+	
+	public static void drawSearchPersonTable(final List<DatedEntity> searched,
+			final SearchEntitiesEnum search) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				final int count = searched.size();
+				//creating the search results table
+				if (count > 0){
+					final Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					table.setLinesVisible (true);
+					table.setHeaderVisible (true);
+					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+					data.heightHint = 200;
+					table.setLayoutData(data);
+					String[] titles = {" ", "Name", "Age", "ID"};
+					for (int i=0; i<titles.length; i++) {
+						TableColumn column = new TableColumn (table, SWT.NONE);
+						column.setText (titles [i]);
+					}	
+					for (int i=0; i<count; i++) {
+						TableItem item = new TableItem (table, SWT.NONE);
+						item.setText (0, String.valueOf(i+1));
+						item.setText (1, searched.get(i).getName());
+						item.setText (2, String.valueOf(searched.get(i).getYear()));
+						item.setText (3, String.valueOf(searched.get(i).getId()));
+					}
+					for (int i=0; i<titles.length; i++) {
+						table.getColumn (i).pack ();
+					}	
+					table.addListener(SWT.MouseDoubleClick, new Listener() {
+						public void handleEvent(Event event) {
+							Point pt = new Point(event.x, event.y);
+							TableItem item = table.getItem(pt);
+							if (item == null)
+								return;
+							for (int i = 0; i < count; i++) {
+								Rectangle rect = item.getBounds(i);
+								if (rect.contains(pt)) {
+									int index = table.indexOf(item);
+									int id = Integer.parseInt(table.getItem(index).getText(3));
+									try {
+										pool.execute(DataManager.getPersonById(id));
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}
+						}
+					});
+					resultsPersonTable.setLocation(2,  145+ shell.getShell().getSize().y/4);
+					resultsPersonTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
+				}
+				else{ // if there were no results
+					switch(okMessageBox("No results. Please change your choises and try again.")){
+					case(SWT.OK):{}
+					}
+				}
+			}
+		});
 	}
 }

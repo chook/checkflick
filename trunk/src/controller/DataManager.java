@@ -53,11 +53,19 @@ public class DataManager {
 	 * @param name
 	 * @return
 	 */
-	public synchronized List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
+	public static Runnable getAllNamedEntities(final NamedEntitiesEnum name) {
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.SetNamedList(DBManager.getInstance().getAllNamedEntities(name), name);		
+			}
+		};
+	}
+	
+	/*public synchronized List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
 		if(!namedEntities.containsKey(name))
 			namedEntities.put(name, db.getAllNamedEntities(name));
 		return namedEntities.get(name);
-	}
+	}*/
 	
 	/**
 	 * This function creates a filter object for the user to help search
@@ -187,7 +195,8 @@ public class DataManager {
 			}
 		};
 	}
-	public boolean insertMovieDataOld(MovieDataEnum dataType, AbsType dataObject) {
+	
+	public int insertMovieDataOld(MovieDataEnum dataType, AbsType dataObject) {
 		return db.insertMovieData(dataType, dataObject, false);
 	}
 	
@@ -197,16 +206,16 @@ public class DataManager {
 	 * @param dataObject - Data
 	 * @return - True if successfully inserted, False - Otherwise
 	 */
-	public boolean insertPersonData(PersonDataEnum dataType, AbsType dataObject) {
+	public int insertPersonData(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, false);
 	}
 
-	public boolean updatePersonData(PersonDataEnum dataType, AbsType dataObject) {
+	public int updatePersonData(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, true);
 	}
 	
 
-	public boolean updateMovieData(MovieDataEnum dataType, AbsType dataObject) {
+	public int updateMovieData(MovieDataEnum dataType, AbsType dataObject) {
 		return db.insertMovieData(dataType, dataObject, true);
 	}
 
@@ -216,20 +225,24 @@ public class DataManager {
 	 * @param list - filters
 	 * @return a named list
 	 */
-	public List<DatedEntity> search(SearchEntitiesEnum entity, List<AbsFilter> list) {
-		switch(entity)
-		{
-			case MOVIES:
-			{
-				return getEntitiesBySearch(list, DBTablesEnum.MOVIES);
+	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list) {
+		return new Runnable() {
+			public void run() {
+				System.out.println("About to search for " + entity.toString());
+				switch(entity)
+				{
+					case MOVIES:
+						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity);
+						break;
+					case PERSONS:
+						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity);
+						break;
+					default:
+						break;
+				}
 			}
-			case PERSONS:
-			{
-				return getEntitiesBySearch(list, DBTablesEnum.PERSONS);
-			}
-			default:
-				return null;
-		}
+		};
+		
 	}
 	
 	/**

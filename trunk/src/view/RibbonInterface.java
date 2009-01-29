@@ -1,19 +1,17 @@
 package view;
 
 import java.util.List;
-
-import org.eclipse.swt.widgets.Display;
-
 import controller.entity.AbsType;
+import controller.entity.DatedEntity;
 import controller.entity.MovieEntity;
+import controller.entity.NamedEntity;
 import controller.entity.PersonEntity;
 import controller.enums.MovieDataEnum;
+import controller.enums.NamedEntitiesEnum;
 import controller.enums.PersonDataEnum;
+import controller.enums.SearchEntitiesEnum;
 
 public class RibbonInterface {
-	protected RibbonInterface(Display display) {
-	}
-	
 	public static void settingShellText(final String text) {
 		SampleRibbonClass.updateShellText(text);		
 	}
@@ -29,8 +27,16 @@ public class RibbonInterface {
 	public static void drawMovieData(List<AbsType> result , MovieDataEnum type){
 		SampleRibbonClass.drawMovieData(result , type);
 	}
+	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
+		SampleRibbonClass.drawSearchMovieTable(list, search);
+	}
+	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
+		SampleRibbonClass.drawSearchPersonTable(list, search);
+	}
 	public static void InsertMovie(int id){
 		SampleRibbonClass.drawMoreInsertMovie(id);
 	}
-
+	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
+		SampleRibbonClass.setList(list, type);
+	}
 }

@@ -63,9 +63,9 @@ public class OracleSingleFilter extends AbsSingleFilter {
 		case DATE: 
 			return super.getValue();
 		case BOOLEAN: 
-			return "'" + ((Boolean.parseBoolean(super.getValue()) == true) ? "Y" : "N") + "'";
+			return (super.getValue() != null ? "'" + ((Boolean.parseBoolean(super.getValue()) == true) ? "Y" : "N") + "'" : null);
 		case STRING:
-			return "'" + super.getValue().replace("'", "''") + "'";
+			return (super.getValue() != null ? "'" + super.getValue().replace("'", "''") + "'" : null);
 		}
 		return null;
 	}
