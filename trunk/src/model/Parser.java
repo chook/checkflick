@@ -19,6 +19,8 @@ public class Parser {
 	static String actorsListEndLine = "SUBMITTING UPDATES";
 	
 	private BufferedReader listFile;
+	private ListFilesEnum listType;
+	private String filename;
 	private String listStartLine1;
 	private String listStartLine2;
 	private boolean hasEndLine;
@@ -44,7 +46,8 @@ public class Parser {
 			//InputStreamReader insr = new InputStreamReader(fstream, "UTF-8");
 			InputStreamReader insr = new InputStreamReader(fstream);
 			listFile =  new BufferedReader(insr);
-			currentLine = 0;
+			this.listType = listType;
+			currentLine = 1;
 			isEOF = false;
 			listEndLine = "";
 			
@@ -95,10 +98,14 @@ public class Parser {
 	}
 	
 	/**
-	 * runs to the start of the list in the file (after all the comments in the beginning)
+	 * opens the file again, to start from the top of the list
+	 * and then runs to the start of the list in the file (after all the comments in the beginning)
 	 * @return boolean if the start of the list was found
 	 */
 	public boolean findStartOfList() {
+		closeFile();
+		loadFile(filename, listType);
+
 		if (findLine(listStartLine1) && findLine(listStartLine2)) {
 			checkIfEOF();
 			return true;
@@ -153,7 +160,7 @@ public class Parser {
 	 * @return boolean whether the method succeeded
 	 */
 	public boolean resetLineCount() {
-		currentLine = 0;
+		currentLine = 1;
 		
 		return true;
 	}
@@ -177,6 +184,34 @@ public class Parser {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Runs over the file until reaching the line number
+	 * @param lineNumber the line to get to
+	 * @return int 1 if the line was found, 0 if the line wasn't found (EOF before the line number), -1 if the line requested is smaller than the current line
+	 * 				-2 if there was an error
+	 */
+	public int findLine(int lineNumber) {
+		try {
+			if (lineNumber < getLineNumber())
+				return -1;
+			else if (lineNumber == getLineNumber())
+				return 1;
+			else {
+				while (!isEOF()) {
+					readLine();
+					if (getLineNumber() == lineNumber)
+						return 1;
+				}
+				// if the code reached here, the EOF was reached before lineNumber
+				return 0;
+			}
+		}
+		catch (Exception e) {
+			System.err.println("File input error");
+		}
+		return -2;
 	}
 	
 	/**

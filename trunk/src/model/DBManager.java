@@ -28,6 +28,10 @@ public class DBManager {
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
 //	private static String CONNECTION_USERNAME = "nadavsh2";
 //	private static String CONNECTION_PASSWORD = "nadavsh2";
+/** Nadav's TAU server - Local connection 	**/
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
+//	private static String CONNECTION_USERNAME = "nadavsh2";
+//	private static String CONNECTION_PASSWORD = "nadavsh2";
 
 	// The strings for prepared statements
 	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
@@ -38,11 +42,12 @@ public class DBManager {
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
-	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT (%s) FROM %s ORDER BY %s";
+	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT %s FROM %s ORDER BY %s";
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
-	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)";
+	private static String INSERT_2_VALUES_PSTMT = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
 	private static String INSERT_MOVIE_LANGUAGES_TEST = "INSERT INTO %s (%s, %s) VALUES ((%s), (%s))";
@@ -174,24 +179,25 @@ public class DBManager {
 			while (set.next()) {
 				// retrieving the different fields
 				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
-				tempMovieDBName = set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
-				tempMovieDBYear = set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
-				tempMovieRomanNotation = set.getString(DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName());
-				tempMovieMadeFor = set.getString(DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
-				if (tempMovieDBYear == 0)
-					tempMovieYear = "????";
-				else
-					tempMovieYear = String.valueOf(tempMovieDBYear);
-				
-				// rebuilding the movie name as it appears on the lists for comparison
-				movieNameBuilder = new StringBuilder(tempMovieDBName);
-				movieNameBuilder.append(" (").append(tempMovieYear);
-				if (tempMovieRomanNotation != null)
-					movieNameBuilder.append("/").append(tempMovieRomanNotation);
-				movieNameBuilder.append(")");
-				if (tempMovieMadeFor != null)
-					movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
-				tempMovieName = movieNameBuilder.toString();
+				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
+//				tempMovieDBName = set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
+//				tempMovieDBYear = set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
+//				tempMovieRomanNotation = set.getString(DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName());
+//				tempMovieMadeFor = set.getString(DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
+//				if (tempMovieDBYear == 0)
+//					tempMovieYear = "????";
+//				else
+//					tempMovieYear = String.valueOf(tempMovieDBYear);
+//				
+//				// rebuilding the movie name as it appears on the lists for comparison
+//				movieNameBuilder = new StringBuilder(tempMovieDBName);
+//				movieNameBuilder.append(" (").append(tempMovieYear);
+//				if (tempMovieRomanNotation != null)
+//					movieNameBuilder.append("/").append(tempMovieRomanNotation);
+//				movieNameBuilder.append(")");
+//				if (tempMovieMadeFor != null)
+//					movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
+//				tempMovieName = movieNameBuilder.toString();
 				// inserting the full movie name into the moviesMap
 				moviesMap.put(tempMovieName, tempMovieId);
 			}
@@ -227,10 +233,10 @@ public class DBManager {
 		// creating the prepared statement template including the ROWNUM limits for the SELECT
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
 		
-		int tempPersonId;
-		String tempPersonName;
+		int tempPersonId = 0;
+		String tempPersonName = null;
 		Map<String, Integer> personsMap = null;
-		
+		System.out.println(pstmtStr);
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
@@ -248,12 +254,71 @@ public class DBManager {
 			pstmt.close();
 		} catch (SQLException e) {
 			System.out.println("Error in searchMovies");
+			System.out.println("stopped on this record - " + tempPersonId + " / " + tempPersonName);
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
 		
 		pool.returnConnection(conn);
 		return personsMap;
+	}
+	
+	/**
+	 * returns a map of persons selected from the DB, that were limited by (top, bottom) limit on the SELECT
+	 * results that are sent are ordered beforehand by MOVIE_ID
+	 * Note: there is no way to return the whole movies list, and you must specify a bottomLimit (memory reasons)
+	 * Note: the rows starts with 1 and not 0 (meaning, topLimit = 0 returns exactly what topLimit = 1 returns)
+	 * @param topLimit the start of the limit (the beginning ROWNUM of the ResultSet returned)
+	 * @param bottomLimit the end of the limit (the ending ROWNUM of the ResultSet returned)
+	 * @return
+	 */
+	public Relation[] getAllPersonsAndLineNumbersArray(int topLimit, int bottomLimit, int bucketSize) {
+		ResultSet set = null;
+//		Set<Relation> personsSet = null;
+		Relation[] personsArray = new Relation[bucketSize];
+		int arrayIndex = 0;
+
+		PreparedStatement pstmt = null;
+		Connection conn = pool.getConnection();
+		// creating the generic statement that contains the table and field names
+		String fields = DBFieldsEnum.PERSONS_PERSON_ID + "," + DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER;
+		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, fields, DBTablesEnum.PERSONS, DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER);
+		// creating the prepared statement template including the ROWNUM limits for the SELECT
+		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
+		
+		int tempPersonId = 0;
+		int tempPersonLineNumber = 0;
+		System.out.println(pstmtStr);
+		try {
+			pstmt = conn.prepareStatement(pstmtStr);
+			set = pstmt.executeQuery();
+			set.setFetchSize(1000);
+//			personsSet = new HashSet<Relation>();
+			// adding the persons retrieved to the set
+			while (set.next()) {
+				// retrieving the different fields
+				tempPersonId = set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName());
+				tempPersonLineNumber = set.getInt(DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());
+				// inserting the full movie name into the moviesMap
+				personsArray[arrayIndex] = new Relation(tempPersonId, tempPersonLineNumber);
+				++arrayIndex;
+//				personsSet.add(new Relation(tempPersonId, tempPersonLineNumber));
+			}
+			// if the number of elements is smaller than the bucket size, enter in the following column NULL,
+			// for the program to know that we have reached the end of the array
+			if (arrayIndex < bucketSize)
+				personsArray[arrayIndex] = null;
+			set.close();
+			pstmt.close();
+		} catch (SQLException e) {
+			System.out.println("Error in searchMovies");
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer in searchMovies");
+		}
+		
+		pool.returnConnection(conn);
+//		return personsSet;
+		return personsArray;
 	}
 	
 	/**
@@ -600,7 +665,8 @@ public class DBManager {
 										DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
 										DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
 										DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName(),
-										DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
+										DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName(),
+										DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
 
 		try {
 			pstmt = conn.prepareStatement(statementStr);
@@ -610,6 +676,7 @@ public class DBManager {
 				pstmt.setInt(2, setMovie.getYear());
 				pstmt.setString(3, setMovie.getRomanNotation());
 				pstmt.setString(4, setMovie.getMadeFor());
+				pstmt.setString(5, setMovie.getTaglines());
 				pstmt.addBatch();
 			}
 		} catch (SQLException e) {
@@ -621,6 +688,37 @@ public class DBManager {
 		return bReturn;
 	}
 	
+	public boolean insertPersonsSetToDB(Set<NamedEntity> set) {
+
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr;
+		statementStr = String.format(INSERT_2_VALUES_PSTMT, 
+										DBTablesEnum.PERSONS.getTableName(), 
+										DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName(),
+										DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (NamedEntity setEntity : set) {
+				pstmt.setString(1, setEntity.getName());
+				pstmt.setInt(2, setEntity.getId());
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
+	}
+	/**
+	 * @deprecated
+	 * @param set
+	 * @return
+	 */
 	public boolean insertNamedEntitySetToDB(Set<NamedEntity> set) {
 
 		PreparedStatement pstmt = null;

@@ -6,6 +6,7 @@ import java.util.Map;
 import controller.enums.ListFilesEnum;
 
 import model.DataImporter;
+import model.Parser;
 
 public class ImportHandler {
 	
@@ -65,11 +66,27 @@ public class ImportHandler {
 */	
 		importer = new DataImporter(listfilesMap);
 		
+		Parser parser = new Parser();
+		parser.loadFile("lists//language.list", ListFilesEnum.LANGUAGES);
+		System.out.println("first line:");
+		System.out.println(parser.readLine());
+		if (parser.findLine(1000) == 1) {
+			System.out.println("got to line 1000:");
+			System.out.println(parser.readLine());
+			if (parser.findStartOfList()) {
+				System.out.println("got back to start of list");
+				System.out.println("line number = " + parser.getLineNumber() + ":");
+				System.out.println(parser.readLine());
+			}
+		}
+		
+		
 //		importer.getLanguagesGenresCountries();
 //		importer.getMovies();
 		
 		// ------------------ dependent only on Movies
-		importer.getMoviesLanguages();	// dependent on Languages
+//		importer.getMoviesLanguages();	// dependent on Languages
+//		importer.getMoviesLanguages2();	// dependent on Languages - NOT TO BE USED
 /*		importer.getMoviesGenres();		// dependent on Genres
 		importer.getMoviesCountries();	// dependent on Countries
 		importer.getMoviesColorInfo();
@@ -83,21 +100,14 @@ public class ImportHandler {
 		importer.getMoviesRunningTimes();
 		importer.getMoviesTaglines();
 		importer.getMoviesTrivias();
-		
-		importer.getPersons();
-		// ------------------ dependent only on Persons
+*/		
+//		importer.getPersons();
+/*		// ------------------ dependent only on Persons
 		importer.getAKANames();
 		importer.getBiographies();
 		
-		// ------------------ dependent on both Persons and Movies
-		importer.getMovieAppearances();
-			
-		
-*/
-		
-		
-		
-
+*/		// ------------------ dependent on both Persons and Movies
+//		importer.getPersonMovieCredits();
 		
 		return true;
 		
