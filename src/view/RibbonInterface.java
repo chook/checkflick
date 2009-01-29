@@ -29,5 +29,8 @@ public class RibbonInterface {
 	public static void drawMovieData(List<AbsType> result , MovieDataEnum type){
 		SampleRibbonClass.drawMovieData(result , type);
 	}
+	public static void InsertMovie(int id){
+		SampleRibbonClass.drawMoreInsertMovie(id);
+	}
 
 }
