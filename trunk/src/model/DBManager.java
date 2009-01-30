@@ -47,6 +47,7 @@ public class DBManager {
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
 	private static String INSERT_2_VALUES_PSTMT = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
+	private static String INSERT_6_VALUES_PSTMT = "INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)";
 	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
@@ -157,9 +158,13 @@ public class DBManager {
 	 */
 	public Map<String, Integer> getAllMovies(int topLimit, int bottomLimit) {
 		ResultSet set = null;
-
+		int tempMovieId;
+		String tempMovieName;
+		Map<String, Integer> moviesMap = null;
+		
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
+		
 		// creating the generic statement that contains the table and field names
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, "*", DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_ID);
 		// creating the prepared statement template including the ROWNUM limits for the SELECT
@@ -167,28 +172,22 @@ public class DBManager {
 		
 		System.out.println("getting " + (bottomLimit - topLimit + 1) + " movies from the DB");
 		System.out.println(pstmtStr);
-		int tempMovieId, tempMovieDBYear;
-		String tempMovieDBName, tempMovieRomanNotation, tempMovieMadeFor, tempMovieYear, tempMovieName;
-		StringBuilder movieNameBuilder = null;
-		Map<String, Integer> moviesMap = null;
-		
+	
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(1000);
 			moviesMap = new HashMap<String, Integer>();
 			// going over the movies retrieved from the DB to create the full movie name for comparison
-			if (set.next()) 
-				moviesMap.put("temp", 1);
-//			while (set.next()) {
-//				// retrieving the different fields
-//				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
-//				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
-//				moviesMap.put(tempMovieName, tempMovieId);
-//				
-//				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
-//					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
-//			}
+			while (set.next()) {
+				// retrieving the different fields
+				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
+				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
+				moviesMap.put(tempMovieName, tempMovieId);
+				
+				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
+					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
+			}
 			set.close();
 			pstmt.close();
 		} catch (SQLException e) {
@@ -709,6 +708,48 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;
 	}
+	
+	public boolean insertPersonMovieCreditsSetToDB(Set<CastingRelation> set) {
+
+//		CastingRelation(personsArray[tempArrayIndex].getId(), 
+//		tempMovieId, 1, true, matcher.group(3), tempActorCreditRank)
+		
+		PreparedStatement pstmt = null;
+		boolean bReturn = false;
+		Connection conn = pool.getConnection();
+		String statementStr;
+		statementStr = String.format(INSERT_6_VALUES_PSTMT, 
+										DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+										DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
+										DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(),
+										DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName(),
+										DBFieldsEnum.PERSON_MOVIE_CREDITS_IS_ACTOR.getFieldName(),
+										DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_ROLE.getFieldName(),
+										DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_CREDITS_RANK.getFieldName());
+		try {
+			pstmt = conn.prepareStatement(statementStr);
+
+			for (CastingRelation setRelation : set) {
+				pstmt.setInt(1, setRelation.getId());
+				pstmt.setInt(2, setRelation.getSecondaryId());
+				pstmt.setInt(3, 1);
+				if (setRelation.isActor())
+					pstmt.setString(4, "Y");
+				else
+					pstmt.setString(4, "N");						
+				pstmt.setString(5, setRelation.getActorRole());
+				pstmt.setInt(6, setRelation.getActorCreditRank());
+				pstmt.addBatch();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		bReturn = executePreparedStatementBatch(pstmt);
+		pool.returnConnection(conn);
+		return bReturn;
+	}
+	
 	/**
 	 * @deprecated
 	 * @param set

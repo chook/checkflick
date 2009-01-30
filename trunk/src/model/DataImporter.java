@@ -18,7 +18,7 @@ public class DataImporter {
 
 	private Map<ListFilesEnum, String> listfilesMap;
 	static int PSTMT_BATCH_SIZE = 15000;
-	static int SELECT_BUCKET_SIZE = 200000;
+	static int SELECT_BUCKET_SIZE = 10000;
 	
 	// languagePattern explanation:
 	// ([^\"].+[)}])					- group 1: movie name
@@ -641,29 +641,18 @@ public class DataImporter {
 
 		Parser parser = new Parser();
 		Map<String, Integer> moviesMap = new HashMap<String, Integer>();
-//		Set<Relation> personsSet = null;
 		Relation[] personsArray = null;
 		Set<CastingRelation> personMovieCreditsSet = new LinkedHashSet<CastingRelation>();
-		ResultSet moviesResultSet;
 		String lineFromFile;
-		String patternRegExp = null;
+		String patternRegExp;
 		Pattern pattern;
 		Matcher matcher;
 		boolean matchFound;
 		int totalElementsNum = 0;
-		List<NamedEntity> languagesList;
-		StringBuilder movieNameBuilder;
-		String tempMovieName;
 		String tempMovieFullName;
-		String tempMovieDBName;
 		int tempMovieId;
-		int tempMovieDBYear;
-		String tempMovieYear;
-		String tempMovieRomanNotation;
-		String tempMovieMadeFor;
 		int moviesStartRow, personsStartRow;
 		int moviesEndRow, personsEndRow;
-		int CreditsSetCounter;
 		int tempArrayIndex;
 		int tempActorCreditRank;
 
@@ -678,7 +667,6 @@ public class DataImporter {
 		do {
 			// retrieving part of the persons list to put inside a map
 			// since the movie list is huge, we select buckets and iterate over all of them
-//			personsSet = DBManager.getInstance().getAllPersonsAndLineNumbersArray(personsStartRow, personsEndRow, SELECT_BUCKET_SIZE);
 			personsArray = DBManager.getInstance().getAllPersonsAndLineNumbersArray(personsStartRow, personsEndRow, SELECT_BUCKET_SIZE);
 			if (personsArray[0] == null)
 				isPersonsEmpty = true;
@@ -702,29 +690,20 @@ public class DataImporter {
 						// Making sure we find the start of the list
 						while (personsArray[tempArrayIndex] != null) {
 							lineFromFile = parser.readLine();
-//							System.out.println("parsing line: " + lineFromFile);
 							matcher = pattern.matcher(lineFromFile);
 							matchFound = matcher.matches();
 							if (!matchFound) {
 								if (lineFromFile.length() > 0) {
-//									System.out.println("match not found!");
 									if (!(lineFromFile.contains("\t\""))) {
 										System.out.println("couldn't find a match on line " + parser.getLineNumber() + "!");
 										System.out.println(lineFromFile);
 									}
 								} else {
 									// if the line was empty, this signifies moving on to the next actor in the list
-//									System.out.println("line is empty!");
 									++tempArrayIndex;
 								}
 							} else {
 								tempMovieFullName = matcher.group(2).trim();
-//								System.out.println("match found!");
-//								System.out.println("group 1 = " + matcher.group(1) +
-//								" / group 2 = " + matcher.group(2) +
-//								" / group 3 = " + matcher.group(3) +
-//								" / group 4 = " + matcher.group(4));
-//								System.out.println("group 2 = " + matcher.group(2).trim());
 								if (moviesMap.containsKey(tempMovieFullName)) {
 									tempMovieId = moviesMap.get(tempMovieFullName).intValue();
 									
@@ -733,31 +712,20 @@ public class DataImporter {
 									} catch (Exception e) {
 										tempActorCreditRank = 0;
 									}
-//									System.out.println("found: personID = " + personsArray[tempArrayIndex].getId() +
-//														", movieID = " + tempMovieId +
-//														", role = " + matcher.group(3) +
-//														", credit rank = " + tempActorCreditRank);
 									personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
-											tempMovieId, 
-											1, 
-											true,
-											matcher.group(3),
-											tempActorCreditRank));
+											tempMovieId, 1, true, matcher.group(3), tempActorCreditRank));
 								}
-//								System.out.println("movie isn't on map!");
-//								if (tempArrayIndex == 50)
-//									return true;
 							}
 							// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
 							if ((personMovieCreditsSet.size() > 0) && (personMovieCreditsSet.size() % PSTMT_BATCH_SIZE == 0)) {
 								System.out.println("Inserting " + personMovieCreditsSet.size() + " elements to the DB");
-//								DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieLanguagesSet, DBTablesEnum.MOVIE_LANGUAGES, DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID);
+								DBManager.getInstance().insertPersonMovieCreditsSetToDB(personMovieCreditsSet);
 								totalElementsNum += personMovieCreditsSet.size();
 								personMovieCreditsSet.clear();
 							}
 						}
 						System.out.println("Inserting " + personMovieCreditsSet.size() + " elements to the DB");
-//						DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieLanguagesSet, DBTablesEnum.MOVIE_LANGUAGES, DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID);
+						DBManager.getInstance().insertPersonMovieCreditsSetToDB(personMovieCreditsSet);
 						totalElementsNum += personMovieCreditsSet.size();
 						personMovieCreditsSet.clear();
 						System.out.println("clearing moviesMap");
@@ -769,16 +737,6 @@ public class DataImporter {
 						moviesStartRow += SELECT_BUCKET_SIZE;
 						moviesEndRow += SELECT_BUCKET_SIZE;
 					}
-//					parser.closeFile();
-					//moviesMap.clear();
-//					System.gc();
-//					System.out.println("about to iterate over moviesMap and assign NULL to all the entries");
-//					moviesMap.entrySet().removeAll();
-//					for (Map.Entry<String, Integer> entry : moviesMap.entrySet()) {
-//					moviesMap.entrySet().iterator().remove();				
-//					}
-//					System.out.println("finished assigning NULLs to moviesMap");
-
 				} while (!isMoviesEmpty);
 			}
 			personsStartRow += SELECT_BUCKET_SIZE;
