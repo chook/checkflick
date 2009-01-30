@@ -34,6 +34,7 @@ import com.hexapixel.widgets.ribbon.RibbonTooltip;
 import controller.AppData;
 import controller.DataManager;
 import controller.entity.AbsType;
+import controller.entity.CastingRelation;
 import controller.entity.DatedEntity;
 import controller.entity.MovieEntity;
 import controller.entity.NamedEntity;
@@ -240,7 +241,7 @@ public class SampleRibbonClass {
 			public void run() {
 				Image image = ImageCache.getImage("book_48.png"); ;
 				String[] titles= new String[3];
-				String toGet = null;
+				String toGet = "name";
 				titles[0]="";
 				titles[2] ="";
 				String title = "";
@@ -264,6 +265,7 @@ public class SampleRibbonClass {
 					image = ImageCache.getImage("globe_48.png");
 					title ="Movie's Countries";
 					titles[1]="Country";
+					toGet ="secondaryId";
 					message = "No countries for this movie.";
 					break;
 				case MOVIE_LANGUAGES:
@@ -271,6 +273,7 @@ public class SampleRibbonClass {
 					image = ImageCache.getImage("furl_48.png");
 					title = "Movie's Languages";
 					titles[1] = "Language";
+					toGet ="secondaryId";
 					message = "No languages for this movie.";
 					break;
 				case MOVIE_GOOFS:
@@ -290,6 +293,7 @@ public class SampleRibbonClass {
 					image = ImageCache.getImage("pie_chart_48.png");
 					title = "Movie's Genres";
 					titles[1] = "Genre";
+					toGet ="secondaryId";
 					message = "No genres for this movie.";
 					break;
 				case MOVIE_CAST:
@@ -325,14 +329,14 @@ public class SampleRibbonClass {
 							TableItem item = new TableItem (table, SWT.NONE);
 							item.setText (0, String.valueOf(i+1));
 							if (list!=null){
-								if (getName(list , map.get("name"))!=null)
-									item.setText (1, getName(list , map.get("name")));
+								if (getName(list , map.get(toGet))!=null)
+									item.setText (1, getName(list , map.get(toGet)));
 								//else item.setText(1, "null");
 							}
 							else
-								if (map.get("name")!=null)
-									item.setText (1, map.get("name"));
-							if (toGet!=null){
+								if (map.get(toGet)!=null)
+									item.setText (1, map.get(toGet));
+							if (toGet=="type"){
 								if (getName(rolesList , map.get(toGet))!=null)
 									item.setText (2, getName(rolesList , map.get(toGet)));
 							}
@@ -794,7 +798,7 @@ public class SampleRibbonClass {
 				resultsPersonTable.setLayout(new GridLayout());
 				
 				//creating the filter to search by
-				List<AbsFilter> list = new ArrayList<AbsFilter>();;
+				List<AbsFilter> list = new ArrayList<AbsFilter>();
 				System.out.println(nameText.getText());
 				if (nameText.getText()!= ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, nameText.getText()));
@@ -813,7 +817,7 @@ public class SampleRibbonClass {
 				//search for persons
 				
 				try {
-					pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list));
+					pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list ));
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -1215,24 +1219,27 @@ public class SampleRibbonClass {
 				String taglines = null;
 				String plot = null;
 				String location = null;
-				if (nameText.getText() == "")
-					okMessageBox("Please insert movie name");
+				if ((nameText.getText() == "" )||(colorCombo.getText()=="" )||(yearText.getText()== "") )
+					okMessageBox("Please insert movie name, movie year and movie color info.");
 				else{
-					if (yearText.getText()!= "" ){
-						try{
-							year =Integer.parseInt(yearText.getText());
-							if ((year < 1880) || (year >today+100)){
-								okMessageBox("Year is not valid. Must be between 1880 and " +(today+100)+".");
-								valid = false;
-							}
-						}
-						catch (NumberFormatException nfe){
-							okMessageBox("Year must be a number.");
+					try{
+						year =Integer.parseInt(yearText.getText());
+						if ((year < 1880) || (year >today+100)){
+							okMessageBox("Year is not valid. Must be between 1880 and " +(today+100)+".");
 							valid = false;
 						}
 					}
-					if (colorCombo.getText()!="")
-						color = Integer.parseInt(getID(colorList, colorCombo.getText()));
+					catch (NumberFormatException nfe){
+						okMessageBox("Year must be a number.");
+						valid = false;
+					}
+					String id = getID(colorList, colorCombo.getText());
+					if (id!= null)
+						color = Integer.parseInt(id);
+					else{
+						okMessageBox("Color-info is not valid.");
+						valid = false;
+					}
 					if (timeText.getText() != ""){
 						try{
 							time = Integer.parseInt(timeText.getText());
@@ -1293,7 +1300,7 @@ public class SampleRibbonClass {
 		label.setText("Nick Names:");
 		final Text nNameText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
-		label.setText("Date Of Birth:");
+		label.setText("Year Of Birth:");
 		final Text birthText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Origin City:");
@@ -1308,7 +1315,7 @@ public class SampleRibbonClass {
 		}
 		countryCombo.setItems (countryString);
 		label = new Label(composite ,SWT.NONE);
-		label.setText("Date Of Death:");
+		label.setText("Year Of Death:");
 		final Text deathText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Height (cm):");
@@ -1354,27 +1361,30 @@ public class SampleRibbonClass {
 				int bYear = 0;
 				int dYear = 0;
 				
-				if (nameText.getText() == "")
-					okMessageBox("Please insert movie name");
+				if ((nameText.getText() == "")||(birthText.getText()=="")||(countryCombo.getText()==""))
+					okMessageBox("Please insert person name, year of birth and origin country.");
 				else{
-					/*if (birthText.getText()!= "" ){
-						try{
-							birth =Date.parse((birthText.getText());
-							if ((year < 1880) || (year >today+100)){
-								okMessageBox("Year is not valid. Must be between 1880 and " +(today+100)+".");
-								valid = false;
-							}
-						}
-						catch (NumberFormatException nfe){
-							okMessageBox("Year must be a number.");
+					try{
+						bYear =Integer.parseInt(birthText.getText());
+						if ((year < 1800) || (year >today)){
+							okMessageBox("Year is not valid. Must be between 1800 and " +(today)+".");
 							valid = false;
 						}
-					}*/
+					}
+					catch (NumberFormatException nfe){
+						okMessageBox("Year must be a number.");
+						valid = false;
+					}
 					if (cityText.getText() != ""){
 						city = cityText.getText();
 					}
-					if (countryCombo.getText()!="")
-						country = Integer.parseInt(getID(countriesList, countryCombo.getText()));
+					String id = getID(countriesList, countryCombo.getText());
+					if (id != null)
+						country = Integer.parseInt(id);
+					else{
+						okMessageBox("Origin country is not valid.");
+						valid = false;
+					}
 					if (heightText.getText() != ""){
 						try{
 							height =Integer.parseInt(heightText.getText());
@@ -1642,9 +1652,11 @@ public class SampleRibbonClass {
 						moreInsert.dispose();
 				
 				if(id == -1) {
-					okMessageBox("There was a problem inserting the movie");
-				} else {
+					okMessageBox("There was a problem inserting the movie. Sorry for the inconvenience :)");
+				}
+				else {
 					moreInsert = new ExpandBar(insertMovie, SWT.V_SCROLL);
+					//moreInsert.setLocation(0, (shell.getShell().getSize().y)/3+145);
 					Composite composite = new Composite (moreInsert, SWT.NONE);
 					GridLayout layout = new GridLayout (6,false);
 					Image image = ImageCache.getImage("add_48.png");
@@ -1770,6 +1782,20 @@ public class SampleRibbonClass {
 					final Text goofText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 					Button goofButton = new Button (composite, SWT.PUSH);
 					goofButton.setText("Add");
+					goofButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(goofText.getText() != "" ) {
+								AbsType t = new NamedEntity(id, goofText.getText());
+								try {
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GOOFS, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
 					ExpandItem item4 = new ExpandItem(moreInsert, SWT.NONE, 3);
 					item4.setText("Insert Movie's Goofs");
 					item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -1788,6 +1814,20 @@ public class SampleRibbonClass {
 					final Text quoteText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 					Button quoteButton = new Button (composite, SWT.PUSH);
 					quoteButton.setText("Add");
+					quoteButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(quoteText.getText() != "" ) {
+								AbsType t = new NamedEntity(id, quoteText.getText());
+								try {
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_QUOTES, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
 					ExpandItem item5 = new ExpandItem(moreInsert, SWT.NONE, 4);
 					item5.setText("Insert Movie's Quotes");
 					item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -1806,6 +1846,20 @@ public class SampleRibbonClass {
 					final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 					Button akaButton = new Button (composite, SWT.PUSH);
 					akaButton.setText("Add");
+					akaButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(akaText.getText() != "" ) {
+								AbsType t = new NamedEntity(id, akaText.getText());
+								try {
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_AKAS, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
 					ExpandItem item6 = new ExpandItem(moreInsert, SWT.NONE, 5);
 					item6.setText("Insert Movie's AKA Names");
 					item6.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -1814,6 +1868,40 @@ public class SampleRibbonClass {
 					item6.setExpanded(false);
 					//connections
 					//cast
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Person Name:");
+					final Text castText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+					Button castButton = new Button (composite, SWT.PUSH);
+					castButton.setText("Search");
+					castButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							List<AbsFilter> list = new ArrayList<AbsFilter>();
+							System.out.println(castText.getText());
+							if (castText.getText()!= ""){
+								list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, castText.getText()));
+							/*	AbsType t = new NamedEntity(id, akaText.getText());*/
+								try {
+									pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list , id));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
+					ExpandItem item7 = new ExpandItem(moreInsert, SWT.NONE, 6);
+					item7.setText("Insert Movie's Cast");
+					item7.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item7.setControl(composite);
+					item7.setImage(image);
+					item7.setExpanded(false);
+					
 					moreInsert.setSpacing(8);
 					insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
 				}
@@ -1826,6 +1914,10 @@ public class SampleRibbonClass {
 				//genres- 2nd item
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
+				if(id == -1) {
+					okMessageBox("There was a problem inserting the person. Sorry for the inconvenience :)");
+				}
+				else{
 				okMessageBox("id "+String.valueOf(id));
 				moreInsert = new ExpandBar(insertPerson, SWT.V_SCROLL);
 				Composite composite = new Composite (moreInsert, SWT.NONE);
@@ -1954,11 +2046,103 @@ public class SampleRibbonClass {
 				//cast
 				moreInsert.setSpacing(8);
 				insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
+				}
 			}
 		});
 	}
-
-	public static void drawInsertMovieDataSuccess() {
+	static protected void peopleToInsertTable(final List<DatedEntity> searched, final SearchEntitiesEnum search ,final int movieId) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				final int count = searched.size();
+				//creating the search results table
+				if (count > 0){
+					castInsertWindow(searched , search , movieId);	
+				}
+				else{ // if there were no results
+					switch(okMessageBox("No such person. Please try again.")){
+					case(SWT.OK):{}
+					}
+				}
+			}
+		});
+	}
+	static public void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id){	
+		shell.getShell().setEnabled(false);
+		//final RibbonShell personResults = new RibbonShell(display);	
+		final Shell personResults = new Shell();
+	//	personResults.setBackground(shell.getShell().getBackground());
+		Rectangle monitor_bounds = personResults.getShell().getMonitor().getBounds();
+		personResults.setSize(new Point(monitor_bounds.width/4,
+		                        monitor_bounds.height/3));		
+		personResults.setText("Persons List");		
+		GridLayout layout = new GridLayout(2 , false);
+		personResults.setLayout(layout);
+		
+		final Table table = new Table (personResults, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+		table.setLinesVisible (true);
+		table.setHeaderVisible (true);
+		GridData data = new GridData(SWT.NONE, SWT.NONE, true, true);
+		data.heightHint = 200;
+		table.setLayoutData(data);
+		String[] titles = {" ", "Name", "Age", "ID"};
+		for (int i=0; i<titles.length; i++) {
+			TableColumn column = new TableColumn (table, SWT.NONE);
+			column.setText (titles [i]);
+		}	
+		for (int i=0; i<searched.size(); i++) {
+			TableItem item = new TableItem (table, SWT.NONE);
+			item.setText (0, String.valueOf(i+1));
+			item.setText (1, searched.get(i).getName());
+			item.setText (2, String.valueOf(searched.get(i).getYear()));
+			item.setText (3, String.valueOf(searched.get(i).getId()));
+		}
+		for (int i=0; i<titles.length; i++) {
+			table.getColumn (i).pack ();
+		}
+		final Combo rolesCombo = new Combo (personResults, SWT.FILL|SWT.READ_ONLY);
+		String[] rolesString= new String[rolesList.size()];
+		for (int i=0; i<rolesList.size(); i++){
+			rolesString[i]=rolesList.get(i).getName();
+		}
+		rolesCombo.setItems (rolesString);
+		Button add = new Button(personResults, SWT.PUSH);
+		add.setText("Add");
+		Button close = new Button(personResults, SWT.PUSH);
+		close.setText("Close");
+		add.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				int[] t= table.getSelectionIndices();
+				if ((rolesCombo.getText()=="")||(t.length==0))
+					okMessageBox("Please select a person and a production role.");
+				else{
+					int secondId;
+					int role = Integer.parseInt(getID(rolesList, rolesCombo.getText()));
+					for (int i = 0 ; i<t.length; i++){
+						secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
+						AbsType relation = new CastingRelation(id, secondId, role);
+						try {
+							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
+					table.deselectAll();
+				}
+			}
+		});
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				personResults.close();
+			}
+		});
+		personResults.open();
+		shell.getShell().setEnabled(true);		
+	}
+	static protected void drawInsertMovieDataSuccess() {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				okMessageBox("Successfuly added to movie");		
