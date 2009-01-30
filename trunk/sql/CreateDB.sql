@@ -809,3 +809,23 @@ END;
 
 /
 ALTER TRIGGER "BI_PRODUCTION_ROLES" ENABLE;
+
+--------------------------------------------------------
+--  Hard Coded data for PRODUCTION_ROLES
+--------------------------------------------------------
+
+INSERT INTO "PRODUCTION_ROLES" 
+(PRODUCTION_ROLE_ID, PRODUCTION_ROLE_NAME)
+VALUES (1, 'Actors');
+
+INSERT INTO "PRODUCTION_ROLES" 
+(PRODUCTION_ROLE_NAME)
+VALUES ('Producers');
+
+INSERT INTO "PRODUCTION_ROLES" 
+(PRODUCTION_ROLE_NAME)
+VALUES ('Writers');
+
+INSERT INTO "PRODUCTION_ROLES" 
+(PRODUCTION_ROLE_NAME)
+VALUES ('Directors');
