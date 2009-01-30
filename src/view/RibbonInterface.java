@@ -30,8 +30,14 @@ public class RibbonInterface {
 	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
 		SampleRibbonClass.drawSearchMovieTable(list, search);
 	}
-	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
+	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search ,int id) {
+		//	SampleRibbonClass.drawSearchMovieTable(list, search , id);
+	}
+	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search ) {
 		SampleRibbonClass.drawSearchPersonTable(list, search);
+	}
+	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search , int id) {
+		SampleRibbonClass.peopleToInsertTable(list, search , id);
 	}
 	public static void InsertMovie(int id){
 		SampleRibbonClass.drawMoreInsertMovie(id);
@@ -47,4 +53,5 @@ public class RibbonInterface {
 	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
 		SampleRibbonClass.setList(list, type);
 	}
+
 }
