@@ -1189,10 +1189,9 @@ public class SampleRibbonClass {
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Color-Info");
 		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] colorString= new String[colorList.size()+1];
-		colorString[0]="";
+		String[] colorString= new String[colorList.size()];
 		for (int i=0; i<colorList.size(); i++){
-			colorString[i+1]=colorList.get(i).getName();
+			colorString[i]=colorList.get(i).getName();
 		}
 		colorCombo.setItems (colorString);
 		label = new Label(composite,SWT.NONE);
@@ -1342,10 +1341,6 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				/*int id, String name, String personRealName,
-				String personNickNames, Date dateOfBirth, int yearOfBirth,
-				String cityOfBirth, int countryOfBirth, Date dateOfDeath,
-				int yearOfDeath, int height, String trademark, String biography*/
 				Calendar toDay = Calendar.getInstance();
 				int today = toDay.get(Calendar.YEAR);
 				boolean valid = true ;
@@ -1911,141 +1906,103 @@ public class SampleRibbonClass {
 	protected static void drawMoreInsertPerson(final int id){
 		display.asyncExec(new Runnable() {
 			public void run() {
-				//genres- 2nd item
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
 				if(id == -1) {
 					okMessageBox("There was a problem inserting the person. Sorry for the inconvenience :)");
 				}
 				else{
-				okMessageBox("id "+String.valueOf(id));
-				moreInsert = new ExpandBar(insertPerson, SWT.V_SCROLL);
-				Composite composite = new Composite (moreInsert, SWT.NONE);
-				GridLayout layout = new GridLayout (6,false);
-				Image image = ImageCache.getImage("add_48.png");
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				Label label = new Label(composite ,SWT.NONE);
-				label.setText("Genre:");
-				final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
-				String[] genresString= new String[genresList.size()];
-				for (int i=0; i<genresList.size(); i++){
-					genresString[i]=genresList.get(i).getName();
-				}
-				genresCombo.setItems (genresString);
-				Button genreButton = new Button (composite, SWT.PUSH);
-				genreButton.setText("Add");
-				ExpandItem item1 = new ExpandItem(moreInsert, SWT.NONE, 0);
-				item1.setText("Insert Movie's Genres");
-				item1.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item1.setControl(composite);
-				item1.setImage(image);
-				item1.setExpanded(false);
-				
-				//languages- 3rd item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Language:");
-				final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
-				String[] langString= new String[langList.size()];
-				for (int i=0; i<langList.size(); i++){
-					langString[i]=langList.get(i).getName();
-				}
-				langCombo.setItems(langString);
-				Button langButton = new Button (composite, SWT.PUSH);
-				langButton.setText("Add");
-				ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 1);
-				item2.setText("Insert Movie's Languages");
-				item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item2.setControl(composite);
-				item2.setImage(image);
-				item2.setExpanded(false);
-				
-				//countries - 4th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Country:");
-				final Combo countryCombo = new Combo(composite ,SWT.READ_ONLY);
-				String[] countryString= new String[countriesList.size()];
-				for (int i=0; i<countriesList.size(); i++){
-					countryString[i]=countriesList.get(i).getName();
-				}
-				countryCombo.setItems(countryString);
-				Button countryButton = new Button (composite, SWT.PUSH);
-				countryButton.setText("Add");
-				ExpandItem item3 = new ExpandItem(moreInsert, SWT.NONE, 2);
-				item3.setText("Insert Movie's Countries");
-				item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item3.setControl(composite);
-				item3.setImage(image);
-				item3.setExpanded(false);
-				
-				//goofs - 5th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Goof:");
-				final Text goofText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-				Button goofButton = new Button (composite, SWT.PUSH);
-				goofButton.setText("Add");
-				ExpandItem item4 = new ExpandItem(moreInsert, SWT.NONE, 3);
-				item4.setText("Insert Movie's Goofs");
-				item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item4.setControl(composite);
-				item4.setImage(image);
-				item4.setExpanded(false);
-				
-				//quotes - 6th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("Quote:");
-				final Text quoteText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-				Button quoteButton = new Button (composite, SWT.PUSH);
-				quoteButton.setText("Add");
-				ExpandItem item5 = new ExpandItem(moreInsert, SWT.NONE, 4);
-				item5.setText("Insert Movie's Quotes");
-				item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item5.setControl(composite);
-				item5.setImage(image);
-				item5.setExpanded(false);
-				
-				//aka names - 7th item
-				composite = new Composite (moreInsert, SWT.NONE);
-				layout = new GridLayout (6,false);
-				layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-				layout.verticalSpacing = 10;
-				composite.setLayout(layout); 
-				label = new Label(composite,SWT.NONE);
-				label.setText("AKA Name:");
-				final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-				Button akaButton = new Button (composite, SWT.PUSH);
-				akaButton.setText("Add");
-				ExpandItem item6 = new ExpandItem(moreInsert, SWT.NONE, 5);
-				item6.setText("Insert Movie's AKA Names");
-				item6.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-				item6.setControl(composite);
-				item6.setImage(image);
-				item6.setExpanded(false);
-				//connections
-				//cast
-				moreInsert.setSpacing(8);
-				insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
+					moreInsert = new ExpandBar(insertPerson, SWT.V_SCROLL);
+					Composite composite = new Composite (moreInsert, SWT.NONE);
+					GridLayout layout = new GridLayout (6,false);
+					Image image = ImageCache.getImage("add_48.png");
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					//aka names- 2nd item
+					Label label = new Label(composite ,SWT.NONE);
+					label.setText("AKA Name:");
+					final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+					Button akaButton = new Button (composite, SWT.PUSH);
+					akaButton.setText("Add");
+					akaButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(akaText.getText() != "" ) {
+								AbsType t = new NamedEntity(id, akaText.getText());
+								try {
+									pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON_AKAS, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
+					ExpandItem item1 = new ExpandItem(moreInsert, SWT.NONE, 0);
+					item1.setText("Insert AKA Names For The Person");
+					item1.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item1.setControl(composite);
+					item1.setImage(image);
+					item1.setExpanded(false);
+					
+					//roles- 3rd item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Production Roles:");
+					final Combo roleCombo = new Combo(composite ,SWT.READ_ONLY);
+					String[] roleString= new String[rolesList.size()];
+					for (int i=0; i<rolesList.size(); i++){
+						roleString[i]=rolesList.get(i).getName();
+					}
+					roleCombo.setItems(roleString);
+					Button langButton = new Button (composite, SWT.PUSH);
+					langButton.setText("Add");
+					ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 1);
+					item2.setText("Insert Person's Production Roles");
+					item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item2.setControl(composite);
+					item2.setImage(image);
+					item2.setExpanded(false);
+					
+					//quotes - 4th item
+					composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Quote:");
+					final Text quoteText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+					Button quoteButton = new Button (composite, SWT.PUSH);
+					quoteButton.setText("Add");
+					quoteButton.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {
+						}
+						public void widgetSelected(SelectionEvent e) {
+							if(quoteText.getText() != "" ) {
+								AbsType t = new NamedEntity(id, quoteText.getText());
+								try {
+									pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON_QUOTES, t));
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+								}
+							}
+						}
+					});
+					ExpandItem item3 = new ExpandItem(moreInsert, SWT.NONE, 2);
+					item3.setText("Insert Person's Quotes");
+					item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item3.setControl(composite);
+					item3.setImage(image);
+					item3.setExpanded(false);
+					
+					moreInsert.setSpacing(8);
+					insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
 				}
 			}
 		});
@@ -2066,7 +2023,7 @@ public class SampleRibbonClass {
 			}
 		});
 	}
-	static public void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id){	
+	static protected void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id){	
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
 		final Shell personResults = new Shell();
@@ -2142,7 +2099,7 @@ public class SampleRibbonClass {
 		personResults.open();
 		shell.getShell().setEnabled(true);		
 	}
-	static protected void drawInsertMovieDataSuccess() {
+	static protected void drawInsertDataSuccess() {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				okMessageBox("Successfuly added to movie");		
