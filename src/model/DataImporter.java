@@ -733,10 +733,10 @@ public class DataImporter {
 									} catch (Exception e) {
 										tempActorCreditRank = 0;
 									}
-									System.out.println("found: personID = " + personsArray[tempArrayIndex].getId() +
-														", movieID = " + tempMovieId +
-														", role = " + matcher.group(3) +
-														", credit rank = " + tempActorCreditRank);
+//									System.out.println("found: personID = " + personsArray[tempArrayIndex].getId() +
+//														", movieID = " + tempMovieId +
+//														", role = " + matcher.group(3) +
+//														", credit rank = " + tempActorCreditRank);
 									personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
 											tempMovieId, 
 											1, 
