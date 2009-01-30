@@ -234,7 +234,7 @@ public class DataManager {
 	 * @param list - filters
 	 * @return a named list
 	 */
-	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list) {
+	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list ) {
 		return new Runnable() {
 			public void run() {
 				System.out.println("About to search for " + entity.toString());
@@ -244,7 +244,25 @@ public class DataManager {
 						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity);
 						break;
 					case PERSONS:
-						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity);
+						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity );
+						break;
+					default:
+						break;
+				}
+			}
+		};
+	}
+	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list  ,final  int id) {
+		return new Runnable() {
+			public void run() {
+				System.out.println("About to search for " + entity.toString());
+				switch(entity)
+				{
+					case MOVIES:
+						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity , id);
+						break;
+					case PERSONS:
+						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity , id);
 						break;
 					default:
 						break;
