@@ -18,7 +18,7 @@ public class DataImporter {
 
 	private Map<ListFilesEnum, String> listfilesMap;
 	static int PSTMT_BATCH_SIZE = 15000;
-	static int SELECT_BUCKET_SIZE = 50000;
+	static int SELECT_BUCKET_SIZE = 200000;
 	
 	// languagePattern explanation:
 	// ([^\"].+[)}])					- group 1: movie name
@@ -769,6 +769,8 @@ public class DataImporter {
 
 				} while (!isMoviesEmpty);
 			}
+			personsStartRow += SELECT_BUCKET_SIZE;
+			personsEndRow += SELECT_BUCKET_SIZE;
 		} while (!isPersonsEmpty);
 
 		return true;

@@ -165,6 +165,7 @@ public class DBManager {
 		// creating the prepared statement template including the ROWNUM limits for the SELECT
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
 		
+		System.out.println("getting " + (bottomLimit - topLimit + 1) + " movies from the DB");
 		int tempMovieId, tempMovieDBYear;
 		String tempMovieDBName, tempMovieRomanNotation, tempMovieMadeFor, tempMovieYear, tempMovieName;
 		StringBuilder movieNameBuilder = null;
@@ -200,6 +201,9 @@ public class DBManager {
 //				tempMovieName = movieNameBuilder.toString();
 				// inserting the full movie name into the moviesMap
 				moviesMap.put(tempMovieName, tempMovieId);
+				
+				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
+					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
 			}
 			set.close();
 			pstmt.close();
@@ -209,6 +213,7 @@ public class DBManager {
 			System.out.println("Null pointer in searchMovies");
 		}
 		
+		System.out.println("finished getting " + (bottomLimit - topLimit + 1) + " movies from the DB");
 		pool.returnConnection(conn);
 		return moviesMap;
 	}
@@ -278,6 +283,7 @@ public class DBManager {
 		Relation[] personsArray = new Relation[bucketSize+1];		// if the bucket is full, then the last cell is null as a delimiter
 		int arrayIndex = 0;
 
+		System.out.println("getting " + bucketSize + " persons from the DB");
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
 		// creating the generic statement that contains the table and field names
@@ -302,6 +308,10 @@ public class DBManager {
 				// inserting the full movie name into the moviesMap
 				personsArray[arrayIndex] = new Relation(tempPersonId, tempPersonLineNumber);
 				++arrayIndex;
+				
+				if (arrayIndex > 0 && arrayIndex % 10000 == 0)
+					System.out.println("- already entered " + arrayIndex + " elements to the personsArray");
+				
 //				personsSet.add(new Relation(tempPersonId, tempPersonLineNumber));
 			}
 			// if the number of elements is smaller than the bucket size, enter in the following column NULL,
@@ -318,6 +328,7 @@ public class DBManager {
 		
 		pool.returnConnection(conn);
 //		return personsSet;
+		System.out.println("finished getting " + bucketSize + " persons from the DB");
 		return personsArray;
 	}
 	
