@@ -94,10 +94,8 @@ public class SampleRibbonClass {
 			
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES));
-			pool.stopRequestIdleWorkers();
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.GENRES));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES));
-			pool.stopRequestIdleWorkers();
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES));
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -2091,8 +2089,7 @@ public class SampleRibbonClass {
 					int secondId;
 					int actors =Integer.parseInt(getID(rolesList, "Actors"));
 					int role = Integer.parseInt(getID(rolesList, rolesCombo.getText()));
-<<<<<<< .mine
-					if (role != actors){
+					if (role != actors) {
 						for (int i = 0 ; i<t.length; i++){
 							secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
 							AbsType relation = new CastingRelation(secondId, id, role);
@@ -2101,19 +2098,9 @@ public class SampleRibbonClass {
 							} catch (InterruptedException e1) {
 								e1.printStackTrace();
 							}
-=======
-					for (int i = 0 ; i<t.length; i++){
-						secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
-						AbsType relation = new CastingRelation(secondId, id, role);
-						try {
-							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
->>>>>>> .r154
+							table.deselectAll();
 						}
-						table.deselectAll();
-					}
-					else{
+					} else {
 						boolean valid = true;
 						if ((roleText.getText()=="")|| (rankText.getText()=="")){
 							okMessageBox("If you want to insert an actor you need to write his role and rank.");
