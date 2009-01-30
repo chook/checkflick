@@ -75,6 +75,7 @@ public class Parser {
 				hasEndLine = false;
 				break;
 			case ACTORS:
+			case ACTRESSES:
 				listStartLine1 = actorsListStartLine1;
 				listStartLine2 = actorsListStartLine2;
 				hasEndLine = true;

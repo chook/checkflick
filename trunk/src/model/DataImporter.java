@@ -341,7 +341,11 @@ public class DataImporter {
 		return true;
 	}
 
-	public boolean getPersons() {
+	/**
+	 * the function receives the name of the list to extract persons, and imports them to the DB
+	 * @return int the number of persons entered to the DB. Returns -1 if failed.
+	 */
+	public int getPersons(ListFilesEnum listType) {
 		// for now, this retrieves only the actors (male)
 
 		Parser parser = new Parser();
@@ -355,8 +359,16 @@ public class DataImporter {
 		int totalElementsNum = 0;
 		int tempLineNumber;
 
-		parser.loadFile(listfilesMap.get(ListFilesEnum.ACTORS), ListFilesEnum.ACTORS);
-		patternRegExp = actorsPattern;
+		parser.loadFile(listfilesMap.get(listType), listType);
+		switch (listType) {
+		case ACTORS:
+		case ACTRESSES:
+			patternRegExp = actorsPattern;
+			break;
+		case DIRECTORS:
+			patternRegExp = actorsPattern; // to be changed to directorsPattern
+			break;
+		}
 
 		// Making sure we find the start of the list
 		if (parser.findStartOfList()) {
@@ -398,11 +410,11 @@ public class DataImporter {
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
 		} else
-			return false;
+			return -1;
 
 		parser.closeFile();
 
-		return true;
+		return totalElementsNum;
 	}
 
 	public void runOverResultSet(ResultSet moviesResultSet) {
@@ -637,16 +649,24 @@ public class DataImporter {
 		return true;
 	}
 
-	public boolean getPersonMovieCredits() {
+	/**
+	 * imports to the DB the different movie appearances of each actor / producer / director / writer
+	 * @param listType the type of the list to be parsed
+	 * @param personIndexMarkStart the start row of this specific person's list
+	 * @return boolean whether the method succeeded or not
+	 */
+	public boolean getPersonMovieCredits(ListFilesEnum listType, int personIndexMarkStart) {
 
 		Parser parser = new Parser();
 		Map<String, Integer> moviesMap = new HashMap<String, Integer>();
 		Relation[] personsArray = null;
 		Set<CastingRelation> personMovieCreditsSet = new LinkedHashSet<CastingRelation>();
 		String lineFromFile;
-		String patternRegExp;
+		String patternRegExp = null;
 		Pattern pattern;
 		Matcher matcher;
+		boolean isMoviesEmpty;
+		boolean isPersonsEmpty;
 		boolean matchFound;
 		int totalElementsNum = 0;
 		String tempMovieFullName;
@@ -655,14 +675,29 @@ public class DataImporter {
 		int moviesEndRow, personsEndRow;
 		int tempArrayIndex;
 		int tempActorCreditRank;
+		boolean isActor;
+		int productionRoleId;
 
+		switch (listType) {
+		case ACTORS:
+		case ACTRESSES:
+			patternRegExp = actorsMoviesPattern;
+			isActor = true;
+			productionRoleId = 1;
+			break;
+		case DIRECTORS:
+			patternRegExp = actorsPattern; // to be changed to directorsPattern
+			isActor = false;
+			productionRoleId = 4;
+			break;
+		default:
+			isActor = false;
+		}
 		// compiling the pattern to look for in the list file
-		patternRegExp = actorsMoviesPattern;
 		pattern = Pattern.compile(patternRegExp);
 
-		boolean isMoviesEmpty = false;
-		boolean isPersonsEmpty = false;
-		personsStartRow = 1;
+		isPersonsEmpty = false;
+		personsStartRow = personIndexMarkStart;
 		personsEndRow = personsStartRow + SELECT_BUCKET_SIZE - 1;
 		do {
 			// retrieving part of the persons list to put inside a map
@@ -672,9 +707,10 @@ public class DataImporter {
 				isPersonsEmpty = true;
 
 			if (!isPersonsEmpty) {
-				parser.loadFile(listfilesMap.get(ListFilesEnum.ACTORS), ListFilesEnum.ACTORS);
+				parser.loadFile(listfilesMap.get(listType), listType);
 				moviesStartRow = 1;
 				moviesEndRow = moviesStartRow + SELECT_BUCKET_SIZE - 1;
+				isMoviesEmpty = false;
 				// going in the list to the first actor in the array
 				do {
 					// retrieving part of the movies list to put inside a map
@@ -712,8 +748,9 @@ public class DataImporter {
 									} catch (Exception e) {
 										tempActorCreditRank = 0;
 									}
-									personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
-											tempMovieId, 1, true, matcher.group(3), tempActorCreditRank));
+									if (isActor)
+										personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
+												tempMovieId, 1, true, matcher.group(3), tempActorCreditRank));
 								}
 							}
 							// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
