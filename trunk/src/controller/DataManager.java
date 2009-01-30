@@ -215,7 +215,10 @@ public class DataManager {
 	public static Runnable insertPersonData(final PersonDataEnum dataType, final AbsType dataObject) {
 		return new Runnable() {
 			public void run() {
-				RibbonInterface.InsertPerson(DBManager.getInstance().insertPersonData(dataType, dataObject, false));
+				if(dataType == PersonDataEnum.PERSON)
+					RibbonInterface.InsertPerson(DBManager.getInstance().insertPersonData(dataType, dataObject, false));
+				else
+					RibbonInterface.InsertPersonExtraData(DBManager.getInstance().insertPersonData(dataType, dataObject, false));
 			}
 		};
 	}
