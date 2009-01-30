@@ -453,6 +453,7 @@ public class SampleRibbonClass {
 		RibbonTab searchTab = new RibbonTab(tabs, "Search");
 		RibbonTab insertTab = new RibbonTab(tabs, "Insert");	
 		//RibbonTab triviaTab = new RibbonTab(tabs, "Trivia");
+		RibbonTab nadavTab = new RibbonTab(tabs, "Nadav");
 		
 		// Tooltip
 		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
@@ -2078,7 +2079,7 @@ public class SampleRibbonClass {
 					int role = Integer.parseInt(getID(rolesList, rolesCombo.getText()));
 					for (int i = 0 ; i<t.length; i++){
 						secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
-						AbsType relation = new CastingRelation(id, secondId, role);
+						AbsType relation = new CastingRelation(secondId, id, role);
 						try {
 							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
 						} catch (InterruptedException e1) {
