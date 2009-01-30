@@ -17,17 +17,17 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "chook";
 //	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-	private static String CONNECTION_USERNAME = "chenhare";
-	private static String CONNECTION_PASSWORD = "Shoochi0";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_USERNAME = "chenhare";
+//	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "nadavsh2";
-//	private static String CONNECTION_PASSWORD = "nadavsh2";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "nadavsh2";
+	private static String CONNECTION_PASSWORD = "nadavsh2";
 /** Nadav's TAU server - Local connection 	**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
 //	private static String CONNECTION_USERNAME = "nadavsh2";
@@ -275,7 +275,7 @@ public class DBManager {
 	public Relation[] getAllPersonsAndLineNumbersArray(int topLimit, int bottomLimit, int bucketSize) {
 		ResultSet set = null;
 //		Set<Relation> personsSet = null;
-		Relation[] personsArray = new Relation[bucketSize];
+		Relation[] personsArray = new Relation[bucketSize+1];		// if the bucket is full, then the last cell is null as a delimiter
 		int arrayIndex = 0;
 
 		PreparedStatement pstmt = null;
