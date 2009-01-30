@@ -344,22 +344,22 @@ public class DBManager {
 
 		switch (entity) {
 		case GENRES:
-			query += DBTablesEnum.GENRES;
+			query += DBTablesEnum.GENRES + " ORDER BY " + DBFieldsEnum.GENRES_GENRE_NAME;
 			break;
 		case COLOR_INFOS:
-			query += DBTablesEnum.COLOR_INFO;
+			query += DBTablesEnum.COLOR_INFO + " ORDER BY " + DBFieldsEnum.COLOR_INFO_COLOR_INFO_TEXT;
 			break;
 		case LANGUAGES:
-			query += DBTablesEnum.LANGUAGES;
+			query += DBTablesEnum.LANGUAGES + " ORDER BY " + DBFieldsEnum.LANGUAGES_LANGUAGE_NAME;
 			break;
 		case PRODUCTION_ROLES:
-			query += DBTablesEnum.PRODUCTION_ROLES;
+			query += DBTablesEnum.PRODUCTION_ROLES + " ORDER BY " + DBFieldsEnum.PRODUCTION_ROLES_PRODUCTION_ROLE_NAME;
 			break;
 		case CONNECTION_RELATIONS:
-			query += DBTablesEnum.CONNECTIONS_RELATIONS;
+			query += DBTablesEnum.CONNECTIONS_RELATIONS + " ORDER BY " + DBFieldsEnum.CONNECTIONS_RELATIONS_CONNECTION_RELATION_NAME;
 			break;
 		case COUNTRIES:
-			query += DBTablesEnum.COUNTRIES;
+			query += DBTablesEnum.COUNTRIES + " ORDER BY " + DBFieldsEnum.COUNTRIES_COUNTRY_NAME;
 		}
 		
 		// Executing the query and building the movies array
@@ -367,7 +367,7 @@ public class DBManager {
 			set = s.executeQuery(query);
 			while (set.next() == true) {
 				list.add(new NamedEntity(set.getInt(1), set.getString(2)));
-				if(list.size() > 1000)
+				if(list.size() > 10000)
 					break;
 			}
 		} catch (SQLException e) {
