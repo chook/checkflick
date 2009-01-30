@@ -221,7 +221,7 @@ public class DataImporter {
 							System.out.println(lineFromFile);
 						}
 				} else {
-					fullMovieName = matcher.group(1);
+					fullMovieName = matcher.group(1).trim();
 					movieName = matcher.group(2);
 					movieRomanNotation = matcher.group(3);
 					movieMadeFor = matcher.group(4);
@@ -229,13 +229,14 @@ public class DataImporter {
 						movieYear = Integer.parseInt(matcher.group(5));
 					} catch (Exception e) {
 						if (matcher.group(5).equals("????")) {
-							System.out.println("year was ????, changed to 0");
+//							System.out.println("year was ????, changed to 0");
 							movieYear = 0;
 						} else
 							movieYear = 1900;
 					}
 					// NOTE: the fullMovieName is a temporary field used during the import and dropped from the DB at the end
-					// it doesn't have a field in the MovieEntity, so for this occasion only, it is sent instead of the taglines field 
+					// it doesn't have a field in the MovieEntity, so for this occasion only, it is sent instead of the taglines field
+//					System.out.println("full movie name = " + fullMovieName);
 					moviesSet.add(new MovieEntity(0, movieName, movieYear, movieRomanNotation, movieMadeFor, 0, 0, fullMovieName, null, null));
 				}
 				// every a certain amount of movies entered to the set, flush the results via one prepared statement batch to the DB 
@@ -653,6 +654,7 @@ public class DataImporter {
 		List<NamedEntity> languagesList;
 		StringBuilder movieNameBuilder;
 		String tempMovieName;
+		String tempMovieFullName;
 		String tempMovieDBName;
 		int tempMovieId;
 		int tempMovieDBYear;
@@ -700,41 +702,51 @@ public class DataImporter {
 						// Making sure we find the start of the list
 						while (personsArray[tempArrayIndex] != null) {
 							lineFromFile = parser.readLine();
+//							System.out.println("parsing line: " + lineFromFile);
 							matcher = pattern.matcher(lineFromFile);
 							matchFound = matcher.matches();
 							if (!matchFound) {
 								if (lineFromFile.length() > 0) {
+//									System.out.println("match not found!");
 									if (!(lineFromFile.contains("\t\""))) {
 										System.out.println("couldn't find a match on line " + parser.getLineNumber() + "!");
 										System.out.println(lineFromFile);
 									}
 								} else {
 									// if the line was empty, this signifies moving on to the next actor in the list
+//									System.out.println("line is empty!");
 									++tempArrayIndex;
 								}
 							} else {
+								tempMovieFullName = matcher.group(2).trim();
+//								System.out.println("match found!");
 //								System.out.println("group 1 = " + matcher.group(1) +
 //								" / group 2 = " + matcher.group(2) +
 //								" / group 3 = " + matcher.group(3) +
 //								" / group 4 = " + matcher.group(4));
-//								System.out.println("group 1 = " + matcher.group(1));
-								if (moviesMap.containsKey(matcher.group(2))) {
+//								System.out.println("group 2 = " + matcher.group(2).trim());
+								if (moviesMap.containsKey(tempMovieFullName)) {
+									tempMovieId = moviesMap.get(tempMovieFullName).intValue();
+									
 									try {
 										tempActorCreditRank = Integer.parseInt(matcher.group(4));
 									} catch (Exception e) {
 										tempActorCreditRank = 0;
 									}
 									System.out.println("found: personID = " + personsArray[tempArrayIndex].getId() +
-														", movieID = " + moviesMap.get(matcher.group(2)).intValue() +
+														", movieID = " + tempMovieId +
 														", role = " + matcher.group(3) +
 														", credit rank = " + tempActorCreditRank);
 									personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
-											moviesMap.get(matcher.group(2)).intValue(), 
+											tempMovieId, 
 											1, 
 											true,
 											matcher.group(3),
 											tempActorCreditRank));
 								}
+//								System.out.println("movie isn't on map!");
+//								if (tempArrayIndex == 50)
+//									return true;
 							}
 							// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
 							if ((personMovieCreditsSet.size() > 0) && (personMovieCreditsSet.size() % PSTMT_BATCH_SIZE == 0)) {
