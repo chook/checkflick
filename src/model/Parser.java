@@ -47,6 +47,7 @@ public class Parser {
 			InputStreamReader insr = new InputStreamReader(fstream);
 			listFile =  new BufferedReader(insr);
 			this.listType = listType;
+			this.filename = filename;
 			currentLine = 1;
 			isEOF = false;
 			listEndLine = "";

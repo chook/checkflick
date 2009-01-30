@@ -161,11 +161,12 @@ public class DBManager {
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
 		// creating the generic statement that contains the table and field names
-		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, "*", DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_NAME);
+		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, "*", DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_ID);
 		// creating the prepared statement template including the ROWNUM limits for the SELECT
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
 		
 		System.out.println("getting " + (bottomLimit - topLimit + 1) + " movies from the DB");
+		System.out.println(pstmtStr);
 		int tempMovieId, tempMovieDBYear;
 		String tempMovieDBName, tempMovieRomanNotation, tempMovieMadeFor, tempMovieYear, tempMovieName;
 		StringBuilder movieNameBuilder = null;
@@ -200,6 +201,7 @@ public class DBManager {
 //					movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
 //				tempMovieName = movieNameBuilder.toString();
 				// inserting the full movie name into the moviesMap
+//				System.out.println("inserting movie name: " + tempMovieName);
 				moviesMap.put(tempMovieName, tempMovieId);
 				
 				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
