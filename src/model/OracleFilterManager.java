@@ -76,10 +76,10 @@ public class OracleFilterManager {
 			break;
 		case MOVIE_CAST:
 			filter = new OracleJoinFilter(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-											DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-											DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(), id),
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(),
+											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+											DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(), id),
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_PERSON_ID.getFieldName());
 			break;
@@ -205,28 +205,28 @@ public class OracleFilterManager {
 			break;
 		case MOVIE_CAST:
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(), ls
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(), ls
 							.get(0)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(), ls
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(), ls
 							.get(1)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_PRODUCTION_ROLE_ID
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID
 							.getFieldName(), ls.get(2)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.BOOLEAN,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_IS_ACTOR.getFieldName(), ls
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_IS_ACTOR.getFieldName(), ls
 							.get(3)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_ACTOR_ROLE.getFieldName(),
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_ROLE.getFieldName(),
 					ls.get(4)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_ACTOR_CREDITS_RANK
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_CREDITS_RANK
 							.getFieldName(), ls.get(5)));
 			break;
 		case MOVIE:
@@ -306,28 +306,28 @@ public class OracleFilterManager {
 			break;
 		case PERSON_ROLES:
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(), ls
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(), ls
 							.get(0)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(), ls
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(), ls
 							.get(1)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_PRODUCTION_ROLE_ID
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID
 							.getFieldName(), ls.get(2)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.BOOLEAN,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_IS_ACTOR.getFieldName(), ls
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_IS_ACTOR.getFieldName(), ls
 							.get(3)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_ACTOR_ROLE.getFieldName(),
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_ROLE.getFieldName(),
 					ls.get(4)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_ACTOR_CREDITS_RANK
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_CREDITS_RANK
 							.getFieldName(), ls.get(5)));
 			break;
 		case PERSON:
@@ -409,10 +409,10 @@ public class OracleFilterManager {
 			break;
 		case PERSON_ROLES:
 			filter = new OracleJoinFilter(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-																DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-																DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(), id),
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(),
+																DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+																DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(), id),
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(),
 					DBTablesEnum.MOVIES.getTableName(),
 					DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
 			break;
@@ -510,14 +510,14 @@ public class OracleFilterManager {
 			break;
 		case PERSON_PRODUCTION_ROLE:
 			singleFilter = new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					DBFieldsEnum.MOVIE_APPEARANCES_PRODUCTION_ROLE_ID
+					DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID
 							.getFieldName(), value);
 
 			filter = new OracleJoinFilter(singleFilter, DBTablesEnum.PERSONS
 					.getTableName(), DBFieldsEnum.PERSONS_PERSON_ID
-					.getFieldName(), DBTablesEnum.MOVIE_APPEARANCES
-					.getTableName(), DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID
+					.getFieldName(), DBTablesEnum.PERSON_MOVIE_CREDITS
+					.getTableName(), DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID
 					.getFieldName());
 			break;
 		}
@@ -550,12 +550,12 @@ public class OracleFilterManager {
 					  DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName(), ls.get(1)));
 			break;
 		case MOVIE_CAST:
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					  DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(), ls.get(0)));
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					  DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(), ls.get(1)));
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					  DBFieldsEnum.MOVIE_APPEARANCES_PRODUCTION_ROLE_ID.getFieldName(), ls.get(2)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					  DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					  DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(), ls.get(1)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					  DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName(), ls.get(2)));
 			break;
 		}
 		return filter;
@@ -570,12 +570,12 @@ public class OracleFilterManager {
 										  DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName(), ls.get(0)));
 			break;
 		case PERSON_ROLES:
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					  DBFieldsEnum.MOVIE_APPEARANCES_PERSON_ID.getFieldName(), ls.get(0)));
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					  DBFieldsEnum.MOVIE_APPEARANCES_MOVIE_ID.getFieldName(), ls.get(1)));
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_APPEARANCES.getTableName(),
-					  DBFieldsEnum.MOVIE_APPEARANCES_PRODUCTION_ROLE_ID.getFieldName(), ls.get(2)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					  DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					  DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(), ls.get(1)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+					  DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName(), ls.get(2)));
 			break;
 		}
 		return filter;
