@@ -11,6 +11,8 @@ import javax.security.auth.callback.LanguageCallback;
 import oracle.net.aso.i;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -245,6 +247,7 @@ public class SampleRibbonClass {
 				titles[0]="";
 				titles[2] ="";
 				String title = "";
+				boolean cast = false;
 				String message = "";
 				List<NamedEntity> list = null;
 				switch(type){
@@ -301,7 +304,7 @@ public class SampleRibbonClass {
 					title = "Movie's Cast";
 					titles[1] = "Name";
 					titles[2] = "Production Role";
-					toGet = "type";
+					cast = true;
 					message ="No cast for this movie.";
 					break;
 				}
@@ -336,9 +339,9 @@ public class SampleRibbonClass {
 							else
 								if (map.get(toGet)!=null)
 									item.setText (1, map.get(toGet));
-							if (toGet=="type"){
-								if (getName(rolesList , map.get(toGet))!=null)
-									item.setText (2, getName(rolesList , map.get(toGet)));
+							if (cast){
+								if (getName(rolesList , map.get("type"))!=null)
+									item.setText (2, getName(rolesList , map.get("type")));
 							}
 						}
 					}
@@ -1024,15 +1027,15 @@ public class SampleRibbonClass {
 		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
 		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton movies = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nMovies", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		new RibbonGroupSeparator(results);
-		RibbonButton role = new RibbonButton(results, ImageCache.getImage("spanner_48.png"), " \nRole", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+	//	RibbonButton movies = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nMovies", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+	//	new RibbonGroupSeparator(results);
+		RibbonButton role = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nRole", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 
 		ButtonSelectGroup group = new ButtonSelectGroup();
 		aka.setButtonSelectGroup(group);
-		movies.setButtonSelectGroup(group);
+	//	movies.setButtonSelectGroup(group);
 		role.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
 
@@ -1071,10 +1074,10 @@ public class SampleRibbonClass {
 		}*/
 		System.out.println(person.getPersonNickNames());
 		Label date = new Label(composite,SWT.NONE);
-		date.setText("Date Of Birth: ");
+		date.setText("Year Of Birth: ");
 		Text dateText = new Text(composite ,SWT.FILL);
-		if (person.getDateOfBirth()!= null)
-			dateText.setText(person.getDateOfBirth().toString());
+		if (person.getYearOfBirth()!= 0)
+			dateText.setText(String.valueOf(person.getYearOfBirth()));
 		Label city = new Label(composite,SWT.NONE);
 		city.setText("Born in: ");
 		Text cityText = new Text(composite ,SWT.FILL);
@@ -1088,8 +1091,8 @@ public class SampleRibbonClass {
 		Label death = new Label(composite,SWT.NONE);
 		death.setText("Died in: ");
 		Text deathText = new Text(composite ,SWT.FILL);
-		if (person.getDateOfDeath()!= null)
-			deathText.setText(person.getDateOfDeath().toString());
+		if (person.getYearOfDeath()!= 0)
+			deathText.setText(String.valueOf(person.getYearOfDeath()));
 		Label height = new Label(composite,SWT.NONE);
 		height.setText("Height: ");
 		Text heightText = new Text(composite ,SWT.FILL);
@@ -1162,7 +1165,7 @@ public class SampleRibbonClass {
 		final int year = toDay.get(Calendar.YEAR);
 		insert.setLocation(2,145);
 		//FillLayout layout = new FillLayout();
-		insert.setLayout(new FillLayout());
+		insert.setLayout(new FillLayout(1));
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
 		bar = new ExpandBar (insert, SWT.V_SCROLL);
@@ -1269,15 +1272,14 @@ public class SampleRibbonClass {
 		});
 		
 		bar.setSpacing(8);
-		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3-60);
 	}
 	public void insertPerson(Composite insert){
 		
 		Calendar toDay = Calendar.getInstance();
 		final int year = toDay.get(Calendar.YEAR);
 		insert.setLocation(2,145);
-		//FillLayout layout = new FillLayout();
-		insert.setLayout(new FillLayout());
+		insert.setLayout(new FillLayout(1));
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
 		bar = new ExpandBar (insert, SWT.V_SCROLL);
@@ -1332,7 +1334,7 @@ public class SampleRibbonClass {
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Insert");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
-		item0.setText("Insert New Movie");
+		item0.setText("Insert New Person");
 		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 		item0.setControl(composite);
 		item0.setImage(image);
@@ -1593,7 +1595,7 @@ public class SampleRibbonClass {
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 					data.heightHint = 200;
 					table.setLayoutData(data);
-					String[] titles = {" ", "Name", "Age", "ID"};
+					String[] titles = {" ", "Name", "Birth", "ID"};
 					for (int i=0; i<titles.length; i++) {
 						TableColumn column = new TableColumn (table, SWT.NONE);
 						column.setText (titles [i]);
@@ -1652,10 +1654,9 @@ public class SampleRibbonClass {
 				}
 				else {
 					moreInsert = new ExpandBar(insertMovie, SWT.V_SCROLL);
-					//moreInsert.setLocation(0, (shell.getShell().getSize().y)/3+145);
 					Composite composite = new Composite (moreInsert, SWT.NONE);
 					GridLayout layout = new GridLayout (6,false);
-					Image image = ImageCache.getImage("add_48.png");
+					Image image = ImageCache.getImage("pie_chart_48.png");
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
 					composite.setLayout(layout); 
@@ -1697,6 +1698,7 @@ public class SampleRibbonClass {
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
 					composite.setLayout(layout); 
+					image = ImageCache.getImage("furl_48.png");
 					label = new Label(composite,SWT.NONE);
 					label.setText("Language:");
 					final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
@@ -1731,6 +1733,7 @@ public class SampleRibbonClass {
 					
 					//countries - 4th item
 					composite = new Composite (moreInsert, SWT.NONE);
+					image =ImageCache.getImage("globe_48.png");
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
@@ -1769,6 +1772,7 @@ public class SampleRibbonClass {
 					
 					//goofs - 5th item
 					composite = new Composite (moreInsert, SWT.NONE);
+					image =ImageCache.getImage("smile_grin_48.png");
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
@@ -1801,6 +1805,7 @@ public class SampleRibbonClass {
 					
 					//quotes - 6th item
 					composite = new Composite (moreInsert, SWT.NONE);
+					image = ImageCache.getImage("speech_bubble_48.png");
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
@@ -1833,6 +1838,7 @@ public class SampleRibbonClass {
 					
 					//aka names - 7th item
 					composite = new Composite (moreInsert, SWT.NONE);
+					image =  ImageCache.getImage("book_48.png");
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
@@ -1865,6 +1871,7 @@ public class SampleRibbonClass {
 					//connections
 					//cast
 					composite = new Composite (moreInsert, SWT.NONE);
+					image = ImageCache.getImage("users_two_48.png");
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
@@ -1916,7 +1923,7 @@ public class SampleRibbonClass {
 					moreInsert = new ExpandBar(insertPerson, SWT.V_SCROLL);
 					Composite composite = new Composite (moreInsert, SWT.NONE);
 					GridLayout layout = new GridLayout (6,false);
-					Image image = ImageCache.getImage("add_48.png");
+					Image image = ImageCache.getImage("book_48.png");
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
 					composite.setLayout(layout); 
@@ -1947,31 +1954,9 @@ public class SampleRibbonClass {
 					item1.setImage(image);
 					item1.setExpanded(false);
 					
-					//roles- 3rd item
+					//quotes - 3rd item
 					composite = new Composite (moreInsert, SWT.NONE);
-					layout = new GridLayout (6,false);
-					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-					layout.verticalSpacing = 10;
-					composite.setLayout(layout); 
-					label = new Label(composite,SWT.NONE);
-					label.setText("Production Roles:");
-					final Combo roleCombo = new Combo(composite ,SWT.READ_ONLY);
-					String[] roleString= new String[rolesList.size()];
-					for (int i=0; i<rolesList.size(); i++){
-						roleString[i]=rolesList.get(i).getName();
-					}
-					roleCombo.setItems(roleString);
-					Button langButton = new Button (composite, SWT.PUSH);
-					langButton.setText("Add");
-					ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 1);
-					item2.setText("Insert Person's Production Roles");
-					item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-					item2.setControl(composite);
-					item2.setImage(image);
-					item2.setExpanded(false);
-					
-					//quotes - 4th item
-					composite = new Composite (moreInsert, SWT.NONE);
+					image = ImageCache.getImage("speech_bubble_48.png");
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
@@ -1995,15 +1980,37 @@ public class SampleRibbonClass {
 							}
 						}
 					});
-					ExpandItem item3 = new ExpandItem(moreInsert, SWT.NONE, 2);
+					ExpandItem item3 = new ExpandItem(moreInsert, SWT.NONE, 1);
 					item3.setText("Insert Person's Quotes");
 					item3.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 					item3.setControl(composite);
 					item3.setImage(image);
 					item3.setExpanded(false);
+					//roles- 4th item
+					/*composite = new Composite (moreInsert, SWT.NONE);
+					layout = new GridLayout (6,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					composite.setLayout(layout); 
+					label = new Label(composite,SWT.NONE);
+					label.setText("Production Roles:");
+					final Combo roleCombo = new Combo(composite ,SWT.READ_ONLY);
+					String[] roleString= new String[rolesList.size()];
+					for (int i=0; i<rolesList.size(); i++){
+						roleString[i]=rolesList.get(i).getName();
+					}
+					roleCombo.setItems(roleString);
+					Button langButton = new Button (composite, SWT.PUSH);
+					langButton.setText("Add");
+					ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 2);
+					item2.setText("Insert Person's Production Roles");
+					item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item2.setControl(composite);
+					item2.setImage(image);
+					item2.setExpanded(false);*/
 					
 					moreInsert.setSpacing(8);
-					insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
+					insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/2+100);
 				}
 			}
 		});
@@ -2031,7 +2038,7 @@ public class SampleRibbonClass {
 	//	personResults.setBackground(shell.getShell().getBackground());
 		Rectangle monitor_bounds = personResults.getShell().getMonitor().getBounds();
 		personResults.setSize(new Point(monitor_bounds.width/4,
-		                        monitor_bounds.height/3));		
+		                        monitor_bounds.height/2));		
 		personResults.setText("Persons List");		
 		GridLayout layout = new GridLayout(2 , false);
 		personResults.setLayout(layout);
@@ -2063,6 +2070,12 @@ public class SampleRibbonClass {
 			rolesString[i]=rolesList.get(i).getName();
 		}
 		rolesCombo.setItems (rolesString);
+		Label label = new Label(personResults , SWT.NONE);
+		label.setText("Actor's Role:");
+		final Text roleText = new Text(personResults , SWT.BORDER);
+		label = new Label(personResults , SWT.NONE);
+		label.setText("Actor's Rank:");
+		final Text rankText = new Text(personResults , SWT.BORDER);
 		Button add = new Button(personResults, SWT.PUSH);
 		add.setText("Add");
 		Button close = new Button(personResults, SWT.PUSH);
@@ -2076,7 +2089,19 @@ public class SampleRibbonClass {
 					okMessageBox("Please select a person and a production role.");
 				else{
 					int secondId;
+					int actors =Integer.parseInt(getID(rolesList, "Actors"));
 					int role = Integer.parseInt(getID(rolesList, rolesCombo.getText()));
+<<<<<<< .mine
+					if (role != actors){
+						for (int i = 0 ; i<t.length; i++){
+							secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
+							AbsType relation = new CastingRelation(secondId, id, role);
+							try {
+								pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
+							} catch (InterruptedException e1) {
+								e1.printStackTrace();
+							}
+=======
 					for (int i = 0 ; i<t.length; i++){
 						secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
 						AbsType relation = new CastingRelation(secondId, id, role);
@@ -2084,9 +2109,39 @@ public class SampleRibbonClass {
 							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
 						} catch (InterruptedException e1) {
 							e1.printStackTrace();
+>>>>>>> .r154
+						}
+						table.deselectAll();
+					}
+					else{
+						boolean valid = true;
+						if ((roleText.getText()=="")|| (rankText.getText()=="")){
+							okMessageBox("If you want to insert an actor you need to write his role and rank.");
+						}
+						else{
+							String part = roleText.getText();
+							int rank = 0;
+							try{
+								rank = Integer.parseInt(rankText.getText());
+							}
+							catch (NumberFormatException nfe){
+								okMessageBox("The rank must be a number!");
+								valid = false;
+							}
+							if (valid){
+								for (int i = 0 ; i<t.length; i++){
+									secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
+									AbsType relation = new CastingRelation(secondId, id, role , true , part , rank);
+									try {
+										pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
+									} catch (InterruptedException e1) {
+										e1.printStackTrace();
+									}
+								}
+								table.deselectAll();
+							}
 						}
 					}
-					table.deselectAll();
 				}
 			}
 		});
@@ -2094,11 +2149,16 @@ public class SampleRibbonClass {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);	
 				personResults.close();
 			}
 		});
+		personResults.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);}			
+		});
 		personResults.open();
-		shell.getShell().setEnabled(true);		
+		//shell.getShell().setEnabled(true);		
 	}
 	static protected void drawInsertDataSuccess() {
 		display.asyncExec(new Runnable() {
