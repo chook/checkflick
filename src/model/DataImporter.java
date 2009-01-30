@@ -667,16 +667,14 @@ public class DataImporter {
 		int tempArrayIndex;
 		int tempActorCreditRank;
 
-		moviesStartRow = 1;
-		moviesEndRow = moviesStartRow + SELECT_BUCKET_SIZE - 1;
-		personsStartRow = 1;
-		personsEndRow = personsStartRow + SELECT_BUCKET_SIZE - 1;
 		// compiling the pattern to look for in the list file
 		patternRegExp = actorsMoviesPattern;
 		pattern = Pattern.compile(patternRegExp);
 
 		boolean isMoviesEmpty = false;
 		boolean isPersonsEmpty = false;
+		personsStartRow = 1;
+		personsEndRow = personsStartRow + SELECT_BUCKET_SIZE - 1;
 		do {
 			// retrieving part of the persons list to put inside a map
 			// since the movie list is huge, we select buckets and iterate over all of them
@@ -687,6 +685,8 @@ public class DataImporter {
 
 			if (!isPersonsEmpty) {
 				parser.loadFile(listfilesMap.get(ListFilesEnum.ACTORS), ListFilesEnum.ACTORS);
+				moviesStartRow = 1;
+				moviesEndRow = moviesStartRow + SELECT_BUCKET_SIZE - 1;
 				// going in the list to the first actor in the array
 				do {
 					// retrieving part of the movies list to put inside a map

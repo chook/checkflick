@@ -178,35 +178,17 @@ public class DBManager {
 			set.setFetchSize(1000);
 			moviesMap = new HashMap<String, Integer>();
 			// going over the movies retrieved from the DB to create the full movie name for comparison
-			while (set.next()) {
-				// retrieving the different fields
-				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
-				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
-//				tempMovieDBName = set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
-//				tempMovieDBYear = set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName());
-//				tempMovieRomanNotation = set.getString(DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName());
-//				tempMovieMadeFor = set.getString(DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName());
-//				if (tempMovieDBYear == 0)
-//					tempMovieYear = "????";
-//				else
-//					tempMovieYear = String.valueOf(tempMovieDBYear);
+			if (set.next()) 
+				moviesMap.put("temp", 1);
+//			while (set.next()) {
+//				// retrieving the different fields
+//				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
+//				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
+//				moviesMap.put(tempMovieName, tempMovieId);
 //				
-//				// rebuilding the movie name as it appears on the lists for comparison
-//				movieNameBuilder = new StringBuilder(tempMovieDBName);
-//				movieNameBuilder.append(" (").append(tempMovieYear);
-//				if (tempMovieRomanNotation != null)
-//					movieNameBuilder.append("/").append(tempMovieRomanNotation);
-//				movieNameBuilder.append(")");
-//				if (tempMovieMadeFor != null)
-//					movieNameBuilder.append(" (").append(tempMovieMadeFor).append(")");
-//				tempMovieName = movieNameBuilder.toString();
-				// inserting the full movie name into the moviesMap
-//				System.out.println("inserting movie name: " + tempMovieName);
-				moviesMap.put(tempMovieName, tempMovieId);
-				
-				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
-					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
-			}
+//				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
+//					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
+//			}
 			set.close();
 			pstmt.close();
 		} catch (SQLException e) {
