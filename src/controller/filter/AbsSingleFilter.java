@@ -1,6 +1,10 @@
 package controller.filter;
 
+import controller.enums.FilterOptionEnum;
+
 /**
+ * An abstract representation of a single filter
+ * 
  * @author Chook
  * 
  */
@@ -23,7 +27,7 @@ public abstract class AbsSingleFilter extends AbsFilter {
 	protected void setValue(String value) {
 		this.value = value;
 	}
-	
+
 	protected AbsSingleFilter() {
 
 	}

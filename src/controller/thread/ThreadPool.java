@@ -1,5 +1,10 @@
 package controller.thread;
 
+/**
+ * The main thread pool (and public) class
+ * @author Chook
+ *
+ */
 public class ThreadPool extends Object {
 	private ThreadPoolData data = new ThreadPoolData();
 

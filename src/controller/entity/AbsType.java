@@ -44,19 +44,23 @@ public abstract class AbsType {
 		return "id: " + getId();
 	}
 	
+	/**
+	 * This function returns a list of all the properties as strings 
+	 * @return A list of properties as string
+	 */
 	public List<String> toStringList() {
 		List<String> list = new ArrayList<String>(1);
 		list.add(String.valueOf(getId()));
 		return list;
 	}
 	
+	/**
+	 * This function returns a map of strings by property name / value
+	 * @return The map
+	 */
 	public Map<String, String> toStringMap() {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("id", String.valueOf(getId()));
 		return map;
-	}
-	
-	public String toInsertString() {
-		return String.valueOf(getId());
 	}
 }

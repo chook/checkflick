@@ -1,5 +1,10 @@
 package controller.filter;
 
+/**
+ * An abstract representation of a join filter
+ * @author Chook
+ *
+ */
 public abstract class AbsJoinFilter extends AbsFilter {
 	protected AbsSingleFilter single = null;
 

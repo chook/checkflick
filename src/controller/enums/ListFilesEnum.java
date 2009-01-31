@@ -4,8 +4,9 @@
 package controller.enums;
 
 /**
+ * This is an enum for representing all the different files for the massive import
  * @author Nadav Shamgar
-  */
+ */
 public enum ListFilesEnum {
 	ACTORS,
 	ACTRESSES,

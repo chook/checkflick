@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An abstract relation entity, has two id's
+ * A relation entity, has two id's
  * 
  * @author Chook
  * 

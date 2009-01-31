@@ -1,15 +1,17 @@
 package controller.thread;
+
+/**
+ * This is a worker design pattern object
+ * 
+ * @author Chook
+ * 
+ */
 class ThreadPoolWorker extends Object {
 	private static int nextWorkerID = 0;
-
 	private ObjectFIFO idleWorkers;
-
 	private int workerID;
-
 	private ObjectFIFO handoffBox;
-
 	private Thread internalThread;
-
 	private volatile boolean noStopRequested;
 
 	public ThreadPoolWorker(ObjectFIFO idleWorkers) {

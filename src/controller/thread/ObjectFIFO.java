@@ -1,5 +1,11 @@
 package controller.thread;
 
+/**
+ * This class represents the first-in-first-out data structure for the thread pool
+ * 
+ * @author Chook
+ * 
+ */
 class ObjectFIFO extends Object {
 	private Object[] queue;
 

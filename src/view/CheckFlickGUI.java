@@ -5,19 +5,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.security.auth.callback.LanguageCallback;
-
-import oracle.net.aso.i;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ControlEditor;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -25,7 +16,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
-
 import com.hexapixel.widgets.generic.ImageCache;
 import com.hexapixel.widgets.generic.Utils;
 import com.hexapixel.widgets.ribbon.ButtonSelectGroup;
@@ -37,7 +27,6 @@ import com.hexapixel.widgets.ribbon.RibbonShell;
 import com.hexapixel.widgets.ribbon.RibbonTab;
 import com.hexapixel.widgets.ribbon.RibbonTabFolder;
 import com.hexapixel.widgets.ribbon.RibbonTooltip;
-
 import controller.AppData;
 import controller.DataManager;
 import controller.entity.AbsType;
@@ -54,7 +43,7 @@ import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
 import controller.thread.ThreadPool;
 
-public class SampleRibbonClass {
+public class CheckFlickGUI {
 	static RibbonShell shell;
 	static Display display;
 	static Composite searchByMovie;
@@ -105,7 +94,7 @@ public class SampleRibbonClass {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		SampleRibbonClass app = new SampleRibbonClass();
+		CheckFlickGUI app = new CheckFlickGUI();
 		app.createShell();
 		
 		Utils.centerDialogOnScreen(shell.getShell());

@@ -13,53 +13,53 @@ import controller.enums.SearchEntitiesEnum;
 
 public class RibbonInterface {
 	public static void settingShellText(final String text) {
-		SampleRibbonClass.updateShellText(text);		
+		CheckFlickGUI.updateShellText(text);		
 	}
 	public static void settingMovieTab(MovieEntity movie){
-		SampleRibbonClass.updateMovieTab(movie);
+		CheckFlickGUI.updateMovieTab(movie);
 	}
 	public static void settingPersonTab(PersonEntity person){
-		SampleRibbonClass.updatePersonTab(person);
+		CheckFlickGUI.updatePersonTab(person);
 	}
 	public static void drawPersonData(List<AbsType> result , PersonDataEnum type){
-		SampleRibbonClass.drawPersonData(result, type);
+		CheckFlickGUI.drawPersonData(result, type);
 	}
 	public static void drawMovieData(List<AbsType> result , MovieDataEnum type){
-		SampleRibbonClass.drawMovieData(result, type);
+		CheckFlickGUI.drawMovieData(result, type);
 	}
 	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
-		SampleRibbonClass.drawSearchMovieTable(list, search);
+		CheckFlickGUI.drawSearchMovieTable(list, search);
 	}
 	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search ,int id) {
 		//	SampleRibbonClass.drawSearchMovieTable(list, search , id);
 	}
 	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search ) {
-		SampleRibbonClass.drawSearchPersonTable(list, search);
+		CheckFlickGUI.drawSearchPersonTable(list, search);
 	}
 	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search , int id) {
-		SampleRibbonClass.peopleToInsertTable(list, search , id);
+		CheckFlickGUI.peopleToInsertTable(list, search , id);
 	}
 	public static void InsertMovie(int id){
-		SampleRibbonClass.drawMoreInsertMovie(id);
+		CheckFlickGUI.drawMoreInsertMovie(id);
 	}
 	
 	public static void InsertMovieExtraData(int id){
-		SampleRibbonClass.drawInsertDataSuccess();
+		CheckFlickGUI.drawInsertDataSuccess();
 	}
 	public static void updateMovie(int id){
-		SampleRibbonClass.drawUpdateDataSuccess();
+		CheckFlickGUI.drawUpdateDataSuccess();
 	}
 	public static void InsertPerson(int id){
-		SampleRibbonClass.drawMoreInsertPerson(id);
+		CheckFlickGUI.drawMoreInsertPerson(id);
 	}
 	public static void InsertPersonExtraData(int id){
-		SampleRibbonClass.drawInsertDataSuccess();
+		CheckFlickGUI.drawInsertDataSuccess();
 	}
 	public static void updatePerson(int id){
-		SampleRibbonClass.drawUpdateDataSuccess();
+		CheckFlickGUI.drawUpdateDataSuccess();
 	}
 	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
-		SampleRibbonClass.setList(list, type);
+		CheckFlickGUI.setList(list, type);
 	}
 
 }

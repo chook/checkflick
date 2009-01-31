@@ -1,18 +1,20 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
 import controller.entity.AbsType;
-import controller.entity.PersonEntity;
+import controller.enums.FilterOptionEnum;
 import controller.enums.MovieDataEnum;
 import controller.enums.PersonDataEnum;
 import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
 import controller.filter.AbsSingleFilter;
-import controller.filter.FilterOptionEnum;
 
+/**
+ * This static class acts as a factory for filters
+ * @author Chook
+ *
+ */
 public class OracleFilterManager {
 	private static OracleFilterManager instance = null;
 

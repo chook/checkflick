@@ -1,7 +1,12 @@
-package controller.entity;
+package controller.enums;
 
+/**
+ * This is all the types that inherit AbsType
+ * @author Chook
+ *
+ */
 public enum EntityEnum {
-	ABS_DATA_TYPE,
+	ABS_TYPE,
 	RELATION,
 	CATEGORIZED_ENTITY,
 	CATEGORIZED_RELATION,

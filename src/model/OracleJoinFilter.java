@@ -3,20 +3,13 @@
  */
 package model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import sun.security.action.GetLongAction;
-
 import controller.filter.AbsJoinFilter;
 import controller.filter.AbsSingleFilter;
 
 /**
+ * This class represents an oracle join filter
  * @author Chook
  *
  */
