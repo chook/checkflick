@@ -50,6 +50,8 @@ public class ImportHandler {
 		return isError;
 	}
 	
+
+	
 	/**
 	 * imports all the data that was given to the handler to the DB using the Parser
 	 * @return true if there was no error
@@ -67,7 +69,8 @@ public class ImportHandler {
 		importer = new DataImporter(listfilesMap);
 		
 //		importer.getLanguagesGenresCountries();
-		importer.getMovies();
+		importer.importMovies();
+		importer.importPersonsAndCredits();
 		
 		// ------------------ dependent only on Movies
 //		importer.getMoviesLanguages();	// dependent on Languages
@@ -86,60 +89,7 @@ public class ImportHandler {
 		importer.getMoviesTaglines();
 		importer.getMoviesTrivias();
 */		
-		int personIndexNextMarkStart;	// the location where starts the specific persons list
-		int personIndexNextMarkEnd;		// the location where ends the specific persons list
-		
-		// TEST: ================================================================
-		importer.TESTcreateTempFields();
-		int[] TESTpersonIndexNextMarkStart = new int[5]; 
-		System.out.println("==========================================================");
-		TESTpersonIndexNextMarkStart[0] = 1;
-		TESTpersonIndexNextMarkStart[1] = TESTpersonIndexNextMarkStart[0] + importer.getPersons(ListFilesEnum.ACTORS);
-		TESTpersonIndexNextMarkStart[2] = TESTpersonIndexNextMarkStart[1] + importer.getPersons(ListFilesEnum.ACTRESSES);
-		TESTpersonIndexNextMarkStart[3] = TESTpersonIndexNextMarkStart[2] + importer.getPersons(ListFilesEnum.DIRECTORS);
-		TESTpersonIndexNextMarkStart[4] = TESTpersonIndexNextMarkStart[3] + importer.getPersons(ListFilesEnum.PRODUCERS);
-		importer.getPersons(ListFilesEnum.WRITERS);
-		importer.TESTaddTempIdForPersons();
-		importer.TESTmarkAllPersonsNotToDelete();
-		importer.TESTfindAndUpdateDuplicates();
-		
-		importer.getPersonMovieCredits(ListFilesEnum.ACTORS, TESTpersonIndexNextMarkStart[0]);
-		importer.getPersonMovieCredits(ListFilesEnum.ACTRESSES, TESTpersonIndexNextMarkStart[1]);
-		importer.getPersonMovieCredits(ListFilesEnum.DIRECTORS, TESTpersonIndexNextMarkStart[2]);
-		importer.getPersonMovieCredits(ListFilesEnum.PRODUCERS, TESTpersonIndexNextMarkStart[3]);
-		importer.getPersonMovieCredits(ListFilesEnum.WRITERS, TESTpersonIndexNextMarkStart[4]);
-		
-		importer.TESTRemoveDuplicates();
-		importer.TESTdeleteTempFields();
-		
-		// TEST END : ===========================================================
-		
-//		System.out.println("==========================================================");
-//		personIndexNextMarkStart = 1;
-//		personIndexNextMarkEnd = importer.getPersons(ListFilesEnum.ACTORS) + 1;
-//		importer.getPersonMovieCredits(ListFilesEnum.ACTORS, personIndexNextMarkStart);
-//		
-//		System.out.println("==========================================================");
-//		personIndexNextMarkStart = personIndexNextMarkEnd;
-//		personIndexNextMarkEnd += importer.getPersons(ListFilesEnum.ACTRESSES) + 1;
-//		importer.getPersonMovieCredits(ListFilesEnum.ACTRESSES, personIndexNextMarkStart);
-//		
-//		System.out.println("==========================================================");
-//		personIndexNextMarkStart = personIndexNextMarkEnd;
-//		personIndexNextMarkEnd += importer.getPersons(ListFilesEnum.DIRECTORS) + 1;
-//		importer.getPersonMovieCredits(ListFilesEnum.DIRECTORS, personIndexNextMarkStart);
-//		
-//		System.out.println("==========================================================");
-//		personIndexNextMarkStart = personIndexNextMarkEnd;
-//		personIndexNextMarkEnd += importer.getPersons(ListFilesEnum.PRODUCERS) + 1;
-//		importer.getPersonMovieCredits(ListFilesEnum.PRODUCERS, personIndexNextMarkStart);
-//		
-//		System.out.println("==========================================================");
-//		personIndexNextMarkStart = personIndexNextMarkEnd;
-//		personIndexNextMarkEnd += importer.getPersons(ListFilesEnum.WRITERS) + 1;
-//		importer.getPersonMovieCredits(ListFilesEnum.WRITERS, personIndexNextMarkStart);
-		
-		// removing temporary fields TEMP_PERSON_LINE_NUMBER & TEMP_MOVIE_FULL_NAME
+		// removing temporary fields TEMP_MOVIE_FULL_NAME
 		
 /*		// ------------------ dependent only on Persons
 		importer.getAKANames();
