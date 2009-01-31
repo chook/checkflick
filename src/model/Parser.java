@@ -14,9 +14,14 @@ public class Parser {
 	static String countriesListStartLine2 = "==============";
 	static String moviesListStartLine1 = "MOVIES LIST";
 	static String moviesListStartLine2 = "===========";
-	static String actorsListStartLine1 = "Name			Titles ";
-	static String actorsListStartLine2 = "----			------";
-	static String actorsListEndLine = "SUBMITTING UPDATES";
+	static String persons1ListStartLine1 = "Name			Titles ";
+	static String persons1ListStartLine2 = "----			------";
+	static String persons2ListStartLine1 = "Name			Titles";
+	static String persons2ListStartLine2 = "----			------";
+	static String persons3ListStartLine1 = "Name                    Titles ";
+	static String persons3ListStartLine2 = "----                    ------";
+	static String persons1ListEndLine = "SUBMITTING UPDATES";
+	static String persons2ListEndLine = "Updates can most conveniently be submitted via the movie mail server; send";
 	
 	private BufferedReader listFile;
 	private ListFilesEnum listType;
@@ -76,10 +81,28 @@ public class Parser {
 				break;
 			case ACTORS:
 			case ACTRESSES:
-				listStartLine1 = actorsListStartLine1;
-				listStartLine2 = actorsListStartLine2;
+				listStartLine1 = persons1ListStartLine1;
+				listStartLine2 = persons1ListStartLine2;
 				hasEndLine = true;
-				listEndLine = actorsListEndLine;
+				listEndLine = persons1ListEndLine;
+				break;
+			case DIRECTORS:
+				listStartLine1 = persons2ListStartLine1;
+				listStartLine2 = persons2ListStartLine2;
+				hasEndLine = true;
+				listEndLine = persons1ListEndLine;
+				break;
+			case PRODUCERS:
+				listStartLine1 = persons3ListStartLine1;
+				listStartLine2 = persons3ListStartLine2;
+				hasEndLine = true;
+				listEndLine = persons1ListEndLine;
+				break;
+			case WRITERS:
+				listStartLine1 = persons2ListStartLine1;
+				listStartLine2 = persons2ListStartLine2;
+				hasEndLine = true;
+				listEndLine = persons2ListEndLine;
 				break;
 			}
 		}

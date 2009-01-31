@@ -41,21 +41,23 @@ public class DataImporter {
 	//												and sometimes '/I' or other greek numbers
 	//                      (?:/((?:[IVX])+))	- group 3: the added part '/I' with a roman numbering to differentiate between movies with the same name and year
 	//											this group would be added to the movie name
-	// \\s?(?:\\((..*)\\))?				- an optional whitespace and then an optional parentheses with TV / V / VG
-	//           (..*)					- group 4: the added part '(TV)' / '(V)' / '(VG)' that would be added to the movie name
+	// \\s?(?:\\((..?)\\))?				- an optional whitespace and then an optional parentheses with TV / V / VG
+	//           (..?)					- group 4: the added part '(TV)' / '(V)' / '(VG)' that would be added to the movie name
 	// \\s*(?:\\{\\{SUSPENDED\\}\\})?	- an optional whitespace and then an optional '{{SUSPENDED}}' notation
 	// \\s*((?:[\\d\\?]){4}).*			- an optional whitespace and then the year of the movie (the same as the one written after the movie name)
 	//     ((?:[\\d\\?]){4})			- group 5: the year of the movie
-	static String moviesPattern = "(([^\"].*)\\s\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(?:\\((..*)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*((?:[\\d\\?]){4}).*";
+	static String moviesPattern = "(([^\"].*)\\s\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(?:\\((..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*((?:[\\d\\?]){4}).*";
 	// movies2Pattern: group 1 = full movie name including year, roman notation and madeFor info / group 2 = year 
-	static String movies2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX])+)?\\)\\s?(?:\\((?:..*)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*((?:[\\d\\?]){4}).*";
-	static String moviesLanguagesPattern = "([^\"].*)\\s\\(([\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
-	static String moviesLanguages2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:(?:[IVX])+))?\\)\\s?(?:\\(?:..*\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
+	static String movies2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX])+)?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*((?:[\\d\\?]){4}).*";
+	static String moviesLanguagesPattern = "([^\"].*)\\s\\(([\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..?\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
+	static String moviesLanguages2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:(?:[IVX])+))?\\)\\s?(?:\\(?:..?\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesNameDBPattern = "([^\"](.)+)(?:\\(((?:[IVX])+)\\))?\\s?(\\(..*\\))?";
-	static String actorsPattern = "((?:[^\\t])+)\\t+.+";
-	// groups: 1 - actor / 2 - full movie name / 3 - role / 4 - credit location
-	static String actorsMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..*)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*(?:\\[(.+)\\])*\\s*(?:<(\\d+)>)*";
-	// 'babeepower' Viera, Michael\tRock Steady (2002)  [Stevie]
+	static String personsPattern = "((?:[^\\t])+)\\t+.+";
+	// actorsMoviesPattern: groups: 1 - actor / 2 - full movie name / 3 - role / 4 - credit location
+	static String actorsMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*(?:\\[(.+)\\])*\\s*(?:<(\\d+)>)*";
+	// directorsMoviesPattern: groups: 1 - director / 2 - full movie name
+	static String directorsMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*(?:<(?:[\\d,])+>)?";
+//	static String producersMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*";
 
 	
 	/**
@@ -80,8 +82,18 @@ public class DataImporter {
 		ih.addListFile(ListFilesEnum.LANGUAGES, "lists\\language.list");
 		ih.addListFile(ListFilesEnum.GENRES, "lists\\genres.list");
 		ih.addListFile(ListFilesEnum.COUNTRIES, "lists\\countries.list");
-		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
-		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
+//		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
+//		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
+//		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses.list");
+//		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors.list");
+//		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers.list");
+//		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers.list");
+		ih.addListFile(ListFilesEnum.MOVIES, "lists\\moviesSHORT.list");
+		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actorsSHORT.list");
+		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actressesSHORT.list");
+		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directorsSHORT.list");
+		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producersSHORT.list");
+		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writersSHORT.list");
 		
 		// run the importing
 		ih.importIntoDB();
@@ -346,10 +358,9 @@ public class DataImporter {
 	 * @return int the number of persons entered to the DB. Returns -1 if failed.
 	 */
 	public int getPersons(ListFilesEnum listType) {
-		// for now, this retrieves only the actors (male)
 
 		Parser parser = new Parser();
-		Set<NamedEntity> personsSet = new HashSet<NamedEntity>();
+		Set<NamedEntity> personsSet = new LinkedHashSet<NamedEntity>();
 		String lineFromFile;
 		String patternRegExp = null;
 		String personName;
@@ -363,16 +374,17 @@ public class DataImporter {
 		switch (listType) {
 		case ACTORS:
 		case ACTRESSES:
-			patternRegExp = actorsPattern;
-			break;
 		case DIRECTORS:
-			patternRegExp = actorsPattern; // to be changed to directorsPattern
+		case PRODUCERS:
+		case WRITERS:
+			patternRegExp = personsPattern;
 			break;
 		}
 
 		// Making sure we find the start of the list
 		if (parser.findStartOfList()) {
 			System.out.println("Found the start of the list!");
+			System.out.println("GET_PERSONS - lineNumber = " + parser.getLineNumber());
 
 			pattern = Pattern.compile(patternRegExp);
 
@@ -416,7 +428,30 @@ public class DataImporter {
 
 		return totalElementsNum;
 	}
+	
+	public void TESTcreateTempFields() {
+		DBManager.getInstance().TESTcreateTempFields();
+	}
+	
+	public void TESTaddTempIdForPersons() {
+		DBManager.getInstance().TESTinsertTempIdForPersons();
+	}
+	
+	public void TESTmarkAllPersonsNotToDelete() {
+		DBManager.getInstance().TESTmarkAllPersonsNotToDelete();
+	}
+	
+	public void TESTfindAndUpdateDuplicates() {
+		DBManager.getInstance().TESTfindAndUpdateDuplicates();
+	}
+	
+	public void TESTRemoveDuplicates() {
+		DBManager.getInstance().TESTRemoveDuplicates();
+	}
 
+	public void TESTdeleteTempFields() {
+		DBManager.getInstance().TESTdeleteTempFields();
+	}
 	public void runOverResultSet(ResultSet moviesResultSet) {
 		Map<String, Integer> moviesMap;
 		Map<String, Integer> languagesMap = new HashMap<String, Integer>();
@@ -674,24 +709,44 @@ public class DataImporter {
 		int moviesStartRow, personsStartRow;
 		int moviesEndRow, personsEndRow;
 		int tempArrayIndex;
+		String tempActorRole;
 		int tempActorCreditRank;
 		boolean isActor;
 		int productionRoleId;
 
+		isActor = false;
+		tempActorRole = null;
+		tempActorCreditRank = 0;
+		productionRoleId = 0;
+		
 		switch (listType) {
 		case ACTORS:
+			System.out.println("");
+			System.out.println("entering movie credits of ACTORS");
 		case ACTRESSES:
+			System.out.println("entering movie credits of ACTRESSES");
 			patternRegExp = actorsMoviesPattern;
 			isActor = true;
 			productionRoleId = 1;
 			break;
+		case PRODUCERS:
+			System.out.println("");
+			System.out.println("entering movie credits of PRODUCERS");
+			patternRegExp = directorsMoviesPattern;
+			productionRoleId = 2;
+			break;
 		case DIRECTORS:
-			patternRegExp = actorsPattern; // to be changed to directorsPattern
-			isActor = false;
+			System.out.println("");
+			System.out.println("entering movie credits of DIRECTORS");
+			patternRegExp = directorsMoviesPattern;
+			productionRoleId = 3;
+			break;
+		case WRITERS:
+			System.out.println("");
+			System.out.println("entering movie credits of WRITERS");
+			patternRegExp = directorsMoviesPattern;
 			productionRoleId = 4;
 			break;
-		default:
-			isActor = false;
 		}
 		// compiling the pattern to look for in the list file
 		pattern = Pattern.compile(patternRegExp);
@@ -722,6 +777,10 @@ public class DataImporter {
 					if (!isMoviesEmpty) {
 						tempArrayIndex = 0;
 						parser.findLine(personsArray[0].getSecondaryId());
+						System.out.println(" ");
+						System.out.println("SECONDARYID - " + personsArray[0].getSecondaryId());
+						System.out.println("LINE - " + parser.getLineNumber());
+						System.out.println(" ");
 						personMovieCreditsSet = new LinkedHashSet<CastingRelation>();
 						// Making sure we find the start of the list
 						while (personsArray[tempArrayIndex] != null) {
@@ -742,15 +801,17 @@ public class DataImporter {
 								tempMovieFullName = matcher.group(2).trim();
 								if (moviesMap.containsKey(tempMovieFullName)) {
 									tempMovieId = moviesMap.get(tempMovieFullName).intValue();
-									
-									try {
-										tempActorCreditRank = Integer.parseInt(matcher.group(4));
-									} catch (Exception e) {
-										tempActorCreditRank = 0;
+									// if this is an actor/actresses list, there are more parameters on the line
+									if (isActor) {
+										tempActorRole = matcher.group(3);
+										try {
+											tempActorCreditRank = Integer.parseInt(matcher.group(4));
+										} catch (Exception e) {
+											tempActorCreditRank = 0;
+										}
 									}
-									if (isActor)
-										personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
-												tempMovieId, 1, true, matcher.group(3), tempActorCreditRank));
+									personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
+											tempMovieId, productionRoleId, isActor, tempActorRole, tempActorCreditRank));
 								}
 							}
 							// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
