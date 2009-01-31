@@ -46,12 +46,15 @@ public class DBManager {
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SELECT_PERSON_PSTMT = "SELECT * FROM PERSONS WHERE PERSON_ID=?";
 	private static String SELECT_GENERIC_STMT = "SELECT * FROM ";
+	
+	// used strings - not to delete
 	private static String SELECT_GENERIC_ORDERED_STMT = "SELECT %s FROM %s ORDER BY %s";
+	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
+	// used strings - not to delete
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
-	private static String INSERT_6_VALUES_PSTMT = "INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)";
-	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
+	
 	
 	private static String INSERT_MOVIE_LANGUAGES_TEST = "INSERT INTO %s (%s, %s) VALUES ((%s), (%s))";
 	private static String SELECT_GENERIC_DISTINCT = "SELECT DISTINCT %s FROM %s WHERE %s = ?";
@@ -178,22 +181,22 @@ public class DBManager {
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
-			set.setFetchSize(1000);
+			set.setFetchSize(RESULTS_FETCH_SIZE);
 			moviesMap = new HashMap<String, Integer>();
-			// going over the movies retrieved from the DB to create the full movie name for comparison
+			// going over the movies retrieved from the DB and adding the full movie name to the map for comparison
 			while (set.next()) {
 				// retrieving the different fields
 				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
 				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
 				moviesMap.put(tempMovieName, tempMovieId);
-				
+				// alive check
 				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
 					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
 			}
 			set.close();
 			pstmt.close();
 		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
+			System.out.println(e.getMessage());
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
@@ -374,20 +377,14 @@ public class DBManager {
 	 */
 	public Relation[] getAllPersonsAndLineNumbersArray(int topLimit, int bottomLimit, int bucketSize) {
 		ResultSet set = null;
-//		Set<Relation> personsSet = null;
-		Relation[] personsArray = new Relation[bucketSize+1];		// if the bucket is full, then the last cell is null as a delimiter
+		Relation[] personsArray = new Relation[bucketSize + 1];		// if the bucket is full, then the last cell is null as a delimiter
 		int arrayIndex = 0;
 
 		System.out.println("getting " + bucketSize + " persons from the DB");
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
 		// creating the generic statement that contains the table and field names
-
-		// TEST: THIS WAS CHANGED IN THE TEST FOR DUPLICATES
-		//String fields = DBFieldsEnum.PERSONS_PERSON_ID + "," + DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER;
 		String fields = "TEMP_PERSON_ID," + DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER;
-		// END TEST: ======================================================
-		
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, fields, DBTablesEnum.PERSONS, DBFieldsEnum.PERSONS_PERSON_ID);
 		// creating the prepared statement template including the ROWNUM limits for the SELECT
 		String pstmtStr = String.format(LIMIT_RESULTS_PSTMT, genericStr, bottomLimit, topLimit);
@@ -398,26 +395,19 @@ public class DBManager {
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
-			set.setFetchSize(1000);
-//			personsSet = new HashSet<Relation>();
-			// adding the persons retrieved to the set
+			set.setFetchSize(RESULTS_FETCH_SIZE);
+			// adding the persons retrieved to the array
 			while (set.next()) {
 				// retrieving the different fields
-				
-				// TEST: THIS WAS CHANGED IN THE TEST FOR DUPLICATES
-				//tempPersonId = set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName());
-				tempPersonId = set.getInt("TEMP_PERSON_ID");
-				// END TEST: ======================================================
-				
+				tempPersonId = set.getInt(DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName());
 				tempPersonLineNumber = set.getInt(DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());
 				// inserting the full movie name into the moviesMap
 				personsArray[arrayIndex] = new Relation(tempPersonId, tempPersonLineNumber);
 				++arrayIndex;
 				
+				// alive check
 				if (arrayIndex > 0 && arrayIndex % 10000 == 0)
 					System.out.println("- already entered " + arrayIndex + " elements to the personsArray");
-				
-//				personsSet.add(new Relation(tempPersonId, tempPersonLineNumber));
 			}
 			// if the number of elements is smaller than the bucket size, enter in the following column NULL,
 			// for the program to know that we have reached the end of the array
@@ -426,13 +416,12 @@ public class DBManager {
 			set.close();
 			pstmt.close();
 		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
+			System.out.println(e.getMessage());
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
 		
 		pool.returnConnection(conn);
-//		return personsSet;
 		System.out.println("finished getting " + bucketSize + " persons from the DB");
 		return personsArray;
 	}
@@ -836,7 +825,7 @@ public class DBManager {
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
 		String statementStr;
-		statementStr = String.format(INSERT_6_VALUES_PSTMT, 
+		statementStr = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)", 
 										DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(),
