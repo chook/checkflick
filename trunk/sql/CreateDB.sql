@@ -10,7 +10,6 @@ DROP TABLE "COLOR_INFO" cascade constraints;
   DROP TABLE "LANGUAGES" cascade constraints;
   DROP TABLE "MOVIE_AKA_NAMES" cascade constraints;
   DROP TABLE "MOVIE_APPEARANCES" cascade constraints;
-  DROP TABLE "PERSON_MOVIE_CREDITS" cascade constraints;
   DROP TABLE "MOVIE_CONNECTIONS" cascade constraints;
   DROP TABLE "MOVIE_COUNTRIES" cascade constraints;
   DROP TABLE "MOVIE_CRAZY_CREDITS" cascade constraints;
@@ -21,6 +20,7 @@ DROP TABLE "COLOR_INFO" cascade constraints;
   DROP TABLE "MOVIES" cascade constraints;
   DROP TABLE "MOVIE_TRIVIA" cascade constraints;
   DROP TABLE "PERSON_AKA_NAMES" cascade constraints;
+  DROP TABLE "PERSON_MOVIE_CREDITS" cascade constraints;
   DROP TABLE "PERSON_QUOTES" cascade constraints;
   DROP TABLE "PERSONS" cascade constraints;
   DROP TABLE "PERSON_TRIVIA" cascade constraints;
@@ -33,7 +33,6 @@ DROP TABLE "COLOR_INFO" cascade constraints;
   DROP SEQUENCE "LANGUAGES_SEQ";
   DROP SEQUENCE "MOVIES_SEQ";
   DROP SEQUENCE "PERSONS_SEQ";
-  DROP SEQUENCE "PRODUCTION_ROLES_SEQ";
 
 --------------------------------------------------------
 --  DDL for Sequence COLOR_INFO_SEQ
@@ -75,11 +74,6 @@ DROP TABLE "COLOR_INFO" cascade constraints;
 --------------------------------------------------------
 
    CREATE SEQUENCE  "PERSONS_SEQ"  MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE ;
---------------------------------------------------------
---  DDL for Sequence PRODUCTION_ROLES_SEQ
---------------------------------------------------------
-
-   CREATE SEQUENCE  "PRODUCTION_ROLES_SEQ"  MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE ;
 --------------------------------------------------------
 --  DDL for Table COLOR_INFO
 --------------------------------------------------------
@@ -270,7 +264,6 @@ DROP TABLE "COLOR_INFO" cascade constraints;
 	"HEIGHT" NUMBER, 
 	"TRADEMARK" VARCHAR2(2000 CHAR), 
 	"BIOGRAPHY_TEXT" VARCHAR2(4000 CHAR),
-  "TEMP_PERSON_LINE_NUMBER" NUMBER
    ) ;
  
 
@@ -525,12 +518,7 @@ IS_ACTOR IN ('Y','N')
 
   CREATE UNIQUE INDEX "LANGUAGES_PK" ON "LANGUAGES" ("LANGUAGE_ID") 
   ;
---------------------------------------------------------
---  DDL for Index PRODUCTION_ROLES_PK
---------------------------------------------------------
 
-  CREATE UNIQUE INDEX "PRODUCTION_ROLES_PK" ON "PRODUCTION_ROLES" ("PRODUCTION_ROLE_ID") 
-  ;
 --------------------------------------------------------
 --  DDL for Index GENRES_PK
 --------------------------------------------------------
@@ -794,29 +782,12 @@ END;
 /
 ALTER TRIGGER "BI_PERSONS" ENABLE;
 --------------------------------------------------------
---  DDL for Trigger BI_PRODUCTION_ROLES
---------------------------------------------------------
-
-  CREATE OR REPLACE TRIGGER "BI_PRODUCTION_ROLES" 
-BEFORE INSERT ON PRODUCTION_ROLES
-FOR EACH ROW 
-BEGIN
-    SELECT  PRODUCTION_ROLES_SEQ.NEXTVAL
-		INTO		:NEW.PRODUCTION_ROLE_ID
-		FROM		dual;
-END;
-
-
-/
-ALTER TRIGGER "BI_PRODUCTION_ROLES" ENABLE;
-
---------------------------------------------------------
 --  Hard Coded data for PRODUCTION_ROLES
 --------------------------------------------------------
 
 INSERT INTO "PRODUCTION_ROLES" 
 (PRODUCTION_ROLE_ID, PRODUCTION_ROLE_NAME)
-VALUES (1, 'Actors');
+VALUES ('Actors');
 
 INSERT INTO "PRODUCTION_ROLES" 
 (PRODUCTION_ROLE_NAME)
@@ -824,8 +795,8 @@ VALUES ('Producers');
 
 INSERT INTO "PRODUCTION_ROLES" 
 (PRODUCTION_ROLE_NAME)
-VALUES ('Writers');
+VALUES ('Directors');
 
 INSERT INTO "PRODUCTION_ROLES" 
 (PRODUCTION_ROLE_NAME)
-VALUES ('Directors');
+VALUES ('Writers');
