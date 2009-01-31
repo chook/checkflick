@@ -131,7 +131,7 @@ public class DataManager {
 //					e.printStackTrace();
 //				}
 				if (id != 0){
-					RibbonInterface.drawMovieData(DBManager.getInstance().getMovieData(dataType, String.valueOf(id)), dataType);
+					RibbonInterface.drawMovieData(DBManager.getInstance().getMovieData(dataType, String.valueOf(id)), dataType , id);
 				}
 			}
 		};
@@ -181,7 +181,7 @@ public class DataManager {
 //					e.printStackTrace();
 //				}
 				if (id != 0){
-					RibbonInterface.drawPersonData(DBManager.getInstance().getPersonData(dataType, String.valueOf(id)), dataType);
+					RibbonInterface.drawPersonData(DBManager.getInstance().getPersonData(dataType, String.valueOf(id)), dataType , id);
 				}
 			}
 		};
@@ -192,13 +192,14 @@ public class DataManager {
 	 * @param dataObject - Data
 	 * @return - True if successfully inserted, False - Otherwise
 	 */
-	public static Runnable insertMovieData(final MovieDataEnum dataType, final AbsType dataObject) {
+	public static Runnable insertMovieData(final MovieDataEnum dataType, final AbsType dataObject , final boolean update) {
 		return new Runnable() {
 			public void run() {
 				if(dataType == MovieDataEnum.MOVIE)
 					RibbonInterface.InsertMovie(DBManager.getInstance().insertMovieData(dataType, dataObject, false));
 				else
-					RibbonInterface.InsertMovieExtraData(DBManager.getInstance().insertMovieData(dataType, dataObject, false));
+					RibbonInterface.InsertMovieExtraData(DBManager.getInstance().insertMovieData(dataType, dataObject, false ), update , dataType);
+				
 			}
 		};
 	}
@@ -216,13 +217,13 @@ public class DataManager {
 	public int insertPersonDataOld(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, false);
 	}
-	public static Runnable insertPersonData(final PersonDataEnum dataType, final AbsType dataObject) {
+	public static Runnable insertPersonData(final PersonDataEnum dataType, final AbsType dataObject  ,final boolean update) {
 		return new Runnable() {
 			public void run() {
 				if(dataType == PersonDataEnum.PERSON)
 					RibbonInterface.InsertPerson(DBManager.getInstance().insertPersonData(dataType, dataObject, false));
 				else
-					RibbonInterface.InsertPersonExtraData(DBManager.getInstance().insertPersonData(dataType, dataObject, false));
+					RibbonInterface.InsertPersonExtraData(DBManager.getInstance().insertPersonData(dataType, dataObject, false ), update , dataType);
 			}
 		};
 	}
@@ -272,7 +273,7 @@ public class DataManager {
 			}
 		};
 	}
-	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list  ,final  int id) {
+	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list  ,final  int id , final boolean update) {
 		return new Runnable() {
 			public void run() {
 				System.out.println("About to search for " + entity.toString());
@@ -282,7 +283,7 @@ public class DataManager {
 						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity , id);
 						break;
 					case PERSONS:
-						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity , id);
+						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity , id , update);
 						break;
 					default:
 						break;
