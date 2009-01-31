@@ -94,6 +94,12 @@ public class OracleFilterManager {
 		return filter;
 	}
 
+	/**
+	 * Get the movie insert list of filters
+	 * @param data - The movie data
+	 * @param t - The type to get the values from
+	 * @return A list of filters
+	 */
 	protected List<AbsSingleFilter> getMovieInsertFilter(MovieDataEnum data,
 			AbsType t) {
 		List<AbsSingleFilter> filterList = new ArrayList<AbsSingleFilter>();
@@ -271,6 +277,12 @@ public class OracleFilterManager {
 		return filterList;
 	}
 
+	/**
+	 * Get the person insert filter list
+	 * @param data - Person data to insert
+	 * @param t - The type to get the values from
+	 * @return The list of filters
+	 */
 	protected List<AbsSingleFilter> getPersonInsertFilter(PersonDataEnum data,
 			AbsType t) {
 		List<AbsSingleFilter> filterList = new ArrayList<AbsSingleFilter>();
@@ -391,6 +403,12 @@ public class OracleFilterManager {
 		return filterList;
 	}
 	
+	/**
+	 * Get the data filters for person
+	 * @param data - The person data
+	 * @param id - The id of the person
+	 * @return A filter
+	 */
 	protected AbsFilter getPersonDataFilter(PersonDataEnum data, String id) {
 		AbsFilter filter = null;
 		switch (data) {
@@ -527,6 +545,12 @@ public class OracleFilterManager {
 		return filter;
 	}
 
+	/**
+	 * Get a movie delete filter
+	 * @param dataType The movie data to delete
+	 * @param entity - The entity containing the values
+	 * @return A list of filters
+	 */
 	protected List<AbsSingleFilter> getMovieDeleteFilter(MovieDataEnum dataType, AbsType entity) {
 		List<AbsSingleFilter> filter = new ArrayList<AbsSingleFilter>();
 		List<String> ls = entity.toStringList();
@@ -534,10 +558,6 @@ public class OracleFilterManager {
 		case MOVIE:
 			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIES.getTableName(),
 										  DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName(), ls.get(0)));
-			break;
-		case MOVIE_AKAS: // BUG
-			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_AKA_NAMES.getTableName(),
-					  DBFieldsEnum.MOVIE_AKA_NAMES_MOVIE_ID.getFieldName(), ls.get(0)));
 			break;
 		case MOVIE_COUNTRIES:
 			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
@@ -559,10 +579,34 @@ public class OracleFilterManager {
 			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 					  DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName(), ls.get(2)));
 			break;
+		case MOVIE_LANGUAGES:
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+					  DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+					  DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName(), ls.get(1)));
+			break;
+		case MOVIE_QUOTES:
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_QUOTES.getTableName(),
+					  DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.STRING, DBTablesEnum.MOVIE_QUOTES.getTableName(),
+					  DBFieldsEnum.MOVIE_QUOTES_QUOTE_TEXT.getFieldName(), ls.get(1)));
+			break;
+		case MOVIE_TRIVIA:
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.MOVIE_TRIVIA.getTableName(),
+					  DBFieldsEnum.MOVIE_TRIVIA_MOVIE_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.STRING, DBTablesEnum.MOVIE_TRIVIA.getTableName(),
+					  DBFieldsEnum.MOVIE_TRIVIA_TRIVIA_TEXT.getFieldName(), ls.get(1)));
+			break;
 		}
 		return filter;
 	}
 	
+	/**
+	 * Get a person delete filter
+	 * @param dataType The person data to delete
+	 * @param entity - The entity containing the values
+	 * @return A list of filters
+	 */
 	protected List<AbsSingleFilter> getPersonDeleteFilter(PersonDataEnum dataType, AbsType entity) {
 		List<AbsSingleFilter> filter = new ArrayList<AbsSingleFilter>();
 		List<String> ls = entity.toStringList();
@@ -578,6 +622,24 @@ public class OracleFilterManager {
 					  DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(), ls.get(1)));
 			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 					  DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName(), ls.get(2)));
+			break;
+		case PERSON_AKAS:
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
+					  DBFieldsEnum.PERSON_AKA_NAMES_PERSON_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.STRING, DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
+					  DBFieldsEnum.PERSON_AKA_NAMES_PERSON_AKA_NAME.getFieldName(), ls.get(1)));
+			break;
+		case PERSON_QUOTES:
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_QUOTES.getTableName(),
+					  DBFieldsEnum.PERSON_QUOTES_PERSON_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.STRING, DBTablesEnum.PERSON_QUOTES.getTableName(),
+					  DBFieldsEnum.PERSON_QUOTES_QUOTE_TEXT.getFieldName(), ls.get(1)));
+			break;
+		case PERSON_TRIVIA:
+			filter.add(new OracleSingleFilter(FilterOptionEnum.NUMBER, DBTablesEnum.PERSON_TRIVIA.getTableName(),
+					  DBFieldsEnum.PERSON_TRIVIA_PERSON_ID.getFieldName(), ls.get(0)));
+			filter.add(new OracleSingleFilter(FilterOptionEnum.STRING, DBTablesEnum.PERSON_TRIVIA.getTableName(),
+					  DBFieldsEnum.PERSON_TRIVIA_TRIVIA_TEXT.getFieldName(), ls.get(1)));
 			break;
 		}
 		return filter;
