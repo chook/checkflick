@@ -65,5 +65,7 @@ public class RibbonInterface {
 	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
 		CheckFlickGUI.setList(list, type);
 	}
-
+	public static void deleteEntity(boolean ok) {
+		CheckFlickGUI.drawDeleteDataSuccess();
+	}
 }
