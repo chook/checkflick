@@ -89,18 +89,18 @@ public class DataImporter {
 		ih.addListFile(ListFilesEnum.LANGUAGES, "lists\\language.list");
 		ih.addListFile(ListFilesEnum.GENRES, "lists\\genres.list");
 		ih.addListFile(ListFilesEnum.COUNTRIES, "lists\\countries.list");
-//		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
-//		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
-//		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses.list");
-//		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors.list");
-//		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers.list");
-//		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers.list");
-		ih.addListFile(ListFilesEnum.MOVIES, "lists\\moviesSHORT.list");
-		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actorsSHORT.list");
-		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actressesSHORT.list");
-		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directorsSHORT.list");
-		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producersSHORT.list");
-		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writersSHORT.list");
+		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
+		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
+		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses.list");
+		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors.list");
+		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers.list");
+		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers.list");
+//		ih.addListFile(ListFilesEnum.MOVIES, "lists\\moviesSHORT.list");
+//		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actorsSHORT.list");
+//		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actressesSHORT.list");
+//		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directorsSHORT.list");
+//		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producersSHORT.list");
+//		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writersSHORT.list");
 		
 		// run the importing
 		ih.importIntoDB();
