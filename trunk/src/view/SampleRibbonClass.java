@@ -99,10 +99,8 @@ public class SampleRibbonClass {
 			
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES));
-			pool.stopRequestIdleWorkers();
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.GENRES));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES));
-			pool.stopRequestIdleWorkers();
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES));
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
