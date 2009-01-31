@@ -833,6 +833,7 @@ public class DBManager {
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_IS_ACTOR.getFieldName(),
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_ROLE.getFieldName(),
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_CREDITS_RANK.getFieldName());
+		System.out.println(statementStr);
 		try {
 			pstmt = conn.prepareStatement(statementStr);
 
