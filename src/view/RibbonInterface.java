@@ -21,11 +21,11 @@ public class RibbonInterface {
 	public static void settingPersonTab(PersonEntity person){
 		CheckFlickGUI.updatePersonTab(person);
 	}
-	public static void drawPersonData(List<AbsType> result , PersonDataEnum type){
-		CheckFlickGUI.drawPersonData(result, type);
+	public static void drawPersonData(List<AbsType> result , PersonDataEnum type , int id){
+		CheckFlickGUI.drawPersonData(result, type , id);
 	}
-	public static void drawMovieData(List<AbsType> result , MovieDataEnum type){
-		CheckFlickGUI.drawMovieData(result, type);
+	public static void drawMovieData(List<AbsType> result , MovieDataEnum type, int id){
+		CheckFlickGUI.drawMovieData(result, type , id);
 	}
 	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
 		CheckFlickGUI.drawSearchMovieTable(list, search);
@@ -36,15 +36,17 @@ public class RibbonInterface {
 	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search ) {
 		CheckFlickGUI.drawSearchPersonTable(list, search);
 	}
-	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search , int id) {
-		CheckFlickGUI.peopleToInsertTable(list, search , id);
+	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search , int id , boolean update) {
+		CheckFlickGUI.peopleToInsertTable(list, search , id ,update);
 	}
 	public static void InsertMovie(int id){
 		CheckFlickGUI.drawMoreInsertMovie(id);
 	}
 	
-	public static void InsertMovieExtraData(int id){
+	public static void InsertMovieExtraData(int id , boolean update , MovieDataEnum type){
 		CheckFlickGUI.drawInsertDataSuccess();
+		if (update)
+			CheckFlickGUI.redrawMovieTable(id , type );
 	}
 	public static void updateMovie(int id){
 		CheckFlickGUI.drawUpdateDataSuccess();
@@ -52,8 +54,10 @@ public class RibbonInterface {
 	public static void InsertPerson(int id){
 		CheckFlickGUI.drawMoreInsertPerson(id);
 	}
-	public static void InsertPersonExtraData(int id){
+	public static void InsertPersonExtraData(int id , boolean update, PersonDataEnum type){
 		CheckFlickGUI.drawInsertDataSuccess();
+		if (update)
+			CheckFlickGUI.redrawPersonTable(id , type );
 	}
 	public static void updatePerson(int id){
 		CheckFlickGUI.drawUpdateDataSuccess();
