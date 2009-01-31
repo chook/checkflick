@@ -244,14 +244,17 @@ public class CheckFlickGUI {
 								if (t.length==0)
 									okMessageBox("Please select a row to delete.");
 								else{
-									//TODO delete
-									redrawPersonTable(personId , type);
-									/*for (int i=0; i< t.length; i++){
-										String del = table.getItem(t[i]).getText(1);
-										table.getItem(t[i]).dispose();
-										table.redraw();
-										
-									}*/
+									for (int i=0; i< t.length; i++){
+										AbsType del = new NamedEntity(personId, table.getItem(t[i]).getText(1));
+										try {
+											pool.execute(DataManager.deletePersonEntity(type, del));
+											redrawPersonTable(personId , type);
+										} catch (InterruptedException ev) {
+											// TODO Auto-generated catch block
+											ev.printStackTrace();
+										}
+		
+									}
 								}
 							}
 						});
@@ -262,6 +265,7 @@ public class CheckFlickGUI {
 					otherResults.setControl(personButtons);
 					otherResults.setImage(image);
 					otherResults.setExpanded(true);
+					
 				}
 				else{
 					okMessageBox(message);
@@ -297,28 +301,17 @@ public class CheckFlickGUI {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				Image image = ImageCache.getImage("book_48.png"); ;
-				String[] titles= new String[3];
+				String[] titles= new String[4];
 				String toGet = "name";
 				titles[0]="";
 				titles[2] ="";
+				titles[3] = "";
 				String title = "";
 				boolean cast = false;
 				boolean combo = false;
 				String message = "";
 				List<NamedEntity> list = null;
 				switch(type){
-				case MOVIE_AKAS:
-					image = ImageCache.getImage("book_48.png");
-					title = "AKA Names For The Movie";
-					titles[1] = "Name";
-					message = "No AKA names for this movie.";
-					break;
-				case MOVIE_CONNECTIONS:
-					image = ImageCache.getImage("google_48.png");
-					title = "Movie's Connections To Other Movies";
-					titles[1]="Name";
-					message = "This movie is not connected to any other movie.";
-					break;
 				case MOVIE_COUNTRIES:
 					list = countriesList;
 					image = ImageCache.getImage("globe_48.png");
@@ -336,12 +329,6 @@ public class CheckFlickGUI {
 					toGet ="secondaryId";
 					message = "No languages for this movie.";
 					combo = true;
-					break;
-				case MOVIE_GOOFS:
-					image = ImageCache.getImage("smile_grin_48.png");
-					title = "Movie's Goofs";
-					titles[1] = "Goof";
-					message = "No goofs for this movie.";
 					break;
 				case MOVIE_QUOTES:
 					image = ImageCache.getImage("speech_bubble_48.png");
@@ -367,7 +354,9 @@ public class CheckFlickGUI {
 					message ="No cast for this movie.";
 					break;
 				}
+				final boolean finalCast = cast;
 				final boolean finalCombo = combo;
+				final List<NamedEntity> finalList = list;
 				if ((movieButtons != null) && !(movieButtons.isDisposed())){
 					movieButtons.dispose();
 				}
@@ -400,8 +389,10 @@ public class CheckFlickGUI {
 								if (map.get(toGet)!=null)
 									item.setText (1, map.get(toGet));
 							if (cast){
-								if (getName(rolesList , map.get("type"))!=null)
+								if (getName(rolesList , map.get("type"))!=null){
 									item.setText (2, getName(rolesList , map.get("type")));
+									item.setText(3 , map.get("id"));
+								}
 							}
 						}
 					}
@@ -435,14 +426,45 @@ public class CheckFlickGUI {
 							if (t.length==0)
 								okMessageBox("Please select a row to delete.");
 							else{
-								//TODO delete
-								redrawMovieTable(movieId , type);
-								/*for (int i=0; i< t.length; i++){
-									String del = table.getItem(t[i]).getText(1);
-									table.getItem(t[i]).dispose();
-									table.redraw();
-									
-								}*/
+								if (finalCast){
+									for (int i=0; i< t.length; i++){
+										int secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
+										int role = Integer.parseInt(getID(rolesList, table.getItem(t[i]).getText(2)));
+										AbsType del = new CastingRelation(secondId, movieId, role);
+										try {
+											pool.execute(DataManager.deleteMovieEntity(type, del));
+											redrawMovieTable(movieId, type);
+										} catch (InterruptedException ev) {
+											// TODO Auto-generated catch block
+											ev.printStackTrace();
+										}
+									}
+								}
+								if (finalCombo){
+									for (int i=0; i< t.length; i++){
+										int secondId = Integer.parseInt(getID( finalList,table.getItem(t[i]).getText(1)));
+										AbsType del = new Relation(movieId, secondId);
+										try {
+											pool.execute(DataManager.deleteMovieEntity(type, del));
+											redrawMovieTable(movieId, type);
+										} catch (InterruptedException ev) {
+											// TODO Auto-generated catch block
+											ev.printStackTrace();
+										}
+									}
+								}
+								else{
+									for (int i=0; i< t.length; i++){
+										AbsType del = new NamedEntity(movieId, table.getItem(t[i]).getText(1));
+										redrawMovieTable(movieId, type);
+										try {
+											pool.execute(DataManager.deleteMovieEntity(type, del));
+										} catch (InterruptedException ev) {
+											// TODO Auto-generated catch block
+											ev.printStackTrace();
+										}
+									}
+								}
 							}
 						}
 					});
@@ -494,9 +516,6 @@ public class CheckFlickGUI {
 				switch(type) {
 				case GENRES:
 					genresList = list;
-					break;
-				case COLOR_INFOS:
-					colorList = list;
 					break;
 				case COUNTRIES:
 					countriesList = list;
@@ -774,15 +793,8 @@ public class CheckFlickGUI {
 			langString[i+1]=langList.get(i).getName();
 		}
 		langCombo.setItems(langString);
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Color-Info");
-		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] colorString= new String[colorList.size()+1];
-		colorString[0]="";
-		for (int i=0; i<colorList.size(); i++){
-			colorString[i+1]=colorList.get(i).getName();
-		}
-		colorCombo.setItems (colorString);
+		label = new Label(composite,SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -793,9 +805,6 @@ public class CheckFlickGUI {
 		
 		item0.setExpanded(true);
 		bar.setSpacing(8);
-		//bar.setSize(shell.getShell().getSize());
-		//searchByActor.setVisible(checked);
-		//composite.setSize(shell.getShell().getSize().x-5, (shell.getShell().getSize().y/4));
 		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/4);
 		//listener for the search button
 		button.addSelectionListener(new SelectionListener() {
@@ -820,9 +829,6 @@ public class CheckFlickGUI {
 				}
 				if (langCombo.getText() != ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_LANGUAGES,getID(langList , langCombo.getText()) ));
-				}
-				if (colorCombo.getText()!= ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_COLOR_INFO,getID(colorList , colorCombo.getText()) ));
 				}
 				//search by year only if the years parameters were changed
 				if ((Integer.parseInt(yearFrom.getText())!= 1880) || ((Integer.parseInt(yearTo.getText())!= (year+100))))
@@ -946,7 +952,7 @@ public class CheckFlickGUI {
 
 	}
 	//message box that is opened whenever Yes/No/Cancel question is asked
-	public int yesNoMessageBox(String q){	
+	static public int yesNoMessageBox(String q){	
 		shell.getShell().setEnabled(false);
 		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
 		mb.setMessage(q);
@@ -973,15 +979,9 @@ public class CheckFlickGUI {
 		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info" , toolTip);
 		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		RibbonGroup results = new RibbonGroup(tab, "More Details" , toolTip);
-		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		new RibbonGroupSeparator(results);
-		RibbonButton connections = new RibbonButton(results, ImageCache.getImage("google_48.png"), " \nMovie Connections", RibbonButton.STYLE_TWO_LINE_TEXT);
-		new RibbonGroupSeparator(results);
 		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		new RibbonGroupSeparator(results);
-		RibbonButton goofs = new RibbonButton(results, ImageCache.getImage("smile_grin_48.png"), " \nGoofs", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
@@ -990,11 +990,8 @@ public class CheckFlickGUI {
 		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		ButtonSelectGroup group = new ButtonSelectGroup();
 		general.setButtonSelectGroup(group);
-		aka.setButtonSelectGroup(group);
-		connections.setButtonSelectGroup(group);
 		countries.setButtonSelectGroup(group);
 		genres.setButtonSelectGroup(group);
-		goofs.setButtonSelectGroup(group);
 		languages.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
 		persons.setButtonSelectGroup(group);
@@ -1036,18 +1033,6 @@ public class CheckFlickGUI {
 		if (movie.getRunningTime()!=0)
 			timeText.setText(String.valueOf(movie.getRunningTime()));
 		final String oldTime = String.valueOf(movie.getRunningTime());
-		label = new Label (composite , SWT.NONE);
-		label.setText("Color-Info");
-		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] colorString= new String[colorList.size()];
-		int selected = 0;
-		for (int i=0; i<colorList.size(); i++){
-			colorString[i]=colorList.get(i).getName();
-			if ( movie.getColorInfo() == colorList.get(i).getId())
-				selected = i;
-		}
-		colorCombo.setItems (colorString);
-		colorCombo.select(selected);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Plot: ");
 		final Text plotText = new Text(composite ,SWT.WRAP);
@@ -1055,6 +1040,8 @@ public class CheckFlickGUI {
 			plotText.setText(movie.getPlot());
 		label= new Label(composite, SWT.NONE);
 		label= new Label(composite, SWT.NONE);
+		label = new Label(composite,SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.addSelectionListener(new SelectionListener() {
@@ -1066,7 +1053,6 @@ public class CheckFlickGUI {
 				String newName = movie.getName();
 				int newYear = movie.getYear();
 				int newTime = movie.getRunningTime();
-				int newColor = movie.getColorInfo();
 				String newPlot = movie.getPlot();
 				boolean valid = true;
 				boolean update = false;
@@ -1118,11 +1104,6 @@ public class CheckFlickGUI {
 						update = true;
 					}
 				}
-				
-				if (newColor != Integer.parseInt(getID(colorList, colorCombo.getText()))){
-					newColor = Integer.parseInt(getID(colorList, colorCombo.getText()));
-					update = true;
-				}
 				if (newPlot != null){		
 					if (newPlot.compareTo(plotText.getText())!= 0){
 						newPlot = plotText.getText();
@@ -1136,7 +1117,7 @@ public class CheckFlickGUI {
 					}
 				}
 				if (update && valid){
-					AbsType updatedMovie = new MovieEntity(movie.getId(), newName, newYear, null, null, newColor, newTime, movie.getTaglines() , newPlot, movie.getFilmingLocations());
+					AbsType updatedMovie = new MovieEntity(movie.getId(), newName, newYear, null, null, movie.getColorInfo(), newTime, movie.getTaglines() , newPlot, movie.getFilmingLocations());
 					try {
 						pool.execute(DataManager.updateMovieData(MovieDataEnum.MOVIE, updatedMovie));
 					} catch (InterruptedException e1) {
@@ -1171,12 +1152,6 @@ public class CheckFlickGUI {
 					timeText.setText(String.valueOf(movie.getRunningTime()));
 				else
 					timeText.setText("");
-				int selected = 0;
-				for (int i=0; i<colorList.size(); i++){
-					if ( movie.getColorInfo() == colorList.get(i).getId())
-						selected = i;
-				}
-				colorCombo.select(selected);
 				if (movie.getPlot()!= null)
 					plotText.setText(movie.getPlot());
 				else
@@ -1184,7 +1159,31 @@ public class CheckFlickGUI {
 				
 			}
 		});
-		label= new Label(composite, SWT.NONE);
+		Button delete = new Button(composite , SWT.PUSH);
+		delete.setText("Delete Movie");
+		delete.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+			public void widgetSelected(SelectionEvent arg0) {
+				switch(yesNoMessageBox("Are you sure you want to delete this movie?")){
+				case (SWT.YES):{
+					try {
+						pool.execute(DataManager.deleteMovieEntity(MovieDataEnum.MOVIE, movie));
+						RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
+						entityDetails.setVisible(false);
+						shell.getRibbonTabFolder().selectPrevTab();
+						List<RibbonTab> tabList = shell.getRibbonTabFolder().getTabs();
+						tabList.remove(current.getIndex());
+		                shell.getRibbonTabFolder().redraw();
+					} catch (InterruptedException ev) {
+						// TODO Auto-generated catch block
+						ev.printStackTrace();
+					}
+				}
+				case (SWT.NO):{} //do nothing
+				}
+			}
+		});
 		label= new Label(composite, SWT.NONE);
 		label= new Label(composite, SWT.NONE);
 		
@@ -1196,24 +1195,6 @@ public class CheckFlickGUI {
 		item0.setControl(composite);
 		item0.setImage(image);
 		item0.setExpanded(true);
-
-		aka.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_AKAS);
-			}
-		});
-		connections.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-			//	entityDetails.setVisible(true);
-				//movieButtonsResults(movie , MovieDataEnum.MOVIE_CONNECTIONS);
-				//not working
-			}
-		});
 		countries.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1229,14 +1210,6 @@ public class CheckFlickGUI {
 				entityDetails.setVisible(true);
 				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_LANGUAGES);
 		}});
-		goofs.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_GOOFS);
-			}			
-		});
 		quotes.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1282,18 +1255,18 @@ public class CheckFlickGUI {
 		searchByPerson.setVisible(false);
 		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
 		// Person Tab
-		RibbonGroup results = new RibbonGroup(tab, "More About" , toolTip);
+		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info" , toolTip);
+		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonGroup results = new RibbonGroup(tab, "More Details" , toolTip);
 		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-	//	RibbonButton movies = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nMovies", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-	//	new RibbonGroupSeparator(results);
-		RibbonButton role = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nRole", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton role = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nRoles", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 
 		ButtonSelectGroup group = new ButtonSelectGroup();
+		general.setButtonSelectGroup(group);
 		aka.setButtonSelectGroup(group);
-	//	movies.setButtonSelectGroup(group);
 		role.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
 
@@ -1317,20 +1290,6 @@ public class CheckFlickGUI {
 		label.setText("Person Name:");
 		final Text nameText = new Text(composite ,SWT.FILL);
 		nameText.setText(person.getName());
-		label = new Label(composite,SWT.NONE);
-		label.setText("Real Name:");
-		final Text rnameText = new Text(composite ,SWT.FILL);
-		if (person.getPersonRealName()!= null)
-			rnameText.setText(person.getPersonRealName());
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Nick Names:");
-		org.eclipse.swt.widgets.List nicksList = new org.eclipse.swt.widgets.List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-		/*if (person.getPersonNickNames()!= null){
-			String[] nicksString = person.getPersonNickNames().split("/X\\");
-			nicksList.setBounds(50, 50, 75, 75);
-			for(int i=0; i<nicksString.length; i++) nicksList.add(nicksString[i]);
-		}*/
-		System.out.println(person.getPersonNickNames());
 		label = new Label(composite,SWT.NONE);
 		label.setText("Year Of Birth: ");
 		final Text bYearText = new Text(composite ,SWT.FILL);
@@ -1362,26 +1321,10 @@ public class CheckFlickGUI {
 		if (person.getYearOfDeath()!= 0)
 			dYearText.setText(String.valueOf(person.getYearOfDeath()));
 		final String oldDYear = String.valueOf(person.getYearOfDeath());
-		label = new Label(composite,SWT.NONE);
-		label.setText("Height: ");
-		final Text heightText = new Text(composite ,SWT.FILL);
-		if (person.getHeight()!= 0)
-			heightText.setText(String.valueOf(person.getHeight()));
-		final String oldHeight = String.valueOf(person.getHeight());
-		label = new Label(composite, SWT.NONE);
-		label.setText("Trademark: ");
-		final Text tmText = new Text(composite, SWT.MULTI);
-		if (person.getTrademark()!= null)	
-			tmText.setText(person.getTrademark());
-		label = new Label(composite,SWT.NONE);
-		label.setText("Biography: ");
-		final Text bioText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL);
-		if (person.getBiography()!= null)	
-			bioText.setText(person.getBiography());
+		
 		label= new Label(composite, SWT.NONE);
 		label= new Label(composite, SWT.NONE);
-		label= new Label(composite, SWT.NONE);
-		label= new Label(composite, SWT.NONE);
+
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.addSelectionListener(new SelectionListener() {
@@ -1446,55 +1389,12 @@ public class CheckFlickGUI {
 						}
 					}
 				}
-				if (oldHeight.compareTo(heightText.getText())!= 0){
-					if (heightText.getText()!=""){
-						try{
-							newHeight = Integer.parseInt(heightText.getText());
-							update = true;
-							if (newHeight<0){
-								okMessageBox("The height must be larger than 0.");
-								valid = false;
-							}
-						}
-						catch (NumberFormatException nfe){
-							okMessageBox("Height must be a number.");
-							valid = false;
-						}
-					}
-					else{
-						newHeight = 0;
-						update = true;
-					}
-				}
 				
 				if (newCountry != Integer.parseInt(getID(countriesList, countryCombo.getText()))){
 					newCountry = Integer.parseInt(getID(countriesList, countryCombo.getText()));
 					update = true;
 				}
-				if (newBio!= null){		
-					if (newBio.compareTo(bioText.getText())!= 0){
-						newBio = bioText.getText();
-						update = true;
-					}
-				}
-				else{
-					if (bioText.getText()!=""){
-						newBio = bioText.getText();
-						update = true;	
-					}
-				}
-				if (newTM!= null){		
-					if (newTM.compareTo(tmText.getText())!= 0){
-						newTM = tmText.getText();
-						update = true;
-					}
-				}
-				else{
-					if (tmText.getText()!=""){
-						newTM = tmText.getText();
-						update = true;	
-					}
-				}
+				
 				if (newCity!= null){		
 					if (newCity.compareTo(cityText.getText())!= 0){
 						newCity = cityText.getText();
@@ -1538,31 +1438,49 @@ public class CheckFlickGUI {
 					dYearText.setText(String.valueOf(person.getYearOfDeath()));
 				else
 					dYearText.setText("");
-				if (person.getHeight()!=0)
-					heightText.setText(String.valueOf(person.getHeight()));
-				else
-					heightText.setText("");
 				int selected = 0;
 				for (int i=0; i<countriesList.size(); i++){
 					if ( person.getCountryOfBirth() == countriesList.get(i).getId())
 						selected = i;
 				}
 				countryCombo.select(selected);
-				if (person.getBiography()!= null)
-					bioText.setText(person.getBiography());
-				else
-					bioText.setText("");
 				if (person.getCityOfBirth()!= null)
 					cityText.setText(person.getCityOfBirth());
 				else
 					cityText.setText("");
-				if (person.getTrademark()!= null)
-					tmText.setText(person.getTrademark());
-				else
-					tmText.setText("");
 				
 			}
 		});
+		Button delete = new Button(composite , SWT.PUSH);
+		delete.setText("Delete Person");
+		delete.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+			public void widgetSelected(SelectionEvent arg0) {
+				switch(yesNoMessageBox("Are you sure you want to delete this person?")){
+				case (SWT.YES):{
+					try {
+						pool.execute(DataManager.deletePersonEntity(PersonDataEnum.PERSON, person));
+						RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
+						entityDetails.setVisible(false);
+						shell.getRibbonTabFolder().selectPrevTab();
+						List<RibbonTab> tabList = shell.getRibbonTabFolder().getTabs();
+						tabList.remove(current.getIndex());
+		                shell.getRibbonTabFolder().redraw();
+					} catch (InterruptedException ev) {
+						// TODO Auto-generated catch block
+						ev.printStackTrace();
+					}
+				}
+				case (SWT.NO):{} //do nothing
+				}
+			}
+		});
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
+		
+		Button close = new Button(composite , SWT.PUSH);
+		close.setText("Close Tab");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
 		item0.setText("General Information About The Person");
 		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -1594,7 +1512,18 @@ public class CheckFlickGUI {
 		
 		bar.setSpacing(8);
 		entityDetails.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y-150);
-		
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
+				entityDetails.setVisible(false);
+				shell.getRibbonTabFolder().selectPrevTab();
+				List<RibbonTab> tabList = shell.getRibbonTabFolder().getTabs();
+				tabList.remove(current.getIndex());
+                shell.getRibbonTabFolder().redraw();
+			}			
+		});
 	}
 	static protected void personButtonsResults(int id, PersonDataEnum type){
 		try {
@@ -1616,7 +1545,6 @@ public class CheckFlickGUI {
 		Calendar toDay = Calendar.getInstance();
 		final int year = toDay.get(Calendar.YEAR);
 		insert.setLocation(2,145);
-		//FillLayout layout = new FillLayout();
 		insert.setLayout(new FillLayout(1));
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
@@ -1624,8 +1552,6 @@ public class CheckFlickGUI {
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.NONE);
-		//composite.setSize(search.getSize());
-		//createMovieForm(composite);
 		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
@@ -1642,14 +1568,8 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		label.setText("Plot:");
 		final Text plotText = new Text(composite ,SWT.MULTI|SWT.BORDER| SWT.V_SCROLL);
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Color-Info");
-		final Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] colorString= new String[colorList.size()];
-		for (int i=0; i<colorList.size(); i++){
-			colorString[i]=colorList.get(i).getName();
-		}
-		colorCombo.setItems (colorString);
+		label = new Label(composite,SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
@@ -1674,8 +1594,8 @@ public class CheckFlickGUI {
 				String taglines = null;
 				String plot = null;
 				String location = null;
-				if ((nameText.getText() == "" )||(colorCombo.getText()=="" )||(yearText.getText()== "") )
-					okMessageBox("Please insert movie name, movie year and movie color info.");
+				if ((nameText.getText() == "" )||(yearText.getText()== "") )
+					okMessageBox("Please insert movie name and movie year.");
 				else{
 					try{
 						year =Integer.parseInt(yearText.getText());
@@ -1686,13 +1606,6 @@ public class CheckFlickGUI {
 					}
 					catch (NumberFormatException nfe){
 						okMessageBox("Year must be a number.");
-						valid = false;
-					}
-					String id = getID(colorList, colorCombo.getText());
-					if (id!= null)
-						color = Integer.parseInt(id);
-					else{
-						okMessageBox("Color-info is not valid.");
 						valid = false;
 					}
 					if (timeText.getText() != ""){
@@ -1738,8 +1651,6 @@ public class CheckFlickGUI {
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.NONE);
-		//composite.setSize(search.getSize());
-		//createMovieForm(composite);
 		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
@@ -1747,12 +1658,6 @@ public class CheckFlickGUI {
 		Label label = new Label(composite,SWT.NONE);
 		label.setText("Person Name:");
 		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite,SWT.NONE);
-		label.setText("Real Name:");
-		final Text rNameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite,SWT.NONE);
-		label.setText("Nick Names:");
-		final Text nNameText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Year Of Birth:");
 		final Text birthText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
@@ -1771,18 +1676,6 @@ public class CheckFlickGUI {
 		label = new Label(composite ,SWT.NONE);
 		label.setText("Year Of Death:");
 		final Text deathText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Height (cm):");
-		final Text heightText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Trade Mark:");
-		final Text markText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite,SWT.NONE);
-		label.setText("Biography:");
-		final Text bioText = new Text(composite ,SWT.MULTI|SWT.BORDER| SWT.V_SCROLL);
-		
-		label = new Label(composite,SWT.NONE);
-		label = new Label(composite,SWT.NONE);
 		label= new Label(composite, SWT.NONE);
 		label= new Label(composite, SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
@@ -1850,25 +1743,6 @@ public class CheckFlickGUI {
 						okMessageBox("Origin country is not valid.");
 						valid = false;
 					}
-					if (heightText.getText() != ""){
-						try{
-							height =Integer.parseInt(heightText.getText());
-							if (height<0){
-								okMessageBox("Height is not valid. Must be larger than 0.");
-								valid = false;
-							}
-						}
-						catch (NumberFormatException nfe){
-							okMessageBox("Height must be a number.");
-							valid = false;
-						}
-					}
-						
-					if (bioText.getText() != "")
-						bio = bioText.getText();
-					if (markText.getText() != "")
-						mark = markText.getText();
-					//rName , nicks
 					if (valid){
 						AbsType person = new PersonEntity(0,nameText.getText() , rName , nick , birth ,bYear , city , country , death , dYear , height, mark , bio );
 						try {
@@ -1884,85 +1758,6 @@ public class CheckFlickGUI {
 		
 		bar.setSpacing(8);
 		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
-	}
-	public void createMovieForm(Composite composite){
-		Calendar toDay = Calendar.getInstance();
-		int year = toDay.get(Calendar.YEAR);
-		FormLayout layout = new FormLayout();
-		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-		layout.spacing = 10;
-		composite.setLayout(layout);
-		
-		Label movieName = new Label(composite,SWT.NONE);
-		movieName.setText("Movie Name");
-		Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		Label movieYear = new Label(composite,SWT.NONE);
-		movieYear.setText("Movie Year");
-		Label from = new Label(composite, SWT.NONE);
-		from.setText("From");
-		Spinner yearFrom = new Spinner (composite, SWT.BORDER);
-		yearFrom.setMinimum(1900);
-		yearFrom.setMaximum(year);
-		yearFrom.setSelection(year);
-		yearFrom.setPageIncrement(1);
-		yearFrom.pack();
-		/*Label to= new Label(composite,SWT.NONE);
-		to.setText("To");
-		Spinner yearTo = new Spinner (composite, SWT.BORDER);
-		yearTo.setMinimum(1900);
-		yearTo.setMaximum(year);
-		yearTo.setSelection(year);
-		yearTo.setPageIncrement(1);
-		yearTo.pack();*/
-		/*Label genre = new Label(composite ,SWT.NONE);
-		genre.setText("Movie Genre");
-		Combo genreCombo = new Combo (composite, SWT.READ_ONLY);
-		//get the genres list from a table
-		genreCombo.setItems (new String [] {"Action", "Fiction", "Sheker"});
-		Label lang = new Label(composite,SWT.NONE);
-		lang.setText("Movie Language");
-		Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
-		langCombo.setItems(new String [] {"Hebrew", "English", "SHEKER"});
-		Label color = new Label(composite ,SWT.NONE);
-		color.setText("Color-Info");
-		Combo colorCombo = new Combo (composite, SWT.READ_ONLY);
-		//get the genres list from a table
-		colorCombo.setItems (new String [] {"Black&White", "Colors", "SHEKER"});
-		Button button = new Button (composite, SWT.PUSH);
-		button.setText("Search");*/
-		
-		FormData data= new FormData();
-		
-		data.top = new FormAttachment(nameText, 0, SWT.CENTER);
-		movieName.setLayoutData(data);
-		data = new FormData();
-		data.left = new FormAttachment(movieName, 5);
-		data.right = new FormAttachment(100, 0);
-		nameText.setLayoutData(data);
-		
-		data = new FormData();
-		data.top = new FormAttachment(from , 0 , SWT.CENTER);
-		movieYear.setLayoutData(data);
-		data = new FormData();
-		data.top = new FormAttachment(nameText, 5);
-		data.left = new FormAttachment(nameText, 0, SWT.LEFT);
-		data.right = new FormAttachment(yearFrom, -5 );
-		from.setLayoutData(data);
-		data = new FormData();
-		data.top = new FormAttachment(nameText, 5);
-		data.left = new FormAttachment(from, 0, SWT.LEFT);
-		//data.right = new FormAttachment(yearFrom, -5 );
-		yearFrom.setLayoutData(data);
-
-		
-	/*	
-		data = new FormData();
-		data.top = new FormAttachment(genreCombo, 0, SWT.CENTER);
-		genre.setLayoutData(data);
-		data = new FormData();
-		data.top = new FormAttachment(nameText, 5);
-		data.left = new FormAttachment(nameText, 0, SWT.LEFT);
-		genreCombo.setLayoutData(data);*/
 	}
 	
 	static private String getID(List<NamedEntity> list , String name){
@@ -2043,9 +1838,7 @@ public class CheckFlickGUI {
 					resultsMovieTable.setSize(shell.getShell().getSize().x, shell.getShell().getSize().y/2);
 				}
 				else{ // if there were no results
-					switch(okMessageBox("No results. Please change your choises and try again.")){
-    				case(SWT.OK):{}
-					}
+					okMessageBox("No results. Please change your choises and try again.");
 				}
 			}
 		});
@@ -2063,7 +1856,7 @@ public class CheckFlickGUI {
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 					data.heightHint = 200;
 					table.setLayoutData(data);
-					String[] titles = {" ", "Name", "Birth", "ID"};
+					String[] titles = {" ", "Name", "Birth Year", "ID"};
 					for (int i=0; i<titles.length; i++) {
 						TableColumn column = new TableColumn (table, SWT.NONE);
 						column.setText (titles [i]);
@@ -2238,40 +2031,8 @@ public class CheckFlickGUI {
 					item3.setImage(image);
 					item3.setExpanded(false);
 					
-					//goofs - 5th item
-					composite = new Composite (moreInsert, SWT.NONE);
-					image =ImageCache.getImage("smile_grin_48.png");
-					layout = new GridLayout (6,false);
-					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-					layout.verticalSpacing = 10;
-					composite.setLayout(layout); 
-					label = new Label(composite,SWT.NONE);
-					label.setText("Goof:");
-					final Text goofText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-					Button goofButton = new Button (composite, SWT.PUSH);
-					goofButton.setText("Add");
-					goofButton.addSelectionListener(new SelectionListener() {
-						public void widgetDefaultSelected(SelectionEvent e) {
-						}
-						public void widgetSelected(SelectionEvent e) {
-							if(goofText.getText() != "" ) {
-								AbsType t = new NamedEntity(id, goofText.getText());
-								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GOOFS, t , false));
-								} catch (InterruptedException e1) {
-									e1.printStackTrace();
-								}
-							}
-						}
-					});
-					ExpandItem item4 = new ExpandItem(moreInsert, SWT.NONE, 3);
-					item4.setText("Insert Movie's Goofs");
-					item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-					item4.setControl(composite);
-					item4.setImage(image);
-					item4.setExpanded(false);
 					
-					//quotes - 6th item
+					//quotes - 5th item
 					composite = new Composite (moreInsert, SWT.NONE);
 					image = ImageCache.getImage("speech_bubble_48.png");
 					layout = new GridLayout (6,false);
@@ -2297,46 +2058,13 @@ public class CheckFlickGUI {
 							}
 						}
 					});
-					ExpandItem item5 = new ExpandItem(moreInsert, SWT.NONE, 4);
-					item5.setText("Insert Movie's Quotes");
-					item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-					item5.setControl(composite);
-					item5.setImage(image);
-					item5.setExpanded(false);
+					ExpandItem item4 = new ExpandItem(moreInsert, SWT.NONE, 3);
+					item4.setText("Insert Movie's Quotes");
+					item4.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item4.setControl(composite);
+					item4.setImage(image);
+					item4.setExpanded(false);
 					
-					//aka names - 7th item
-					composite = new Composite (moreInsert, SWT.NONE);
-					image =  ImageCache.getImage("book_48.png");
-					layout = new GridLayout (6,false);
-					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-					layout.verticalSpacing = 10;
-					composite.setLayout(layout); 
-					label = new Label(composite,SWT.NONE);
-					label.setText("AKA Name:");
-					final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-					Button akaButton = new Button (composite, SWT.PUSH);
-					akaButton.setText("Add");
-					akaButton.addSelectionListener(new SelectionListener() {
-						public void widgetDefaultSelected(SelectionEvent e) {
-						}
-						public void widgetSelected(SelectionEvent e) {
-							if(akaText.getText() != "" ) {
-								AbsType t = new NamedEntity(id, akaText.getText());
-								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_AKAS, t , false));
-								} catch (InterruptedException e1) {
-									e1.printStackTrace();
-								}
-							}
-						}
-					});
-					ExpandItem item6 = new ExpandItem(moreInsert, SWT.NONE, 5);
-					item6.setText("Insert Movie's AKA Names");
-					item6.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-					item6.setControl(composite);
-					item6.setImage(image);
-					item6.setExpanded(false);
-					//connections
 					//cast
 					composite = new Composite (moreInsert, SWT.NONE);
 					image = ImageCache.getImage("users_two_48.png");
@@ -2366,12 +2094,12 @@ public class CheckFlickGUI {
 							}
 						}
 					});
-					ExpandItem item7 = new ExpandItem(moreInsert, SWT.NONE, 6);
-					item7.setText("Insert Movie's Cast");
-					item7.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-					item7.setControl(composite);
-					item7.setImage(image);
-					item7.setExpanded(false);
+					ExpandItem item5 = new ExpandItem(moreInsert, SWT.NONE, 4);
+					item5.setText("Insert Movie's Cast");
+					item5.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					item5.setControl(composite);
+					item5.setImage(image);
+					item5.setExpanded(false);
 					
 					moreInsert.setSpacing(8);
 					insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)-150);
@@ -2454,29 +2182,7 @@ public class CheckFlickGUI {
 					item3.setControl(composite);
 					item3.setImage(image);
 					item3.setExpanded(false);
-					//roles- 4th item
-					/*composite = new Composite (moreInsert, SWT.NONE);
-					layout = new GridLayout (6,false);
-					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-					layout.verticalSpacing = 10;
-					composite.setLayout(layout); 
-					label = new Label(composite,SWT.NONE);
-					label.setText("Production Roles:");
-					final Combo roleCombo = new Combo(composite ,SWT.READ_ONLY);
-					String[] roleString= new String[rolesList.size()];
-					for (int i=0; i<rolesList.size(); i++){
-						roleString[i]=rolesList.get(i).getName();
-					}
-					roleCombo.setItems(roleString);
-					Button langButton = new Button (composite, SWT.PUSH);
-					langButton.setText("Add");
-					ExpandItem item2 = new ExpandItem(moreInsert, SWT.NONE, 2);
-					item2.setText("Insert Person's Production Roles");
-					item2.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-					item2.setControl(composite);
-					item2.setImage(image);
-					item2.setExpanded(false);*/
-					
+
 					moreInsert.setSpacing(8);
 					insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/2+100);
 				}
@@ -2696,16 +2402,8 @@ public class CheckFlickGUI {
 		Label label = new Label(addToMovie , SWT.NONE);
 		final Text text = new Text(addToMovie , SWT.FILL|SWT.BORDER);
 		switch(type){
-		case MOVIE_AKAS:{
-			label.setText("AKA name:");
-			break;
-		}
 		case MOVIE_QUOTES:{
 			label.setText("Quote:");
-			break;
-		}
-		case MOVIE_GOOFS:{
-			label.setText("Goof:");
 			break;
 		}
 		case MOVIE_CAST:{
@@ -2867,6 +2565,13 @@ public class CheckFlickGUI {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				okMessageBox("Successfuly updated");		
+			}
+		});
+	}
+	static protected void drawDeleteDataSuccess() {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				okMessageBox("Successfuly deleted");		
 			}
 		});
 	}
