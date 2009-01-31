@@ -10,6 +10,7 @@ public enum FilterOptionEnum {
 	STRING,
 	DATE,
 	STRING_ARRAY,
+	STRING_WILDCARD,
 	NUMBER_RANGE,
 	BOOLEAN
 }

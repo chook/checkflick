@@ -33,16 +33,19 @@ public class OracleSingleFilter extends AbsSingleFilter {
 		String strFilter = "";
 
 		switch (option) {
-		case DATE: // TODO: This is wrong but i still haven't checked how to
-					// properly do it
 		case NUMBER:
 			strFilter = table + "." + column + "=" + value;
 			break;
+		case DATE: // TODO: This is wrong but i still haven't checked how to
+			// properly do it
 		case STRING:
-			strFilter = table + "." + column + " LIKE '%" + value + "%'";
+			strFilter = table + "." + column + " = '" + value + "'";
 			break;
 		case STRING_ARRAY:
 			strFilter = table + "." + column + " IN (" + value + ")";
+			break;
+		case STRING_WILDCARD:
+			strFilter = table + "." + column + " LIKE '%" + value + "%'";
 			break;
 		case NUMBER_RANGE:
 			// We rely on the fact that value is of type "3 and 10"
