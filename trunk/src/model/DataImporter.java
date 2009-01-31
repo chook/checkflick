@@ -31,8 +31,7 @@ public class DataImporter {
 	//											the group contains whitespaces, then '(', different characters and whitespaces, and then ')'
 	//											(there can be more than one comments in parentheses)
 	static String languagePattern = "([^\"].+[)}])\\s+([\\P{InGreek}\\-\\s',&&[^(]]+)(?:\\s+\\(.+\\)\\s*)*";
-	static String genresPattern = ".+[)}]\\s+(.+)";
-	static String countriesPattern = ".+[)}]\\s+(.+)";
+	static String genresCountriesPattern = "(.+[)}])\\s+(.+)";
 	
 	// moviePattern explanation:
 	// (([^\"].*)\\s\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(?:\\((..*)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?) 	- group 1: the full movie name
@@ -119,7 +118,7 @@ public class DataImporter {
 	 * and adds all the data to the DB
 	 * @return boolean if the method succeeded
 	 */
-	public boolean getLanguagesGenresCountries() {
+	public boolean importLanguagesGenresCountries() {
 		
 		Parser parser = new Parser();
 		Set<String> elementsSet = new HashSet<String>();		// a dictionary to collect all the different elements
@@ -140,25 +139,22 @@ public class DataImporter {
 				patternRegExp = languagePattern;
 				tablesEnum = DBTablesEnum.LANGUAGES;
 				fieldsEnum = DBFieldsEnum.LANGUAGES_LANGUAGE_NAME;
-				groupNumber = 2;
 				break;
 				
 			case 2:
 				System.out.println("Working on the genres file");
 				parser.loadFile(listfilesMap.get(ListFilesEnum.GENRES), ListFilesEnum.GENRES);
-				patternRegExp = genresPattern;
+				patternRegExp = genresCountriesPattern;
 				tablesEnum = DBTablesEnum.GENRES;
 				fieldsEnum = DBFieldsEnum.GENRES_GENRE_NAME;
-				groupNumber = 1;
 				break;
 				
 			case 3:
 				System.out.println("Working on the countries file");
 				parser.loadFile(listfilesMap.get(ListFilesEnum.COUNTRIES), ListFilesEnum.COUNTRIES);
-				patternRegExp = countriesPattern;
+				patternRegExp = genresCountriesPattern;
 				tablesEnum = DBTablesEnum.COUNTRIES;
 				fieldsEnum = DBFieldsEnum.COUNTRIES_COUNTRY_NAME;
-				groupNumber = 1;
 				break;
 			}
 		
@@ -173,7 +169,7 @@ public class DataImporter {
 				while (!parser.isEOF()) {
 					matcher = pattern.matcher(parser.readLine());
 					if (matcher.matches())
-						elementsSet.add(matcher.group(groupNumber));
+						elementsSet.add(matcher.group(2));
 				}
 
 				System.out.println("Inserting " + elementsSet.size() + " elements to the DB");
@@ -489,43 +485,75 @@ public class DataImporter {
 		}
 	}
 	
-	public boolean getMoviesLanguages() {
+	/**
+	 * retrieves all the different languages for each and every movie
+	 * @return boolean whether the method succeeded
+	 */
+	public boolean importMoviesLanguagesGenresCountries() {
 		
 		Parser parser = new Parser();
 		Map<String, Integer> moviesMap = new WeakHashMap<String, Integer>();
-		Map<String, Integer> languagesMap = new HashMap<String, Integer>();
-		Set<NamedRelation> movieLanguagesSet = new LinkedHashSet<NamedRelation>();
-		ResultSet moviesResultSet;
-		String lineFromFile;
+		Map<String, Integer> datatypesMap = new HashMap<String, Integer>();
+		Set<NamedRelation> movieDatatypeSet = new LinkedHashSet<NamedRelation>();
 		String patternRegExp = null;
 		Pattern pattern;
 		Matcher matcher;
-		boolean matchFound;
 		int totalElementsNum = 0;
-		List<NamedEntity> languagesList;
-		StringBuilder movieNameBuilder;
-		String tempMovieName;
-		String tempMovieDBName;
-		int tempMovieId;
-		int tempMovieDBYear;
-		String tempMovieYear;
-		String tempMovieRomanNotation;
-		String tempMovieMadeFor;
+		List<NamedEntity> datatypesList;
 		int moviesStartRow;
 		int moviesEndRow;
-		int tempMoviesSetCounter;
-		
+		String tempMovieName = null;
+		DBTablesEnum tablesEnum = null;
+		DBFieldsEnum movieFieldsEnum = null;
+		DBFieldsEnum datatypeFieldsEnum = null;
+		NamedEntitiesEnum namedEntitiesEnum = null;
+
+		// The same code is for 3 different data tables - Languages, Genres & Countries
+		// therefore, only minor changes would be made to the same code
+		for (int i = 1; i < 4; ++i) {
+			switch (i) {
+			case 1:
+				System.out.println("Working on the languages file");
+				parser.loadFile(listfilesMap.get(ListFilesEnum.LANGUAGES), ListFilesEnum.LANGUAGES);
+				patternRegExp = languagePattern;
+				tablesEnum = DBTablesEnum.MOVIE_LANGUAGES;
+				movieFieldsEnum = DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID;
+				datatypeFieldsEnum = DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID;
+				namedEntitiesEnum = namedEntitiesEnum.LANGUAGES;
+				break;
+				
+			case 2:
+				System.out.println("Working on the genres file");
+				parser.loadFile(listfilesMap.get(ListFilesEnum.GENRES), ListFilesEnum.GENRES);
+				patternRegExp = genresCountriesPattern;
+				tablesEnum = DBTablesEnum.MOVIE_GENRES;
+				movieFieldsEnum = DBFieldsEnum.MOVIE_GENRES_MOVIE_ID;
+				datatypeFieldsEnum = DBFieldsEnum.MOVIE_GENRES_GENRE_ID;
+				namedEntitiesEnum = namedEntitiesEnum.GENRES;
+				break;
+				
+			case 3:
+				System.out.println("Working on the countries file");
+				parser.loadFile(listfilesMap.get(ListFilesEnum.COUNTRIES), ListFilesEnum.COUNTRIES);
+				patternRegExp = genresCountriesPattern;
+				tablesEnum = DBTablesEnum.MOVIE_COUNTRIES;
+				movieFieldsEnum = DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID;
+				datatypeFieldsEnum = DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID;
+				namedEntitiesEnum = namedEntitiesEnum.COUNTRIES;
+				break;
+			}
+		}
+			
 		moviesStartRow = 1;
 		moviesEndRow = moviesStartRow + SELECT_BUCKET_SIZE;
 		// compiling the pattern to look for in the list file
-		patternRegExp = languagePattern;
 		pattern = Pattern.compile(patternRegExp);
-		
-		// retrieving the languages list to put inside a map
+
+		// retrieving the list to put inside a map
 		// the language map would be small enough to stay resident in memory during the whole method
-		languagesList = DBManager.getInstance().getAllNamedEntities(NamedEntitiesEnum.LANGUAGES);
-		for (NamedEntity entity : languagesList) {
-			languagesMap.put(entity.getName(), entity.getId());
+		datatypesList = DBManager.getAllNamedEntities(namedEntitiesEnum);
+		for (NamedEntity entity : datatypesList) {
+			datatypesMap.put(entity.getName(), entity.getId());
 		}
 
 		boolean isEmpty = false;
@@ -538,68 +566,43 @@ public class DataImporter {
 
 			if (!isEmpty) {
 				// run over the Result Set, and enter all the movies there to the moviesMap
-				tempMoviesSetCounter = 1;
-
-				parser.loadFile(listfilesMap.get(ListFilesEnum.LANGUAGES), ListFilesEnum.LANGUAGES);
-				movieLanguagesSet = new LinkedHashSet<NamedRelation>();
+				movieDatatypeSet = new LinkedHashSet<NamedRelation>();
 				// Making sure we find the start of the list
 				if (parser.findStartOfList()) {
 					System.out.println("Found the start of the list!");
 					while (!parser.isEOF()) {
-						lineFromFile = parser.readLine();
-						matcher = pattern.matcher(lineFromFile);
-						matchFound = matcher.matches();
-						if (!matchFound) {
-							if (lineFromFile.length() > 0)
-								if (!(lineFromFile.charAt(0) == '"')) {
-									System.out.println("couldn't find a match on line " + parser.getLineNumber() + "!");
-									System.out.println(lineFromFile);
-								}
-						} else {
-							if (moviesMap.containsKey(matcher.group(1)) && languagesMap.containsKey(matcher.group(2))) {
-//								System.out.println("found a match for " + matcher.group(1) + " AND " + matcher.group(2));
-								movieLanguagesSet.add(new NamedRelation(moviesMap.get(matcher.group(1)), languagesMap.get(matcher.group(2)), null));
-							}
+						matcher = pattern.matcher(parser.readLine());
+						if (matcher.matches()) {
+							tempMovieName = matcher.group(1).trim();
+							if (moviesMap.containsKey(tempMovieName) && datatypesMap.containsKey(matcher.group(2)))
+								movieDatatypeSet.add(new NamedRelation(moviesMap.get(tempMovieName), datatypesMap.get(matcher.group(2)), null));
 						}
-						// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
-						if ((movieLanguagesSet.size() > 0) && (movieLanguagesSet.size() % PSTMT_BATCH_SIZE == 0)) {
-							System.out.println("reached the movies on rows " + moviesStartRow + " - " + moviesEndRow);
-							System.out.println("Inserting " + movieLanguagesSet.size() + " elements to the DB");
-//							DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieLanguagesSet, DBTablesEnum.MOVIE_LANGUAGES, DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID);
-							totalElementsNum += movieLanguagesSet.size();
-							movieLanguagesSet.clear();
+						// flush results every BATCH_SIZE 
+						if ((movieDatatypeSet.size() > 0) && (movieDatatypeSet.size() % PSTMT_BATCH_SIZE == 0)) {
+							System.out.println("Inserting " + movieDatatypeSet.size() + " elements to the DB");
+							DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieDatatypeSet, tablesEnum, movieFieldsEnum, datatypeFieldsEnum);
+							totalElementsNum += movieDatatypeSet.size();
+							movieDatatypeSet.clear();
 						}
 					}
-
-					System.out.println("Inserting " + movieLanguagesSet.size() + " elements to the DB");
-//					DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieLanguagesSet, DBTablesEnum.MOVIE_LANGUAGES, DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID);
-					totalElementsNum += movieLanguagesSet.size();
-					System.out.println("clearing movieLanguagesSet");
-					movieLanguagesSet.clear();
-					System.out.println("clearing moviesMap");
-					moviesMap.clear();
-					moviesMap = null;
-					System.out.println("calling GarbageCollector");
-					System.gc();
-					//System.out.println("movieLanguagesSet's size after clearing is " + movieLanguagesSet.size());
-
+					// flush the results that were left
+					System.out.println("Inserting " + movieDatatypeSet.size() + " elements to the DB");
+					DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieDatatypeSet, tablesEnum, movieFieldsEnum, datatypeFieldsEnum);
+					totalElementsNum += movieDatatypeSet.size();
 					System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
+					movieDatatypeSet.clear();
+					moviesMap.clear();
+					moviesMap = null;
+					System.gc();
 				} else
 					return false;
 			}
 			moviesStartRow += SELECT_BUCKET_SIZE;
 			moviesEndRow += SELECT_BUCKET_SIZE;
 			parser.closeFile();
-			//moviesMap.clear();
+			moviesMap.clear();
 			System.gc();
-//			System.out.println("about to iterate over moviesMap and assign NULL to all the entries");
-//			moviesMap.entrySet().removeAll();
-//			for (Map.Entry<String, Integer> entry : moviesMap.entrySet()) {
-//				moviesMap.entrySet().iterator().remove();				
-//			}
-//			System.out.println("finished assigning NULLs to moviesMap");
-				
 		} while (!isEmpty);
 
 		return true;
@@ -719,7 +722,7 @@ public class DataImporter {
 									// if the line was empty, this signifies moving on to the next actor in the list
 									++tempArrayIndex;
 							}
-							// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
+							// flush results every BATCH_SIZE  
 							if ((personMovieCreditsSet.size() > 0) && (personMovieCreditsSet.size() % PSTMT_BATCH_SIZE == 0)) {
 								System.out.println("Inserting " + personMovieCreditsSet.size() + " elements to the DB");
 								DBManager.getInstance().insertPersonMovieCreditsSetToDB(personMovieCreditsSet);
@@ -727,6 +730,7 @@ public class DataImporter {
 								personMovieCreditsSet.clear();
 							}
 						}
+						// flush the results that were left
 						System.out.println("Inserting " + personMovieCreditsSet.size() + " elements to the DB");
 						DBManager.getInstance().insertPersonMovieCreditsSetToDB(personMovieCreditsSet);
 						totalElementsNum += personMovieCreditsSet.size();

@@ -68,15 +68,12 @@ public class ImportHandler {
 */	
 		importer = new DataImporter(listfilesMap);
 		
-		importer.getLanguagesGenresCountries();
+		importer.importLanguagesGenresCountries();
 //		importer.importMovies();
-		importer.importPersonsAndCredits();
-		
-		// ------------------ dependent only on Movies
-//		importer.getMoviesLanguages();	// dependent on Languages
-/*		importer.getMoviesGenres();		// dependent on Genres
-		importer.getMoviesCountries();	// dependent on Countries
-		importer.getMoviesColorInfo();
+		importer.importMoviesLanguagesGenresCountries();
+//		importer.importPersonsAndCredits();
+
+/*		importer.getMoviesColorInfo();
 		importer.getMoviesAKATitles();
 		importer.getMoviesCrazyCredits();
 		importer.getMoviesGoofs();
