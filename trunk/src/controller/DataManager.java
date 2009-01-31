@@ -1,9 +1,7 @@
 package controller;
 
 import java.util.*;
-
 import view.RibbonInterface;
-import view.SampleRibbonClass;
 import controller.entity.*;
 import controller.enums.MovieDataEnum;
 import controller.enums.NamedEntitiesEnum;
@@ -11,9 +9,15 @@ import controller.enums.PersonDataEnum;
 import controller.enums.SearchEntitiesEnum;
 import controller.filter.AbsFilter;
 import model.DBManager;
-import model.DBOperationEnum;
 import model.DBTablesEnum;
 
+/**
+ * This class acts as the broker between the view and model.
+ * It gets requests from the viewer and returns them to the viewer interface 
+ * to support multi-requests via threads
+ * @author Chook
+ *
+ */
 public class DataManager {
 	private static DataManager manager = null;
 	/**
@@ -286,17 +290,7 @@ public class DataManager {
 			}
 		};
 	}
-	
-	/**
-	 * Search movies using filters
-	 * @param arlFilters - List of filters for WHERE clause
-	 * @return List of movies
-	 */
-	private List<DatedEntity> getEntitiesBySearch(List<AbsFilter> arlFilters,
-													   DBTablesEnum table) {
-		return DBManager.getInstance().search(arlFilters, table);
-	}
-	
+
 	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
 		return db.getSearchFilter(entity, value, value2);
 	}

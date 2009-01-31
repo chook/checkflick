@@ -3,6 +3,11 @@ package controller.entity;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is a casting relation, it ads a "is actor" and actor role/credit rank
+ * @author Chook
+ *
+ */
 public class CastingRelation extends CategorizedRelation {
 	private boolean actor;
 	private String actorRole;

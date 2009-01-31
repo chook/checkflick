@@ -3,13 +3,16 @@ package controller;
 import java.io.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
 import javax.xml.parsers.*;
-
 import org.ini4j.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+/**
+ * This class represents the configurations of the application (fetched from an INI file)
+ * @author Chook
+ *
+ */
 public class AppData {
 	private String importFolder;
 	private String dbHost;

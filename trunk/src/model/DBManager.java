@@ -7,6 +7,12 @@ import controller.filter.*;
 import controller.entity.*;
 import controller.enums.*;
 
+/**
+ * This class is used to handle all the transactions and connection to the database
+ * This class handles the connection through JDBC
+ * @author Chook
+ *
+ */
 public class DBManager {
 
 	// Different Connections used in testings
@@ -17,26 +23,23 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "chook";
 //	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "chenhare";
-//	private static String CONNECTION_PASSWORD = "Shoochi0";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "chenhare";
+	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-	private static String CONNECTION_USERNAME = "nadavsh2";
-	private static String CONNECTION_PASSWORD = "nadavsh2";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_USERNAME = "nadavsh2";
+//	private static String CONNECTION_PASSWORD = "nadavsh2";
 /** Nadav's TAU server - Local connection 	**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
 //	private static String CONNECTION_USERNAME = "nadavsh2";
 //	private static String CONNECTION_PASSWORD = "nadavsh2";
 
 	// The strings for prepared statements
-	private static String INSERT_MOVIE_PSTMT = "INSERT INTO MOVIES(fname,lname) VALUES(?,?)";
-	private static String UPDATE_MOVIE_PSTMT = "UPDATE MOVIES SET ? WHERE MOVIE_ID=?";
-	private static String DELETE_MOVIE_PSTMT = "DELETE FROM MOVIES WHERE MOVIE_ID=?";
 	private static String SEARCH_MOVIE_STMT = "SELECT MOVIES.MOVIE_ID, MOVIES.MOVIE_NAME, MOVIES.MOVIE_YEAR FROM ";
 	private static String SEARCH_PERSON_STMT = "SELECT PERSONS.PERSON_ID, PERSONS.PERSON_NAME, PERSONS.YEAR_OF_BIRTH FROM ";
 	private static String SELECT_MOVIE_PSTMT = "SELECT * FROM MOVIES WHERE MOVIE_ID=?";

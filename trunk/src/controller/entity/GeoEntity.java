@@ -3,6 +3,11 @@ package controller.entity;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is an entity with a country
+ * @author Chook
+ *
+ */
 public class GeoEntity extends DatedEntity {
 	protected int country;
 

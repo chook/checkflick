@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This entity adds a type (or any number) to the named entity
  * @author Chook
  * 
  */

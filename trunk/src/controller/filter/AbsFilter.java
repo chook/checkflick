@@ -1,13 +1,16 @@
 package controller.filter;
 
-import java.util.List;
 import java.util.Set;
 
-
+/**
+ * An abstract class for a filter representation
+ * 
+ * @author Chook
+ * 
+ */
 public abstract class AbsFilter {
 	protected String table;
 	protected String column;
-	
 
 	/**
 	 * @return the column
@@ -42,9 +45,9 @@ public abstract class AbsFilter {
 	public abstract String toString();
 
 	protected AbsFilter() {
-		
+
 	}
-	
+
 	/**
 	 * @param table
 	 * @param column

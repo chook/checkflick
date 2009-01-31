@@ -2,6 +2,11 @@ package controller.entity;
 
 import java.util.Map;
 
+/**
+ * This is an entity with a year
+ * @author Chook
+ *
+ */
 public class DatedEntity extends NamedEntity {
 	protected int year;
 
@@ -46,10 +51,5 @@ public class DatedEntity extends NamedEntity {
 		Map<String, String> map = super.toStringMap();
 		map.put("year", String.valueOf(getYear()));
 		return map;
-	}
-	
-	@Override
-	public String toInsertString() {
-		return super.toInsertString() + ", " + getYear();
 	}
 }

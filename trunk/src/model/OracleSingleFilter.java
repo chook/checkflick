@@ -1,16 +1,15 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import controller.enums.FilterOptionEnum;
 import controller.filter.AbsSingleFilter;
-import controller.filter.FilterOptionEnum;
 
+/**
+ * This class represents an oracle single filter
+ * @author Chook
+ *
+ */
 public class OracleSingleFilter extends AbsSingleFilter {
 
 	public OracleSingleFilter() {

@@ -1,11 +1,9 @@
 package controller.entity;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Movie entity
- * 
  * @author Chook
  * 
  */

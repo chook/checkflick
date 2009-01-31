@@ -1,5 +1,10 @@
 package controller.enums;
 
+/**
+ * This is an enum for all the movie data that we support
+ * @author Chook
+ *
+ */
 public enum MovieDataEnum {
 	MOVIE,
 	MOVIE_AKAS,
