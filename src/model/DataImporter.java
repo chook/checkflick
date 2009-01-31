@@ -17,8 +17,8 @@ import controller.filter.AbsSingleFilter;
 public class DataImporter {
 
 	private Map<ListFilesEnum, String> listfilesMap;
-	static int PSTMT_BATCH_SIZE = 15000;
-	static int SELECT_BUCKET_SIZE = 10000;
+	static int PSTMT_BATCH_SIZE = 25000;
+	static int SELECT_BUCKET_SIZE = 100000;
 	
 	// languagePattern explanation:
 	// ([^\"].+[)}])					- group 1: movie name
@@ -101,12 +101,12 @@ public class DataImporter {
 //		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directorsSHORT.list");
 //		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producersSHORT.list");
 //		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writersSHORT.list");
-		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies10000.list");
-		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors10000.list");
-		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses10000.list");
-		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors10000.list");
-		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers10000.list");
-		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers10000.list");
+		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
+		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
+		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses.list");
+		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors.list");
+		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers.list");
+		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers.list");
 		
 		// run the importing
 		ih.importIntoDB();

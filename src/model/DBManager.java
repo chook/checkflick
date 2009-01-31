@@ -1316,8 +1316,18 @@ public class DBManager {
 		return returnValue;
 	}
 
+	/**
+	 * Deletes a movie 
+	 * @param dataType - The movie data type
+	 * @param dataObject - The object
+	 * @return True if delete successfuly or False otherwise
+	 */
 	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType dataObject) {
 		return deleteAbsDataType(filters.getMovieDeleteFilter(dataType, dataObject));
+	}
+	
+	public boolean deletePersonEntity(PersonDataEnum dataType, AbsType dataObject) {
+		return deleteAbsDataType(filters.getPersonDeleteFilter(dataType, dataObject));
 	}
 
 	private boolean deleteAbsDataType(List<AbsSingleFilter> filterList) {
