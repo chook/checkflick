@@ -137,13 +137,15 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	protected static void drawPersonData(final List<AbsType> result ,final PersonDataEnum type){
+	protected static void drawPersonData(final List<AbsType> result ,final PersonDataEnum type , final int personId){
 		display.asyncExec(new Runnable() {
 			public void run() {
 				Image image = ImageCache.getImage("book_48.png"); ;
-				String[] titles= new String[2];
+				String[] titles= new String[3];
 				String toGet = "name";
 				titles[0]="";
+				titles[2]="";
+				boolean cast = false;
 				List<NamedEntity> list = null;
 				String message = "";
 				String title = "";
@@ -159,10 +161,12 @@ public class CheckFlickGUI {
 				case PERSON_ROLES:{
 					image = ImageCache.getImage("spanner_48.png");
 					title = "The Roles Of This Person";
+					titles[2] = "Movie Name";
 					titles[1]="Role";
-					toGet = "role";
+					toGet = "type";
 					list = rolesList;
-					message = "No roles for this person.";
+					message = "No roles for this person. Adding roles is done by choosing movie's cast.";
+					cast = true;
 					break;
 				}
 				case PERSON_QUOTES:{
@@ -186,7 +190,7 @@ public class CheckFlickGUI {
 					table.setLinesVisible (true);
 					table.setHeaderVisible (true);
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-					data.heightHint = 200;
+					data.heightHint = 150;
 					table.setLayoutData(data);
 					for (int i=0; i<titles.length; i++) {
 						TableColumn column = new TableColumn (table, SWT.NONE);
@@ -206,15 +210,52 @@ public class CheckFlickGUI {
 							}
 							else
 								item.setText (1, map.get(toGet));
+							if (titles[2]!=""){
+								if (map.get("name")!=null)
+									item.setText (2, map.get("name"));
+							}
 						}
 					}
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
 					}
-					GridLayout layout = new GridLayout (3,false);
+					GridLayout layout = new GridLayout (2,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
 					personButtons.setLayout(layout);
+					if (!cast){
+						Label label = new Label(personButtons , SWT.NONE);
+						Button add = new Button(personButtons , SWT.PUSH);
+						add.setText("Add");
+						add.addSelectionListener(new SelectionListener() {
+							public void widgetDefaultSelected(SelectionEvent e) {	
+							}
+							public void widgetSelected(SelectionEvent e){
+								openPersonAddWindow(type , personId);
+							}
+						});
+						Button delete = new Button(personButtons , SWT.PUSH);
+						delete.setText("Delete");
+						delete.addSelectionListener(new SelectionListener() {
+							public void widgetDefaultSelected(SelectionEvent e) {	
+							}
+							public void widgetSelected(SelectionEvent e){
+								int[] t= table.getSelectionIndices();
+								if (t.length==0)
+									okMessageBox("Please select a row to delete.");
+								else{
+									//TODO delete
+									redrawPersonTable(personId , type);
+									/*for (int i=0; i< t.length; i++){
+										String del = table.getItem(t[i]).getText(1);
+										table.getItem(t[i]).dispose();
+										table.redraw();
+										
+									}*/
+								}
+							}
+						});
+					}
 					otherResults = new ExpandItem(bar, SWT.NONE, 1);
 					otherResults.setText(title);
 					otherResults.setHeight(personButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -223,15 +264,36 @@ public class CheckFlickGUI {
 					otherResults.setExpanded(true);
 				}
 				else{
-					switch(okMessageBox(message)){
-					case(SWT.OK):{}
+					okMessageBox(message);
+					if (!cast){
+						GridLayout layout = new GridLayout (1,false);
+						layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+						layout.verticalSpacing = 10;
+						personButtons.setLayout(layout);
+						Button add = new Button(personButtons , SWT.PUSH);
+						add.setText("Add");
+						add.addSelectionListener(new SelectionListener() {
+							public void widgetDefaultSelected(SelectionEvent e) {	
+							}
+							public void widgetSelected(SelectionEvent e){
+								openPersonAddWindow(type , personId);
+							}
+						});
+						if ((otherResults != null) && !(otherResults.isDisposed()))
+							otherResults.dispose();
+						otherResults = new ExpandItem(bar, SWT.NONE, 1);
+						otherResults.setText(title);
+						otherResults.setHeight(personButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+						otherResults.setControl(personButtons);
+						otherResults.setImage(image);
+						otherResults.setExpanded(true);
 					}
 				}
 			}
 		});
 	}
 	
-	protected static void drawMovieData(final List<AbsType> result ,final MovieDataEnum type){
+	protected static void drawMovieData(final List<AbsType> result ,final MovieDataEnum type , final int movieId){
 		display.asyncExec(new Runnable() {
 			public void run() {
 				Image image = ImageCache.getImage("book_48.png"); ;
@@ -241,6 +303,7 @@ public class CheckFlickGUI {
 				titles[2] ="";
 				String title = "";
 				boolean cast = false;
+				boolean combo = false;
 				String message = "";
 				List<NamedEntity> list = null;
 				switch(type){
@@ -263,6 +326,7 @@ public class CheckFlickGUI {
 					titles[1]="Country";
 					toGet ="secondaryId";
 					message = "No countries for this movie.";
+					combo = true;
 					break;
 				case MOVIE_LANGUAGES:
 					list = langList;
@@ -271,6 +335,7 @@ public class CheckFlickGUI {
 					titles[1] = "Language";
 					toGet ="secondaryId";
 					message = "No languages for this movie.";
+					combo = true;
 					break;
 				case MOVIE_GOOFS:
 					image = ImageCache.getImage("smile_grin_48.png");
@@ -291,6 +356,7 @@ public class CheckFlickGUI {
 					titles[1] = "Genre";
 					toGet ="secondaryId";
 					message = "No genres for this movie.";
+					combo = true;
 					break;
 				case MOVIE_CAST:
 					image = ImageCache.getImage("users_two_48.png");
@@ -301,6 +367,7 @@ public class CheckFlickGUI {
 					message ="No cast for this movie.";
 					break;
 				}
+				final boolean finalCombo = combo;
 				if ((movieButtons != null) && !(movieButtons.isDisposed())){
 					movieButtons.dispose();
 				}
@@ -341,10 +408,44 @@ public class CheckFlickGUI {
 					for (int i=0; i<titles.length; i++) {
 						table.getColumn (i).pack ();
 					}
-					GridLayout layout = new GridLayout (3,false);
+					GridLayout layout = new GridLayout (2,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
 					movieButtons.setLayout(layout);
+					Label label = new Label(movieButtons , SWT.NONE);
+					Button add = new Button(movieButtons , SWT.PUSH);
+					add.setText("Add");
+					add.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {	
+						}
+						public void widgetSelected(SelectionEvent e){
+							if (!finalCombo)
+								openMovieAddWindow(type , movieId);
+							else
+								openMovieAddFromListWindow(type , movieId);
+						}
+					});
+					Button delete = new Button(movieButtons , SWT.PUSH);
+					delete.setText("Delete");
+					delete.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {	
+						}
+						public void widgetSelected(SelectionEvent e){
+							int[] t= table.getSelectionIndices();
+							if (t.length==0)
+								okMessageBox("Please select a row to delete.");
+							else{
+								//TODO delete
+								redrawMovieTable(movieId , type);
+								/*for (int i=0; i< t.length; i++){
+									String del = table.getItem(t[i]).getText(1);
+									table.getItem(t[i]).dispose();
+									table.redraw();
+									
+								}*/
+							}
+						}
+					});
 					if ((otherResults != null) && !(otherResults.isDisposed()))
 						otherResults.dispose();
 					otherResults = new ExpandItem(bar, SWT.NONE, 1);
@@ -355,9 +456,31 @@ public class CheckFlickGUI {
 					otherResults.setExpanded(true);
 				}
 				else{
-					switch(okMessageBox(message)){
-					case(SWT.OK):{}
-					}
+					okMessageBox(message);
+					GridLayout layout = new GridLayout (1,false);
+					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+					layout.verticalSpacing = 10;
+					movieButtons.setLayout(layout);
+					Button add = new Button(movieButtons , SWT.PUSH);
+					add.setText("Add");
+					add.addSelectionListener(new SelectionListener() {
+						public void widgetDefaultSelected(SelectionEvent e) {	
+						}
+						public void widgetSelected(SelectionEvent e){
+							if (!finalCombo)
+								openMovieAddWindow(type , movieId);
+							else
+								openMovieAddFromListWindow(type , movieId);
+						}
+					});
+					if ((otherResults != null) && !(otherResults.isDisposed()))
+						otherResults.dispose();
+					otherResults = new ExpandItem(bar, SWT.NONE, 1);
+					otherResults.setText(title);
+					otherResults.setHeight(movieButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+					otherResults.setControl(movieButtons);
+					otherResults.setImage(image);
+					otherResults.setExpanded(true);
 				}
 			}
 		});
@@ -768,7 +891,8 @@ public class CheckFlickGUI {
 			countryString[i+1]=countriesList.get(i).getName();
 		}
 		countryCombo.setItems (countryString);
-		
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -886,7 +1010,7 @@ public class CheckFlickGUI {
 		
 		// general information
 		final Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (2,false);
+		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
@@ -929,6 +1053,8 @@ public class CheckFlickGUI {
 		final Text plotText = new Text(composite ,SWT.WRAP);
 		if (movie.getPlot()!= null)
 			plotText.setText(movie.getPlot());
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.addSelectionListener(new SelectionListener() {
@@ -1058,6 +1184,10 @@ public class CheckFlickGUI {
 				
 			}
 		});
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
+		
 		Button close = new Button(composite , SWT.PUSH);
 		close.setText("Close Tab");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -1072,7 +1202,7 @@ public class CheckFlickGUI {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_AKAS);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_AKAS);
 			}
 		});
 		connections.addSelectionListener(new SelectionListener() {
@@ -1089,7 +1219,7 @@ public class CheckFlickGUI {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_COUNTRIES);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_COUNTRIES);
 			}
 		});
 		languages.addSelectionListener(new SelectionListener(){
@@ -1097,14 +1227,14 @@ public class CheckFlickGUI {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_LANGUAGES);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_LANGUAGES);
 		}});
 		goofs.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_GOOFS);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_GOOFS);
 			}			
 		});
 		quotes.addSelectionListener(new SelectionListener(){
@@ -1112,7 +1242,7 @@ public class CheckFlickGUI {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_QUOTES);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_QUOTES);
 			}
 		});
 		genres.addSelectionListener(new SelectionListener(){
@@ -1120,7 +1250,7 @@ public class CheckFlickGUI {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_GENRES);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_GENRES);
 			}
 		});
 		persons.addSelectionListener(new SelectionListener(){
@@ -1128,7 +1258,7 @@ public class CheckFlickGUI {
 			}
 			public void widgetSelected(SelectionEvent e) {
 				entityDetails.setVisible(true);
-				movieButtonsResults(movie , MovieDataEnum.MOVIE_CAST);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_CAST);
 			}
 		});
 
@@ -1248,7 +1378,10 @@ public class CheckFlickGUI {
 		final Text bioText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL);
 		if (person.getBiography()!= null)	
 			bioText.setText(person.getBiography());
-		
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.addSelectionListener(new SelectionListener() {
@@ -1441,21 +1574,21 @@ public class CheckFlickGUI {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				personButtonsResults(person , PersonDataEnum.PERSON_AKAS);
+				personButtonsResults(person.getId() , PersonDataEnum.PERSON_AKAS);
 			}			
 		});
 		role.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				personButtonsResults(person , PersonDataEnum.PERSON_ROLES);
+				personButtonsResults(person.getId() , PersonDataEnum.PERSON_ROLES);
 			}			
 		});
 		quotes.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				personButtonsResults(person , PersonDataEnum.PERSON_QUOTES);
+				personButtonsResults(person.getId() , PersonDataEnum.PERSON_QUOTES);
 			}
 		});
 		
@@ -1463,17 +1596,17 @@ public class CheckFlickGUI {
 		entityDetails.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y-150);
 		
 	}
-	static protected void personButtonsResults(PersonEntity person, PersonDataEnum type){
+	static protected void personButtonsResults(int id, PersonDataEnum type){
 		try {
-			pool.execute(DataManager.getPersonData(type, person.getId()));
+			pool.execute(DataManager.getPersonData(type, id));
 		} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	static protected void movieButtonsResults(MovieEntity movie, MovieDataEnum type){
+	static protected void movieButtonsResults(int id, MovieDataEnum type){
 		try {
-			pool.execute(DataManager.getMovieData(type, movie.getId()));
+			pool.execute(DataManager.getMovieData(type, id));
 		} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1580,7 +1713,7 @@ public class CheckFlickGUI {
 					if (valid){
 						AbsType movie = new MovieEntity(0, nameText.getText(), year, null, null, color, time, taglines, plot, location);
 						try {
-							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE, movie));
+							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE, movie , false));
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -1650,6 +1783,8 @@ public class CheckFlickGUI {
 		
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
+		label= new Label(composite, SWT.NONE);
+		label= new Label(composite, SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Insert");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -1737,7 +1872,7 @@ public class CheckFlickGUI {
 					if (valid){
 						AbsType person = new PersonEntity(0,nameText.getText() , rName , nick , birth ,bYear , city , country , death , dYear , height, mark , bio );
 						try {
-							pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON, person));
+							pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON, person , false));
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -2010,7 +2145,7 @@ public class CheckFlickGUI {
 							if(genresCombo.getText() != null && genresCombo.getText() != "") {
 								AbsType t = new Relation(id, Integer.parseInt(getID(genresList, genresCombo.getText())));
 								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GENRES, t));
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GENRES, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2049,7 +2184,7 @@ public class CheckFlickGUI {
 							if(langCombo.getText() != null && langCombo.getText() != "") {
 								AbsType t = new Relation(id, Integer.parseInt(getID(langList, langCombo.getText())));
 								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_LANGUAGES, t));
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_LANGUAGES, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2088,7 +2223,7 @@ public class CheckFlickGUI {
 							if(countryCombo.getText() != null && countryCombo.getText() != "") {
 								AbsType t = new Relation(id, Integer.parseInt(getID(countriesList, countryCombo.getText())));
 								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_COUNTRIES, t));
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_COUNTRIES, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2122,7 +2257,7 @@ public class CheckFlickGUI {
 							if(goofText.getText() != "" ) {
 								AbsType t = new NamedEntity(id, goofText.getText());
 								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GOOFS, t));
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_GOOFS, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2155,7 +2290,7 @@ public class CheckFlickGUI {
 							if(quoteText.getText() != "" ) {
 								AbsType t = new NamedEntity(id, quoteText.getText());
 								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_QUOTES, t));
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_QUOTES, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2188,7 +2323,7 @@ public class CheckFlickGUI {
 							if(akaText.getText() != "" ) {
 								AbsType t = new NamedEntity(id, akaText.getText());
 								try {
-									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_AKAS, t));
+									pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_AKAS, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2219,12 +2354,12 @@ public class CheckFlickGUI {
 						}
 						public void widgetSelected(SelectionEvent e) {
 							List<AbsFilter> list = new ArrayList<AbsFilter>();
-							System.out.println(castText.getText());
+							//System.out.println(castText.getText());
 							if (castText.getText()!= ""){
 								list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, castText.getText()));
 							/*	AbsType t = new NamedEntity(id, akaText.getText());*/
 								try {
-									pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list , id));
+									pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list , id , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2273,7 +2408,7 @@ public class CheckFlickGUI {
 							if(akaText.getText() != "" ) {
 								AbsType t = new NamedEntity(id, akaText.getText());
 								try {
-									pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON_AKAS, t));
+									pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON_AKAS, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2306,7 +2441,7 @@ public class CheckFlickGUI {
 							if(quoteText.getText() != "" ) {
 								AbsType t = new NamedEntity(id, quoteText.getText());
 								try {
-									pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON_QUOTES, t));
+									pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON_QUOTES, t , false));
 								} catch (InterruptedException e1) {
 									e1.printStackTrace();
 								}
@@ -2348,13 +2483,13 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	static protected void peopleToInsertTable(final List<DatedEntity> searched, final SearchEntitiesEnum search ,final int movieId) {
+	static protected void peopleToInsertTable(final List<DatedEntity> searched, final SearchEntitiesEnum search ,final int movieId , final boolean update) {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				final int count = searched.size();
 				//creating the search results table
 				if (count > 0){
-					castInsertWindow(searched , search , movieId);	
+					castInsertWindow(searched , search , movieId , update);	
 				}
 				else{ // if there were no results
 					switch(okMessageBox("No such person. Please try again.")){
@@ -2364,7 +2499,7 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	static protected void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id){	
+	static protected void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id , final boolean update){	
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
 		final Shell personResults = new Shell();
@@ -2429,7 +2564,7 @@ public class CheckFlickGUI {
 							secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
 							AbsType relation = new CastingRelation(secondId, id, role);
 							try {
-								pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
+								pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation , update ));
 							} catch (InterruptedException e1) {
 								e1.printStackTrace();
 							}
@@ -2456,7 +2591,9 @@ public class CheckFlickGUI {
 									secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
 									AbsType relation = new CastingRelation(secondId, id, role , true , part , rank);
 									try {
-										pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation ));
+										pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation , false));
+										shell.getShell().setEnabled(true);	
+										personResults.close();
 									} catch (InterruptedException e1) {
 										e1.printStackTrace();
 									}
@@ -2481,8 +2618,244 @@ public class CheckFlickGUI {
 				shell.getShell().setEnabled(true);}			
 		});
 		personResults.open();
-		//shell.getShell().setEnabled(true);		
+		
 	}
+	static protected void openPersonAddWindow(final PersonDataEnum type , final int personId){
+		shell.getShell().setEnabled(false);
+		//final RibbonShell personResults = new RibbonShell(display);	
+		final Shell addToPerson = new Shell();
+	//	personResults.setBackground(shell.getShell().getBackground());
+		Rectangle monitor_bounds = addToPerson.getShell().getMonitor().getBounds();
+		addToPerson.setSize(new Point(monitor_bounds.width/5,100));		
+		addToPerson.setText("Add To Person");		
+		GridLayout layout = new GridLayout(2 , false);
+		
+		addToPerson.setLayout(layout);
+		
+		Label label = new Label(addToPerson , SWT.NONE);
+		final Text text = new Text(addToPerson , SWT.FILL|SWT.BORDER);
+		switch(type){
+		case PERSON_AKAS:{
+			label.setText("AKA name:");
+			break;
+		}
+		case PERSON_QUOTES:{
+			label.setText("Quote:");
+			break;
+		}
+		}
+		Button add = new Button(addToPerson, SWT.PUSH);
+		add.setText("Add");
+		Button close = new Button(addToPerson, SWT.PUSH);
+		close.setText("Close");
+		add.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				if (text.getText()!=""){
+					AbsType t = new NamedEntity(personId, text.getText());
+					try {
+						pool.execute(DataManager.insertPersonData(type, t , true));
+						shell.getShell().setEnabled(true);	
+						addToPerson.close();
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+				else{
+					okMessageBox("Please insert information to add.");
+				}
+			}
+		});
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);	
+				addToPerson.close();
+			}
+		});
+		addToPerson.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+			}			
+		});
+		addToPerson.open();
+	}
+	static protected void openMovieAddWindow(final MovieDataEnum type , final int id){
+		shell.getShell().setEnabled(false);
+		//final RibbonShell personResults = new RibbonShell(display);	
+		final Shell addToMovie = new Shell();
+	//	personResults.setBackground(shell.getShell().getBackground());
+		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
+		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
+		addToMovie.setText("Add To Movie");		
+		GridLayout layout = new GridLayout(2 , false);
+		String buttonString = "Add";
+		addToMovie.setLayout(layout);
+		Label label = new Label(addToMovie , SWT.NONE);
+		final Text text = new Text(addToMovie , SWT.FILL|SWT.BORDER);
+		switch(type){
+		case MOVIE_AKAS:{
+			label.setText("AKA name:");
+			break;
+		}
+		case MOVIE_QUOTES:{
+			label.setText("Quote:");
+			break;
+		}
+		case MOVIE_GOOFS:{
+			label.setText("Goof:");
+			break;
+		}
+		case MOVIE_CAST:{
+			label.setText("Cast:");
+			buttonString = "Search";
+			break;
+		}
+		}
+		Button add = new Button(addToMovie, SWT.PUSH);
+		add.setText(buttonString);
+		Button close = new Button(addToMovie, SWT.PUSH);
+		close.setText("Close");
+		add.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				
+				if (text.getText()!=""){
+					if (type.equals(MovieDataEnum.MOVIE_CAST)){
+						List<AbsFilter> list = new ArrayList<AbsFilter>();
+						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, text.getText()));
+						try {
+							pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list , id , true));
+							shell.getShell().setEnabled(true);	
+							addToMovie.close();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
+					else{
+						AbsType t = new NamedEntity(id, text.getText());
+						try {
+							pool.execute(DataManager.insertMovieData(type, t , true));
+							shell.getShell().setEnabled(true);	
+							addToMovie.close();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+				else{
+					okMessageBox("Please insert information to add.");
+				}
+			}
+		});
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);	
+				addToMovie.close();
+			}
+		});
+		addToMovie.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+			}			
+		});
+		addToMovie.open();
+	}
+	static protected void openMovieAddFromListWindow(final MovieDataEnum type , final int id){
+		shell.getShell().setEnabled(false);
+		//final RibbonShell personResults = new RibbonShell(display);	
+		final Shell addToMovie = new Shell();
+	//	personResults.setBackground(shell.getShell().getBackground());
+		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
+		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
+		addToMovie.setText("Add To Movie");		
+		GridLayout layout = new GridLayout(2 , false);
+		addToMovie.setLayout(layout);
+		Label label = new Label(addToMovie , SWT.NONE);
+		final Combo combo = new Combo(addToMovie , SWT.FILL|SWT.BORDER|SWT.READ_ONLY);
+		String[] listString;
+		List<NamedEntity> list = countriesList;
+		switch(type){
+		case MOVIE_COUNTRIES:{
+			label.setText("Country:");
+			break;
+		}
+		case MOVIE_GENRES:{
+			label.setText("Genre:");
+			list = genresList;
+			break;
+		}
+		case MOVIE_LANGUAGES:{
+			label.setText("Language:");
+			list = langList;
+			break;
+		}
+		}
+		listString= new String[list.size()];
+		for (int i=0; i<list.size(); i++){
+			listString[i]=list.get(i).getName();
+		}
+		final List<NamedEntity> finalList = list;
+		combo.setItems (listString);
+		Button add = new Button(addToMovie, SWT.PUSH);
+		add.setText("Add");
+		Button close = new Button(addToMovie, SWT.PUSH);
+		close.setText("Close");
+		add.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				
+				if (combo.getText()!=""){
+					AbsType t = new Relation(id, Integer.parseInt(getID(finalList, combo.getText())));
+					try {
+						pool.execute(DataManager.insertMovieData(type, t , true));
+						shell.getShell().setEnabled(true);	
+						addToMovie.close();
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+				else{
+					okMessageBox("Please insert information to add.");
+				}
+			}
+		});
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);	
+				addToMovie.close();
+			}
+		});
+		addToMovie.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+			}			
+		});
+		addToMovie.open();
+	}
+	static protected void redrawPersonTable(final int id ,final PersonDataEnum type){
+		display.asyncExec(new Runnable() {
+			public void run() {
+				personButtonsResults(id , type);
+			}
+		});
+	}
+	static protected void redrawMovieTable(final int id ,final MovieDataEnum type){
+		display.asyncExec(new Runnable() {
+			public void run() {
+				movieButtonsResults(id , type);
+			}
+		});
+	}
+
 	static protected void drawInsertDataSuccess() {
 		display.asyncExec(new Runnable() {
 			public void run() {
