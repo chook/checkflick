@@ -299,4 +299,8 @@ public class DataManager {
 	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType entity) {
 		return db.deleteMovieEntity(dataType, entity);
 	}
+	
+	public boolean deletePersonEntity(PersonDataEnum dataType, AbsType entity) {
+		return db.deletePersonEntity(dataType, entity);
+	}
 }
