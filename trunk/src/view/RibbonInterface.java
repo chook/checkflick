@@ -46,12 +46,17 @@ public class RibbonInterface {
 	public static void InsertMovieExtraData(int id){
 		SampleRibbonClass.drawInsertDataSuccess();
 	}
-	
+	public static void updateMovie(int id){
+		SampleRibbonClass.drawUpdateDataSuccess();
+	}
 	public static void InsertPerson(int id){
 		SampleRibbonClass.drawMoreInsertPerson(id);
 	}
 	public static void InsertPersonExtraData(int id){
 		SampleRibbonClass.drawInsertDataSuccess();
+	}
+	public static void updatePerson(int id){
+		SampleRibbonClass.drawUpdateDataSuccess();
 	}
 	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
 		SampleRibbonClass.setList(list, type);
