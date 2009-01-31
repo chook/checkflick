@@ -930,18 +930,16 @@ public class DBManager {
 	 *            - The name of the Value_name field
 	 * 
 	 **/
-	public boolean insertSingleDataTypeSetToDB(Set<String> set, DBTablesEnum table,
-			DBFieldsEnum field) {
+	public boolean insertSingleDataTypeSetToDB(Set<String> set, DBTablesEnum table, DBFieldsEnum field) {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
-		String statementStr;
-		statementStr = String.format(INSERT_SINGLE_DATATYPE, table.getTableName(), field.getFieldName());
 
 		try {
-			pstmt = conn.prepareStatement(statementStr);
-
+			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s) VALUES (?)",
+														table.getTableName(),
+														field.getFieldName()));
 			for (Object setObject : set) {
 				pstmt.setString(1, setObject.toString());
 				pstmt.addBatch();
