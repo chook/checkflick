@@ -675,7 +675,7 @@ public class DataImporter {
 	 * @param personIndexMarkStart the start row of this specific person's list
 	 * @return boolean whether the method succeeded or not
 	 */
-	public boolean getPersonMovieCredits(ListFilesEnum listType, int personIndexMarkStart) {
+	private boolean getPersonMovieCredits(ListFilesEnum listType, int personIndexMarkStart) {
 
 		Parser parser = new Parser();
 		Map<String, Integer> moviesMap = new HashMap<String, Integer>();
@@ -746,7 +746,7 @@ public class DataImporter {
 				moviesStartRow = 1;
 				moviesEndRow = moviesStartRow + SELECT_BUCKET_SIZE - 1;
 				isMoviesEmpty = false;
-				// going in the list to the first actor in the array
+				// going in the list to the first person in the array
 				do {
 					// retrieving part of the movies list to put inside a map
 					// since the movie list is huge, we select buckets and iterate over all of them
@@ -757,27 +757,12 @@ public class DataImporter {
 					if (!isMoviesEmpty) {
 						tempArrayIndex = 0;
 						parser.findLine(personsArray[0].getSecondaryId());
-						System.out.println(" ");
-						System.out.println("SECONDARYID - " + personsArray[0].getSecondaryId());
-						System.out.println("LINE - " + parser.getLineNumber());
-						System.out.println(" ");
 						personMovieCreditsSet = new LinkedHashSet<CastingRelation>();
 						// Making sure we find the start of the list
 						while (personsArray[tempArrayIndex] != null) {
 							lineFromFile = parser.readLine();
 							matcher = pattern.matcher(lineFromFile);
-							matchFound = matcher.matches();
-							if (!matchFound) {
-								if (lineFromFile.length() > 0) {
-									if (!(lineFromFile.contains("\t\""))) {
-										System.out.println("couldn't find a match on line " + parser.getLineNumber() + "!");
-										System.out.println(lineFromFile);
-									}
-								} else {
-									// if the line was empty, this signifies moving on to the next actor in the list
-									++tempArrayIndex;
-								}
-							} else {
+							if (matcher.matches()) {
 								tempMovieFullName = matcher.group(2).trim();
 								if (moviesMap.containsKey(tempMovieFullName)) {
 									tempMovieId = moviesMap.get(tempMovieFullName).intValue();
@@ -793,6 +778,10 @@ public class DataImporter {
 									personMovieCreditsSet.add(new CastingRelation(personsArray[tempArrayIndex].getId(), 
 											tempMovieId, productionRoleId, isActor, tempActorRole, tempActorCreditRank));
 								}
+							} else {
+								if (lineFromFile.length() == 0)
+									// if the line was empty, this signifies moving on to the next actor in the list
+									++tempArrayIndex;
 							}
 							// every a certain amount of results entered to the set, flush the results via one prepared statement batch to the DB 
 							if ((personMovieCreditsSet.size() > 0) && (personMovieCreditsSet.size() % PSTMT_BATCH_SIZE == 0)) {
