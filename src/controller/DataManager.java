@@ -222,12 +222,25 @@ public class DataManager {
 			}
 		};
 	}
-	public int updatePersonData(PersonDataEnum dataType, AbsType dataObject) {
+	public int updatePersonDataOld(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, true);
 	}
+	public static Runnable updatePersonData(final PersonDataEnum dataType, final AbsType dataObject) {
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.updatePerson(DBManager.getInstance().insertPersonData(dataType, dataObject, true));
+			}
+		};
+	}
 	
-
-	public int updateMovieData(MovieDataEnum dataType, AbsType dataObject) {
+	public static Runnable updateMovieData(final MovieDataEnum dataType, final AbsType dataObject){
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.updateMovie(DBManager.getInstance().insertMovieData(dataType, dataObject, true));
+			}
+		};
+	}
+	public int updateMovieDataOld(MovieDataEnum dataType, AbsType dataObject) {
 		return db.insertMovieData(dataType, dataObject, true);
 	}
 
