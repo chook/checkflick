@@ -295,12 +295,20 @@ public class DataManager {
 	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
 		return db.getSearchFilter(entity, value, value2);
 	}
-
-	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType entity) {
-		return db.deleteMovieEntity(dataType, entity);
-	}
 	
-	public boolean deletePersonEntity(PersonDataEnum dataType, AbsType entity) {
-		return db.deletePersonEntity(dataType, entity);
+	public static Runnable deleteMovieEntity(final MovieDataEnum dataType, final AbsType entity) {
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.deleteEntity(DBManager.getInstance().deleteMovieEntity(dataType, entity));
+			}
+		};
+	}
+
+	public static Runnable deletePersonEntity(final PersonDataEnum dataType, final AbsType entity) {
+		return new Runnable() {
+			public void run() {
+				RibbonInterface.deleteEntity(DBManager.getInstance().deletePersonEntity(dataType, entity));
+			}
+		};
 	}
 }
