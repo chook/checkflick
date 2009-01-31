@@ -18,22 +18,23 @@ public class DBManager {
 	// Different Connections used in testings
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 	private static int CONNECTION_MAX_CONNECTIONS = 6;
+	private static int RESULTS_FETCH_SIZE = 1000;
 /** Chen's home server 1	**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "chook";
 //	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-	private static String CONNECTION_USERNAME = "chenhare";
-	private static String CONNECTION_PASSWORD = "Shoochi0";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_USERNAME = "chenhare";
+//	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "nadavsh2";
-//	private static String CONNECTION_PASSWORD = "nadavsh2";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "nadavsh2";
+	private static String CONNECTION_PASSWORD = "nadavsh2";
 /** Nadav's TAU server - Local connection 	**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
 //	private static String CONNECTION_USERNAME = "nadavsh2";
@@ -49,9 +50,7 @@ public class DBManager {
 	
 	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
-	private static String INSERT_2_VALUES_PSTMT = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
 	private static String INSERT_6_VALUES_PSTMT = "INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)";
-	private static String INSERT_MOVIE_PSTMT_GOOD = "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)";
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	
 	private static String INSERT_MOVIE_LANGUAGES_TEST = "INSERT INTO %s (%s, %s) VALUES ((%s), (%s))";
@@ -254,12 +253,16 @@ public class DBManager {
 		return personsMap;
 	}
 	
-	public void TESTcreateTempFields() {
-
+	/**
+	 * The function receives a hard-coded query and executes it
+	 * @param query the query to be executed
+	 */
+	public void executeSQL(String query) {
+		
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
-		String pstmtStr;
-		pstmtStr = "ALTER TABLE PERSONS ADD TEMP_PERSON_ID NUMBER";
+		String pstmtStr = query;
+		
 		System.out.println(pstmtStr);
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
@@ -270,130 +273,63 @@ public class DBManager {
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
-
-		pstmtStr = "ALTER TABLE PERSONS ADD TO_DELETE CHAR(1)";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			pstmt.executeQuery();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-
-		pstmtStr = "ALTER TABLE PERSONS ADD TEMP_PERSON_LINE_NUMBER NUMBER";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			pstmt.executeQuery();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-
-		pool.returnConnection(conn);		
 	}
 		
-		
-	public void TESTinsertTempIdForPersons() {
-		ResultSet set = null;
-
-		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
-		String pstmtStr = "UPDATE PERSONS SET TEMP_PERSON_ID = PERSON_ID";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			set = pstmt.executeQuery();
-			set.setFetchSize(1000);
-			set.close();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-		
-		pool.returnConnection(conn);
-	}
-
-	public void TESTmarkAllPersonsNotToDelete() {
-		ResultSet set = null;
-
-		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
-		String pstmtStr = "UPDATE PERSONS SET TO_DELETE = 'N'";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			set = pstmt.executeQuery();
-			set.setFetchSize(1000);
-			set.close();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-		
-		pool.returnConnection(conn);		
-	}
-	
-	public void TESTfindAndUpdateDuplicates() {
+	public void findAndUpdateDuplicates() {
 		ResultSet set = null;
 		Set<Relation> duplicatesSet = new LinkedHashSet<Relation>();
 
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
-		String pstmtStr = "SELECT * FROM PERSONS ORDER BY PERSON_NAME, PERSON_ID";
+		String pstmtStr = "SELECT * FROM " + DBTablesEnum.PERSONS.getTableName() +
+							" ORDER BY " + DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName() + ", "
+										+ DBFieldsEnum.PERSONS_PERSON_ID.getFieldName();
 		System.out.println(pstmtStr);
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
-			set.setFetchSize(1000);
+			set.setFetchSize(RESULTS_FETCH_SIZE);
 			
 			String tempPrevPersonName = null;
 			String tempCurrPersonName = null;
 			int tempPersonId = 0;
-			// first time data
+			// insert primary data before iterating over the results
 			if (set.next()) {
 				tempPrevPersonName = set.getString(DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName());
 				tempPersonId = set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName());
 			}
+			// for each result, check if the person's name is the same as the previous result
+			// if it is, add it to the duplicatesSet
 			while (set.next()) {
 				tempCurrPersonName = set.getString(DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName());
-				System.out.println("tempPrevPersonName = " + tempPrevPersonName + " / tempCurrPersonName = " + tempCurrPersonName );
+				// if a duplicate was found
 				if (tempPrevPersonName.equals(tempCurrPersonName)) {
-					// if this is the same person, add him to the duplicatesSet
+					// the structure of the Relation that is added to the duplicatesSet is:
 					// Relation(originalPersonId, currentPersonId)
 					duplicatesSet.add(new Relation(tempPersonId, set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName())));
-					System.out.println("found a duplicate: " + tempPersonId + " --> " + set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 				}
 				else {
+					// if a duplicate wasn't found
 					tempPrevPersonName = tempCurrPersonName;
 					tempPersonId = set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName());
 				}
 				// flush results every BATCH_SIZE
-				if ((duplicatesSet.size() > 0) && (duplicatesSet.size() % 10000 == 0)) {
+				if ((duplicatesSet.size() > 0) && (duplicatesSet.size() % DataImporter.PSTMT_BATCH_SIZE == 0)) {
 					System.out.println("DUPLICATES: Inserting " + duplicatesSet.size() + " elements to the DB");
-					DBManager.getInstance().TESTUpdateDuplicates(duplicatesSet);
+					updateDuplicates(duplicatesSet);
 					duplicatesSet.clear();
 				}
 			}
 			// flush the results that were left
 			if ((duplicatesSet.size() > 0)) {
 				System.out.println("DUPLICATES: Inserting " + duplicatesSet.size() + " elements to the DB");
-				DBManager.getInstance().TESTUpdateDuplicates(duplicatesSet);
+				updateDuplicates(duplicatesSet);
 				duplicatesSet.clear();
 			}
 			set.close();
 			pstmt.close();
 		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
+			System.out.println(e.getMessage());
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
@@ -402,11 +338,14 @@ public class DBManager {
 		
 	}
 	
-	public void TESTUpdateDuplicates(Set<Relation> duplicatesSet) {
+	public void updateDuplicates(Set<Relation> duplicatesSet) {
 
 		PreparedStatement pstmt = null;
 		Connection conn = pool.getConnection();
-		String pstmtStr = "UPDATE PERSONS SET TO_DELETE = 'Y', TEMP_PERSON_ID = ? WHERE PERSON_ID = ?";
+		String pstmtStr = "UPDATE " + DBTablesEnum.PERSONS.getTableName() + " SET " +
+							DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName() + " = 'Y', " +
+							DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName() + " = ? " +
+							"WHERE " + DBFieldsEnum.PERSONS_PERSON_ID.getFieldName() + " = ?";
 		System.out.println("updating duplicates");
 		try {
 			pstmt = conn.prepareStatement(pstmtStr);
@@ -423,69 +362,7 @@ public class DBManager {
 		executePreparedStatementBatch(pstmt);
 		pool.returnConnection(conn);
 	}
-	
-	public void TESTRemoveDuplicates() {
 
-		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
-		String pstmtStr = "DELETE FROM PERSONS WHERE TO_DELETE = 'Y'";
-		System.out.println("removing duplicates");
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			pstmt.executeQuery();
-			pstmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		pool.returnConnection(conn);
-	}
-	
-	public void TESTdeleteTempFields() {
-
-		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
-		String pstmtStr;
-		pstmtStr = "ALTER TABLE PERSONS DROP COLUMN TO_DELETE";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			pstmt.executeQuery();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-		
-		pstmtStr = "ALTER TABLE PERSONS DROP COLUMN TEMP_PERSON_ID";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			pstmt.executeQuery();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-		
-		pstmtStr = "ALTER TABLE PERSONS DROP COLUMN TEMP_PERSON_LINE_NUMBER";
-		System.out.println(pstmtStr);
-		try {
-			pstmt = conn.prepareStatement(pstmtStr);
-			pstmt.executeQuery();
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
-		} catch (NullPointerException e) {
-			System.out.println("Null pointer in searchMovies");
-		}
-		
-		pool.returnConnection(conn);		
-	}
-	
-	
 	/**
 	 * returns a map of persons selected from the DB, that were limited by (top, bottom) limit on the SELECT
 	 * results that are sent are ordered beforehand by MOVIE_ID
@@ -898,17 +775,16 @@ public class DBManager {
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
-		String statementStr;
-		statementStr = String.format(INSERT_MOVIE_PSTMT_GOOD, 
-										DBTablesEnum.MOVIES.getTableName(), 
-										DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
-										DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
-										DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName(),
-										DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName(),
-										DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
+		
 
 		try {
-			pstmt = conn.prepareStatement(statementStr);
+			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)", 
+														DBTablesEnum.MOVIES.getTableName(), 
+														DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
+														DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName(),
+														DBFieldsEnum.MOVIES_MOVIE_ROMAN_NOTATION.getFieldName(),
+														DBFieldsEnum.MOVIES_MOVIE_MADE_FOR.getFieldName(),
+														DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName()));
 
 			for (MovieEntity setMovie : set) {
 				pstmt.setString(1, setMovie.getRawName());
@@ -926,14 +802,14 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;
 	}
-	
 	public boolean insertPersonsSetToDB(Set<NamedEntity> set) {
+	
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
 		Connection conn = pool.getConnection();
 		String statementStr;
-		statementStr = String.format(INSERT_2_VALUES_PSTMT, 
+		statementStr = String.format("INSERT INTO %s (%s, %s) VALUES (?, ?)", 
 										DBTablesEnum.PERSONS.getTableName(), 
 										DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName(),
 										DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());

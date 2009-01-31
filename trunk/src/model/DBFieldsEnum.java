@@ -36,7 +36,9 @@ public enum DBFieldsEnum {
 	PERSONS_HEIGHT("HEIGHT"),
 	PERSONS_TRADEMARK("TRADEMARK"),
 	PERSONS_BIOGRAPHY_TEXT("BIOGRAPHY_TEXT"),
+	PERSONS_TEMP_PERSON_ID("TEMP_PERSON_ID"),						// temporary field used only for the import and dropped afterwards
 	PERSONS_TEMP_PERSON_LINE_NUMBER("TEMP_PERSON_LINE_NUMBER"),		// temporary field used only for the import and dropped afterwards
+	PERSONS_TEMP_IS_DUPLICATE("TEMP_IS_DUPLICATE"),					// temporary field used only for the import and dropped afterwards
 // PERSON_TRIVIA
 	PERSON_TRIVIA_PERSON_ID("PERSON_ID"),
 	PERSON_TRIVIA_TRIVIA_TEXT("TRIVIA_TEXT"),

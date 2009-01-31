@@ -52,12 +52,19 @@ public class DataImporter {
 	static String moviesLanguagesPattern = "([^\"].*)\\s\\(([\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(\\(..?\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesLanguages2Pattern = "([^\"].*\\s\\((?:[\\d\\?]){4}(?:/(?:(?:[IVX])+))?\\)\\s?(?:\\(?:..?\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*([\\P{InGreek}\\-\\s',&&[^(]]+)(\\s+\\(.+\\)\\s*)*";
 	static String moviesNameDBPattern = "([^\"](.)+)(?:\\(((?:[IVX])+)\\))?\\s?(\\(..*\\))?";
+	// general personsPattern:
+	// group 1 = person name
 	static String personsPattern = "((?:[^\\t])+)\\t+.+";
-	// actorsMoviesPattern: groups: 1 - actor / 2 - full movie name / 3 - role / 4 - credit location
+	// actorsMoviesPattern groups: 
+	//group 1 = actor name
+	//group 2 = full movie name
+	//group 3 = role
+	//group 4 = credit location
 	static String actorsMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*(?:\\[(.+)\\])*\\s*(?:<(\\d+)>)*";
-	// directorsMoviesPattern: groups: 1 - director / 2 - full movie name
-	static String directorsMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*(?:<(?:[\\d,])+>)?";
-//	static String producersMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*";
+	// nonActorsMoviesPattern groups:
+	// group 1 = non actor name
+	// group 2 = full movie name
+	static String nonActorsMoviesPattern = "((?:[^\\t])+)?\\t+((?:[^\"\\t].*)\\s\\((?:[\\d\\?]){4}(?:/(?:[IVX]+))?\\)\\s?(?:\\((?:..?)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?)\\s*(?:\\(.+\\)\\s*)*(?:<(?:[\\d,])+>)?";
 
 	
 	/**
@@ -197,20 +204,19 @@ public class DataImporter {
 	}
 
 
-	public boolean getMovies() {
+	/**
+	 * imports all the different movie names from the movies list
+	 * @return boolean whether the method succeeded
+	 */
+	public boolean importMovies() {
 		
 		Parser parser = new Parser();
 		Set<MovieEntity> moviesSet = new LinkedHashSet<MovieEntity>();
-		String lineFromFile;
 		String patternRegExp = null;
-		String fullMovieName;
-		String movieName;
-		String movieRomanNotation;
-		String movieMadeFor;
+		String fullMovieName, movieName, movieRomanNotation, movieMadeFor;
 		int movieYear;
 		Pattern pattern;
 		Matcher matcher;
-		boolean matchFound;
 		int totalElementsNum = 0;
 		
 		parser.loadFile(listfilesMap.get(ListFilesEnum.MOVIES), ListFilesEnum.MOVIES);
@@ -223,16 +229,8 @@ public class DataImporter {
 			pattern = Pattern.compile(patternRegExp);
 			
 			while (!parser.isEOF()) {
-				lineFromFile = parser.readLine();
-				matcher = pattern.matcher(lineFromFile);
-				matchFound = matcher.matches();
-				if (!matchFound) {
-					if (lineFromFile.length() > 0)
-						if (!(lineFromFile.charAt(0) == '"')) {
-							System.out.println("couldn't found a match on line " + parser.getLineNumber() + "!");
-							System.out.println(lineFromFile);
-						}
-				} else {
+				matcher = pattern.matcher(parser.readLine());
+				if (matcher.matches()) {
 					fullMovieName = matcher.group(1).trim();
 					movieName = matcher.group(2);
 					movieRomanNotation = matcher.group(3);
@@ -241,30 +239,28 @@ public class DataImporter {
 						movieYear = Integer.parseInt(matcher.group(5));
 					} catch (Exception e) {
 						if (matcher.group(5).equals("????")) {
-//							System.out.println("year was ????, changed to 0");
 							movieYear = 0;
 						} else
 							movieYear = 1900;
 					}
 					// NOTE: the fullMovieName is a temporary field used during the import and dropped from the DB at the end
 					// it doesn't have a field in the MovieEntity, so for this occasion only, it is sent instead of the taglines field
-//					System.out.println("full movie name = " + fullMovieName);
 					moviesSet.add(new MovieEntity(0, movieName, movieYear, movieRomanNotation, movieMadeFor, 0, 0, fullMovieName, null, null));
 				}
-				// every a certain amount of movies entered to the set, flush the results via one prepared statement batch to the DB 
+				// flush results every BATCH_SIZE 
 				if ((moviesSet.size() > 0) && (moviesSet.size() % PSTMT_BATCH_SIZE == 0)) {
-					System.out.println("got to line " + parser.getLineNumber() + ", uploading to DB...");
 					System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
 					DBManager.getInstance().insertMoviesSetToDB(moviesSet);
 					totalElementsNum += moviesSet.size();
 					moviesSet.clear();
 				}
 			}
-
-			System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-			DBManager.getInstance().insertMoviesSetToDB(moviesSet);
-			totalElementsNum += moviesSet.size();
-
+			// flush the results that were left
+			if ((moviesSet.size() > 0)) {
+				System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
+				DBManager.getInstance().insertMoviesSetToDB(moviesSet);
+				totalElementsNum += moviesSet.size();
+			}
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
 		} else
@@ -274,103 +270,22 @@ public class DataImporter {
 
 		return true;
 	}
-	/**
-	 * was used to test the import method of using nested SELECTs inside the INSERT INTO VALUES(..)
-	 * Rubi said not to use it
-	 * @deprecated 
-	 * @return
-	 */
-	public boolean getMovies2() {
-
-		Parser parser = new Parser();
-		Set<MovieEntity> moviesSet = new LinkedHashSet<MovieEntity>();
-		String lineFromFile;
-		String patternRegExp = null;
-		String movieName;
-		String movieRomanNotation;
-		String movieMadeFor;
-		int movieYear;
-		Pattern pattern;
-		Matcher matcher;
-		boolean matchFound;
-		int totalElementsNum = 0;
-
-		parser.loadFile(listfilesMap.get(ListFilesEnum.MOVIES), ListFilesEnum.MOVIES);
-		patternRegExp = movies2Pattern;
-
-		// Making sure we find the start of the list
-		if (parser.findStartOfList()) {
-			System.out.println("Found the start of the list!");
-
-			pattern = Pattern.compile(patternRegExp);
-
-			while (!parser.isEOF()) {
-				lineFromFile = parser.readLine();
-				matcher = pattern.matcher(lineFromFile);
-				matchFound = matcher.matches();
-				if (!matchFound) {
-					if (lineFromFile.length() > 0)
-						if (!(lineFromFile.charAt(0) == '"')) {
-							System.out.println("couldn't found a match on line " + parser.getLineNumber() + "!");
-							System.out.println(lineFromFile);
-						}
-				} else {
-					movieName = matcher.group(1);
-					try {
-						movieYear = Integer.parseInt(matcher.group(2));
-					} catch (Exception e) {
-						if (matcher.group(2).equals("????")) {
-							System.out.println("year was ????, changed to 0");
-							movieYear = 0;
-						} else
-							movieYear = 1900;
-					}
-//					System.out.println("movie name: " + movieName);
-//					System.out.println("movie year: " + movieYear);
-					moviesSet.add(new MovieEntity(0, movieName, movieYear, null, null, 0, 0, null, null, null));
-				}
-				// every a certain amount of movies entered to the set, flush the results via one prepared statement batch to the DB 
-				if ((moviesSet.size() > 0) && (moviesSet.size() % PSTMT_BATCH_SIZE == 0)) {
-					System.out.println("got to line " + parser.getLineNumber() + ", uploading to DB...");
-					System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-					DBManager.getInstance().insertMoviesSetToDB(moviesSet);
-					totalElementsNum += moviesSet.size();
-					moviesSet.clear();
-				}
-			}
-
-			System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-			DBManager.getInstance().insertMoviesSetToDB(moviesSet);
-			totalElementsNum += moviesSet.size();
-
-			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
-
-		} else
-			return false;
-
-		parser.closeFile();
-
-		return true;
-	}
-
+	
 	/**
 	 * the function receives the name of the list to extract persons, and imports them to the DB
 	 * @return int the number of persons entered to the DB. Returns -1 if failed.
 	 */
-	public int getPersons(ListFilesEnum listType) {
+	private int getPersons(ListFilesEnum listType) {
 
 		Parser parser = new Parser();
 		Set<NamedEntity> personsSet = new LinkedHashSet<NamedEntity>();
-		String lineFromFile;
 		String patternRegExp = null;
 		String personName;
 		Pattern pattern;
 		Matcher matcher;
-		boolean matchFound;
 		int totalElementsNum = 0;
 		int tempLineNumber;
 
-		parser.loadFile(listfilesMap.get(listType), listType);
 		switch (listType) {
 		case ACTORS:
 		case ACTRESSES:
@@ -381,44 +296,34 @@ public class DataImporter {
 			break;
 		}
 
+		parser.loadFile(listfilesMap.get(listType), listType);
 		// Making sure we find the start of the list
 		if (parser.findStartOfList()) {
 			System.out.println("Found the start of the list!");
-			System.out.println("GET_PERSONS - lineNumber = " + parser.getLineNumber());
-
 			pattern = Pattern.compile(patternRegExp);
-
 			while (!parser.isEOF()) {
-				lineFromFile = parser.readLine();
-				matcher = pattern.matcher(lineFromFile);
-				matchFound = matcher.matches();
-				if (!matchFound) {
-//					if (lineFromFile.length() > 0) {
-//						System.out.println("couldn't find a match on line " + parser.getLineNumber() + "!");
-//						System.out.println(lineFromFile);
-//					}
-				} else {
+				matcher = pattern.matcher(parser.readLine());
+				if (matcher.matches()) {
 					tempLineNumber = parser.getLineNumber() - 1;
 					personName = matcher.group(1);
-//					System.out.println("found name: " + personName);
 					// NOTE: tempLineNumber is a temporary field used during the import and dropped from the DB at the end
 					// it doesn't have a field in the NamedEntity, so for this occasion only, it is sent instead of the ID field 
 					personsSet.add(new NamedEntity(tempLineNumber, personName));
 				}
-				// every a certain amount of persons entered to the set, flush the results via one prepared statement batch to the DB 
+				// flush results every BATCH_SIZE 
 				if ((personsSet.size() > 0) && (personsSet.size() % PSTMT_BATCH_SIZE == 0)) {
-					System.out.println("got to line " + parser.getLineNumber() + ", uploading to DB...");
 					System.out.println("Inserting " + personsSet.size() + " elements to the DB");
 					DBManager.getInstance().insertPersonsSetToDB(personsSet);
 					totalElementsNum += personsSet.size();
 					personsSet.clear();
 				}
 			}
-
-			System.out.println("Inserting " + personsSet.size() + " elements to the DB");
-			DBManager.getInstance().insertPersonsSetToDB(personsSet);
-			totalElementsNum += personsSet.size();
-
+			// flush the results that were left
+			if ((personsSet.size() > 0)) {
+				System.out.println("Inserting " + personsSet.size() + " elements to the DB");
+				DBManager.getInstance().insertPersonsSetToDB(personsSet);
+				totalElementsNum += personsSet.size();
+			}
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
 		} else
@@ -429,29 +334,109 @@ public class DataImporter {
 		return totalElementsNum;
 	}
 	
-	public void TESTcreateTempFields() {
-		DBManager.getInstance().TESTcreateTempFields();
+	public void importPersonsAndCredits() {
+		
+		int[] personIndexNextMarkStart = new int[5]; 
+		
+		// creating the temporary fields in PERSONS needed for the import
+		createTempFields();
+		
+		System.out.println("==========================================================");
+		// adding the different persons from all the different lists
+		personIndexNextMarkStart[0] = 1;
+		personIndexNextMarkStart[1] = personIndexNextMarkStart[0] + getPersons(ListFilesEnum.ACTORS);
+		personIndexNextMarkStart[2] = personIndexNextMarkStart[1] + getPersons(ListFilesEnum.ACTRESSES);
+		personIndexNextMarkStart[3] = personIndexNextMarkStart[2] + getPersons(ListFilesEnum.DIRECTORS);
+		personIndexNextMarkStart[4] = personIndexNextMarkStart[3] + getPersons(ListFilesEnum.PRODUCERS);
+		getPersons(ListFilesEnum.WRITERS);
+		
+		// entering a tempPersonID for the persons, exactly as their personID
+		preparePersonsTempFields();
+		findAndUpdateDuplicates();
+		
+		getPersonMovieCredits(ListFilesEnum.ACTORS, personIndexNextMarkStart[0]);
+		getPersonMovieCredits(ListFilesEnum.ACTRESSES, personIndexNextMarkStart[1]);
+		getPersonMovieCredits(ListFilesEnum.DIRECTORS, personIndexNextMarkStart[2]);
+		getPersonMovieCredits(ListFilesEnum.PRODUCERS, personIndexNextMarkStart[3]);
+		getPersonMovieCredits(ListFilesEnum.WRITERS, personIndexNextMarkStart[4]);
+		
+		// removing the records in the PRESONS table marked as duplicates
+		removeDuplicates();
+		deletePersonsTempFields();
 	}
 	
-	public void TESTaddTempIdForPersons() {
-		DBManager.getInstance().TESTinsertTempIdForPersons();
+	
+	/**
+	 * creates 3 fields needed for the import in the PERSONS table:
+	 * TEMP_PERSON_ID, TEMP_PERSON_LINE_NUMBER & TEMP_IS_DUPLICATE
+	 */
+	private void createTempFields() {
+
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s CHAR(1)",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
 	
-	public void TESTmarkAllPersonsNotToDelete() {
-		DBManager.getInstance().TESTmarkAllPersonsNotToDelete();
+	/**
+	 * prepares the temporary fields for the import
+	 * - copy the PERSON_ID to the TEMP_PERSON_ID
+	 * - mark the IS_DUPLICATE field as 'N'
+	 */
+	private void preparePersonsTempFields() {
+		
+		// copy the PERSON_ID to the TEMP_PERSON_ID
+		DBManager.getInstance().executeSQL(String.format("UPDATE %s SET %s = %s",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName(),
+														DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+		// mark the TO_DELETE field as 'N'
+		DBManager.getInstance().executeSQL(String.format("UPDATE %s SET %s = 'N'",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
 	
-	public void TESTfindAndUpdateDuplicates() {
-		DBManager.getInstance().TESTfindAndUpdateDuplicates();
+	private void findAndUpdateDuplicates() {
+		DBManager.getInstance().findAndUpdateDuplicates();
 	}
 	
-	public void TESTRemoveDuplicates() {
-		DBManager.getInstance().TESTRemoveDuplicates();
+	/**
+	 * removes the records that are duplicates and aren't needed
+	 */
+	private void removeDuplicates() {
+	
+		// removing the records that are marked as duplicates and aren't needed
+		DBManager.getInstance().executeSQL(String.format("DELETE FROM %s WHERE %s = 'Y'",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
 
-	public void TESTdeleteTempFields() {
-		DBManager.getInstance().TESTdeleteTempFields();
+	/**
+	 * TEMP_PERSON_ID, TEMP_PERSON_LINE_NUMBER & TEMP_IS_DUPLICATE
+	 * removes the temporary fields that were used for the import in the PERSONS table:
+	 */
+	private void deletePersonsTempFields() {
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
 	}
+	
 	public void runOverResultSet(ResultSet moviesResultSet) {
 		Map<String, Integer> moviesMap;
 		Map<String, Integer> languagesMap = new HashMap<String, Integer>();
@@ -721,30 +706,25 @@ public class DataImporter {
 		
 		switch (listType) {
 		case ACTORS:
-			System.out.println("");
-			System.out.println("entering movie credits of ACTORS");
 		case ACTRESSES:
-			System.out.println("entering movie credits of ACTRESSES");
+			System.out.println("entering movie credits of ACTORS / ACTRESSES");
 			patternRegExp = actorsMoviesPattern;
 			isActor = true;
 			productionRoleId = 1;
 			break;
 		case PRODUCERS:
-			System.out.println("");
 			System.out.println("entering movie credits of PRODUCERS");
-			patternRegExp = directorsMoviesPattern;
+			patternRegExp = nonActorsMoviesPattern;
 			productionRoleId = 2;
 			break;
 		case DIRECTORS:
-			System.out.println("");
 			System.out.println("entering movie credits of DIRECTORS");
-			patternRegExp = directorsMoviesPattern;
+			patternRegExp = nonActorsMoviesPattern;
 			productionRoleId = 3;
 			break;
 		case WRITERS:
-			System.out.println("");
 			System.out.println("entering movie credits of WRITERS");
-			patternRegExp = directorsMoviesPattern;
+			patternRegExp = nonActorsMoviesPattern;
 			productionRoleId = 4;
 			break;
 		}
