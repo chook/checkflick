@@ -139,8 +139,9 @@ public class SampleRibbonClass {
 	protected static void updatePersonTab(final PersonEntity person){
 		display.asyncExec(new Runnable() {
 			public void run() {
+				String tabName = person.getName().substring(0, Math.min(person.getName().length(), 8));
 				final RibbonTabFolder tabs = shell.getRibbonTabFolder();
-				personTab = new RibbonTab(tabs, "Person");
+				personTab = new RibbonTab(tabs, tabName);
 				ShowPersonResult(personTab, person);
 				tabs.selectTab(personTab);
 				resultsPersonTable.setVisible(false);
