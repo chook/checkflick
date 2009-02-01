@@ -2624,7 +2624,7 @@ public class CheckFlickGUI {
 				if (combo.getText()!=""){
 					AbsType t = new Relation(id, Integer.parseInt(getID(finalList, combo.getText())));
 					try {
-						//insetring
+						//inserting
 						pool.execute(DataManager.insertMovieData(type, t , true));
 						shell.getShell().setEnabled(true);	
 						addToMovie.close();
