@@ -451,17 +451,11 @@ public class DBManager {
 		case GENRES:
 			query += DBTablesEnum.GENRES + " ORDER BY " + DBFieldsEnum.GENRES_GENRE_NAME;
 			break;
-		case COLOR_INFOS:
-			query += DBTablesEnum.COLOR_INFO + " ORDER BY " + DBFieldsEnum.COLOR_INFO_COLOR_INFO_TEXT;
-			break;
 		case LANGUAGES:
 			query += DBTablesEnum.LANGUAGES + " ORDER BY " + DBFieldsEnum.LANGUAGES_LANGUAGE_NAME;
 			break;
 		case PRODUCTION_ROLES:
 			query += DBTablesEnum.PRODUCTION_ROLES + " ORDER BY " + DBFieldsEnum.PRODUCTION_ROLES_PRODUCTION_ROLE_NAME;
-			break;
-		case CONNECTION_RELATIONS:
-			query += DBTablesEnum.CONNECTIONS_RELATIONS + " ORDER BY " + DBFieldsEnum.CONNECTIONS_RELATIONS_CONNECTION_RELATION_NAME;
 			break;
 		case COUNTRIES:
 			query += DBTablesEnum.COUNTRIES + " ORDER BY " + DBFieldsEnum.COUNTRIES_COUNTRY_NAME;
@@ -523,24 +517,13 @@ public class DBManager {
 		AbsFilter filter = filters.getMovieDataFilter(data, id);
 		List<AbsType> list = null;
 		switch(data) {
-		case MOVIE_AKAS:
-			list = getAbsDataType(EntityEnum.GEO_ENTITY, filter);
-			break;
 		case MOVIE_GENRES:
 		case MOVIE_LANGUAGES:
 		case MOVIE_COUNTRIES:
 			list = getAbsDataType(EntityEnum.RELATION, filter);
 			break;
-		case MOVIE_CRAZY_CREDITS:
-		case MOVIE_TRIVIA:
 		case MOVIE_QUOTES:
 			list = getAbsDataType(EntityEnum.NAMED_ENTITY, filter);
-			break;
-		case MOVIE_GOOFS:
-			list = getAbsDataType(EntityEnum.NAMED_RELATION, filter);
-			break;
-		case MOVIE_CONNECTIONS:
-			list = getAbsDataType(EntityEnum.CATEGORIZED_RELATION, filter);
 			break;
 		case MOVIE_CAST:
 			list = getAbsDataType(EntityEnum.NAMED_CASTING_RELATION, filter);
@@ -630,8 +613,6 @@ public class DBManager {
 		EntityEnum entity = null;
 		switch(dataType) {
 		case MOVIE_QUOTES:
-		case MOVIE_CRAZY_CREDITS:
-		case MOVIE_TRIVIA:
 			entity = EntityEnum.NAMED_ENTITY;
 			break;
 		case MOVIE_CAST:
@@ -639,15 +620,6 @@ public class DBManager {
 			break;
 		case MOVIE:
 			entity = EntityEnum.MOVIE_ENTITY;
-			break;
-		case MOVIE_AKAS:
-			entity = EntityEnum.GEO_ENTITY;
-			break;
-		case MOVIE_CONNECTIONS:
-			entity = EntityEnum.CATEGORIZED_RELATION;
-			break;
-		case MOVIE_GOOFS:
-			entity = EntityEnum.NAMED_RELATION;
 			break;
 		case MOVIE_LANGUAGES:
 		case MOVIE_GENRES:
@@ -780,7 +752,7 @@ public class DBManager {
 				pstmt.setInt(2, setMovie.getYear());
 				pstmt.setString(3, setMovie.getRomanNotation());
 				pstmt.setString(4, setMovie.getMadeFor());
-				pstmt.setString(5, setMovie.getTaglines());
+				pstmt.setString(5, setMovie.getFullMovieName());
 				pstmt.addBatch();
 			}
 		} catch (SQLException e) {
@@ -1069,7 +1041,7 @@ public class DBManager {
 			movie.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName()));
 			movie.setColorInfo(set.getInt(DBFieldsEnum.MOVIES_MOVIE_COLOR_INFO_ID.getFieldName()));
 			movie.setRunningTime(set.getInt(DBFieldsEnum.MOVIES_MOVIE_RUNNING_TIME.getFieldName()));
-			movie.setTaglines(set.getString(DBFieldsEnum.MOVIES_MOVIE_TAGLINE.getFieldName()));
+			movie.setFullMovieName(set.getString(DBFieldsEnum.MOVIES_MOVIE_TAGLINE.getFieldName()));
 			movie.setPlot(set.getString(DBFieldsEnum.MOVIES_MOVIE_PLOT_TEXT.getFieldName()));
 			movie.setFilmingLocations(set
 					.getString(DBFieldsEnum.MOVIES_MOVIE_FILMING_LOCATION_NAME.getFieldName()));
@@ -1098,17 +1070,10 @@ public class DBManager {
 			person = new PersonEntity(); 
 			person.setId(set.getInt(DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 			person.setName(set.getString(DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName()));
-			person.setPersonRealName(set.getString(DBFieldsEnum.PERSONS_REAL_NAME.getFieldName()));
-			person.setPersonNickNames(set.getString(DBFieldsEnum.PERSONS_NICKNAMES.getFieldName()));
-			person.setDateOfBirth(set.getDate(DBFieldsEnum.PERSONS_DATE_OF_BIRTH.getFieldName()));
 			person.setYearOfBirth(set.getInt(DBFieldsEnum.PERSONS_YEAR_OF_BIRTH.getFieldName()));
 			person.setCityOfBirth(set.getString(DBFieldsEnum.PERSONS_CITY_OF_BIRTH.getFieldName()));
 			person.setCountryOfBirth(set.getInt(DBFieldsEnum.PERSONS_COUNTRY_OF_BIRTH_ID.getFieldName()));
-			person.setDateOfDeath(set.getDate(DBFieldsEnum.PERSONS_DATE_OF_DEATH.getFieldName()));
 			person.setYearOfDeath(set.getInt(DBFieldsEnum.PERSONS_YEAR_OF_DEATH.getFieldName()));
-			person.setHeight(set.getInt(DBFieldsEnum.PERSONS_HEIGHT.getFieldName()));
-			person.setTrademark(set.getString(DBFieldsEnum.PERSONS_TRADEMARK.getFieldName()));
-			person.setBiography(set.getString(DBFieldsEnum.PERSONS_BIOGRAPHY_TEXT.getFieldName()));
 		} catch (SQLException e) {
 			System.out.println("SQLException error");
 			return null;

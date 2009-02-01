@@ -13,7 +13,7 @@ public class MovieEntity extends NamedEntity {
 	private String madeFor;
 	private int colorInfo;
 	private int runningTime;
-	private String taglines;
+	private String fullMovieName;
 	private String plot;
 	private String filmingLocations;
 
@@ -110,16 +110,16 @@ public class MovieEntity extends NamedEntity {
 	/**
 	 * @return the taglines
 	 */
-	public String getTaglines() {
-		return taglines;
+	public String getFullMovieName() {
+		return fullMovieName;
 	}
 
 	/**
-	 * @param taglines
-	 *            the taglines to set
+	 * @param fullMovieName
+	 *            the full movie name to set
 	 */
-	public void setTaglines(String taglines) {
-		this.taglines = taglines;
+	public void setFullMovieName(String fullMovieName) {
+		this.fullMovieName = fullMovieName;
 	}
 
 	/**
@@ -160,12 +160,12 @@ public class MovieEntity extends NamedEntity {
 	 * @param year
 	 * @param colorInfo
 	 * @param runningTime
-	 * @param taglines
+	 * @param fullMovieNames
 	 * @param plot
 	 * @param filmingLocations
 	 */
 	public MovieEntity(int id, String name, int year, String romanNotation, String madeFor, int colorInfo, int runningTime,
-			String taglines, String plot, String filmingLocations) {
+			String fullMovieNames, String plot, String filmingLocations) {
 		super(id, name);
 
 		this.year = year;
@@ -173,7 +173,7 @@ public class MovieEntity extends NamedEntity {
 		this.madeFor = madeFor;
 		this.colorInfo = colorInfo;
 		this.runningTime = runningTime;
-		this.taglines = taglines;
+		this.fullMovieName = fullMovieNames;
 		this.plot = plot;
 		this.filmingLocations = filmingLocations;
 	}
@@ -214,7 +214,7 @@ public class MovieEntity extends NamedEntity {
 		list.add(String.valueOf(getYear()));
 		list.add(String.valueOf(getColorInfo()));
 		list.add(String.valueOf(getRunningTime()));
-		list.add(getTaglines());
+		list.add(getFullMovieName());
 		list.add(getPlot());
 		list.add(getFilmingLocations());
 		return list;
