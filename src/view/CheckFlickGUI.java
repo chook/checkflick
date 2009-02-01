@@ -2,7 +2,6 @@ package view;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.swt.SWT;
@@ -253,7 +252,6 @@ public class CheckFlickGUI {
 										try {
 											pool.execute(DataManager.deletePersonEntity(type, del , personId));
 										} catch (InterruptedException ev) {
-											// TODO Auto-generated catch block
 											ev.printStackTrace();
 										}
 		
@@ -438,7 +436,6 @@ public class CheckFlickGUI {
 										try {
 											pool.execute(DataManager.deleteMovieEntity(type, del , movieId));
 										} catch (InterruptedException ev) {
-											// TODO Auto-generated catch block
 											ev.printStackTrace();
 										}
 									}
@@ -450,7 +447,6 @@ public class CheckFlickGUI {
 										try {
 											pool.execute(DataManager.deleteMovieEntity(type, del , movieId));
 										} catch (InterruptedException ev) {
-											// TODO Auto-generated catch block
 											ev.printStackTrace();
 										}
 									}
@@ -461,7 +457,6 @@ public class CheckFlickGUI {
 										try {
 											pool.execute(DataManager.deleteMovieEntity(type, del , movieId));
 										} catch (InterruptedException ev) {
-											// TODO Auto-generated catch block
 											ev.printStackTrace();
 										}
 									}
@@ -635,8 +630,6 @@ public class CheckFlickGUI {
 					entityDetails.dispose();
 				if ((bar!=null)&& !(bar.isDisposed()))
 					bar.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
 				searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
 				searchByMovie.setBackground(shell.getShell().getBackground());
 				searchByMovie(searchByMovie);
@@ -669,8 +662,6 @@ public class CheckFlickGUI {
 					entityDetails.dispose();
 				if ((bar!=null)&& !(bar.isDisposed()))
 					bar.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
 				searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
 				searchByPerson.setBackground(shell.getShell().getBackground());
 				searchByPerson(searchByPerson);
@@ -702,8 +693,6 @@ public class CheckFlickGUI {
 					entityDetails.dispose();
 				if ((bar!=null)&& !(bar.isDisposed()))
 					bar.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
 				insertMovie = new Composite(shell.getShell(),SWT.BORDER);
 				insertMovie.setBackground(shell.getShell().getBackground());
 				insertMovie(insertMovie);
@@ -735,8 +724,6 @@ public class CheckFlickGUI {
 					entityDetails.dispose();
 				if ((bar!=null)&& !(bar.isDisposed()))
 					bar.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
 				insertPerson = new Composite(shell.getShell(),SWT.BORDER);
 				insertPerson.setBackground(shell.getShell().getBackground());
 				insertPerson(insertPerson);
@@ -768,8 +755,6 @@ public class CheckFlickGUI {
 					entityDetails.dispose();
 				if ((bar!=null)&& !(bar.isDisposed()))
 					bar.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
 				try {
 					openImportMessage(importLabel ,closeImportButton);
 					pool.execute(DataManager.importIntoDb(AppData.getInstance().getImportFolder()));
@@ -1169,7 +1154,6 @@ public class CheckFlickGUI {
 		try {
 			pool.execute(DataManager.getPersonData(type, id));
 		} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1177,7 +1161,6 @@ public class CheckFlickGUI {
 		try {
 			pool.execute(DataManager.getMovieData(type, id));
 		} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -1267,7 +1250,6 @@ public class CheckFlickGUI {
 						try {
 							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE, movie , false));
 						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
@@ -1381,7 +1363,6 @@ public class CheckFlickGUI {
 						try {
 							pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON, person , false));
 						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
@@ -1579,7 +1560,6 @@ public class CheckFlickGUI {
 					try {
 						pool.execute(DataManager.updatePersonData(PersonDataEnum.PERSON, person));
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -1637,7 +1617,6 @@ public class CheckFlickGUI {
 						tabList.remove(current.getIndex());
 		                shell.getRibbonTabFolder().redraw();
 					} catch (InterruptedException ev) {
-						// TODO Auto-generated catch block
 						ev.printStackTrace();
 					}
 				}
@@ -1820,7 +1799,6 @@ public class CheckFlickGUI {
 					try {
 						pool.execute(DataManager.updateMovieData(MovieDataEnum.MOVIE, movie));
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -1872,7 +1850,6 @@ public class CheckFlickGUI {
 						tabList.remove(current.getIndex());
 		                shell.getRibbonTabFolder().redraw();
 					} catch (InterruptedException ev) {
-						// TODO Auto-generated catch block
 						ev.printStackTrace();
 					}
 				}
@@ -1950,15 +1927,14 @@ public class CheckFlickGUI {
 									try {
 										pool.execute(DataManager.getMovieById(id));
 									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
 								}
 							}
 						}
 					});
-					resultsMovieTable.setLocation(2,  145+ shell.getShell().getSize().y/4);
-					resultsMovieTable.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y/2);
+					resultsMovieTable.setLocation(2,  145+ shell.getShell().getSize().y/3);
+					resultsMovieTable.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y/3);
 				}
 				else{ // if there were no results
 					okMessageBox("No results. Please change your choises and try again.");
@@ -2011,15 +1987,14 @@ public class CheckFlickGUI {
 									try {
 										pool.execute(DataManager.getPersonById(id));
 									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
 								}
 							}
 						}
 					});
-					resultsPersonTable.setLocation(2,  145+ shell.getShell().getSize().y/4);
-					resultsPersonTable.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y/2);
+					resultsPersonTable.setLocation(2,  145+ shell.getShell().getSize().y/3);
+					resultsPersonTable.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y/3);
 				}
 				else{ // if there were no results
 					switch(okMessageBox("No results. Please change your choises and try again.")){
