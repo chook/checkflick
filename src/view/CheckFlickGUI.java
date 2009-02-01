@@ -2510,6 +2510,7 @@ public class CheckFlickGUI {
 		Button close = new Button(addToMovie, SWT.PUSH);
 		close.setText("Close");
 		close.setBackground(bgColor);
+		//listen to add button
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2520,6 +2521,7 @@ public class CheckFlickGUI {
 						List<AbsFilter> list = new ArrayList<AbsFilter>();
 						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, text.getText()));
 						try {
+							//adding cast
 							pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list , id , true));
 							shell.getShell().setEnabled(true);	
 							addToMovie.close();
@@ -2530,6 +2532,7 @@ public class CheckFlickGUI {
 					else{
 						AbsType t = new NamedEntity(id, text.getText());
 						try {
+							//adding others
 							pool.execute(DataManager.insertMovieData(type, t , true));
 							shell.getShell().setEnabled(true);	
 							addToMovie.close();
@@ -2539,10 +2542,12 @@ public class CheckFlickGUI {
 					}
 				}
 				else{
+					//nothing was written
 					okMessageBox("Please insert information to add.");
 				}
 			}
 		});
+		//listen to close
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2551,6 +2556,7 @@ public class CheckFlickGUI {
 				addToMovie.close();
 			}
 		});
+		//listen to the X button
 		addToMovie.addDisposeListener( new DisposeListener(){
 			public void widgetDisposed(DisposeEvent e) {
 				shell.getShell().setEnabled(true);
@@ -2563,8 +2569,7 @@ public class CheckFlickGUI {
 	 * Open a new window that adds extra data to a movie that is from tables
 	 */
 	static protected void openMovieAddFromListWindow(final MovieDataEnum type , final int id){
-		shell.getShell().setEnabled(false);
-		//final RibbonShell personResults = new RibbonShell(display);	
+		shell.getShell().setEnabled(false);	
 		final Shell addToMovie = new Shell(SWT.CLOSE);
 		Color bgColor = new Color(display , 177 ,200 , 231);
 		addToMovie.setBackground(bgColor);
@@ -2610,6 +2615,7 @@ public class CheckFlickGUI {
 		Button close = new Button(addToMovie, SWT.PUSH);
 		close.setText("Close");
 		close.setBackground(bgColor);
+		//listen to add button
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2618,6 +2624,7 @@ public class CheckFlickGUI {
 				if (combo.getText()!=""){
 					AbsType t = new Relation(id, Integer.parseInt(getID(finalList, combo.getText())));
 					try {
+						//insetring
 						pool.execute(DataManager.insertMovieData(type, t , true));
 						shell.getShell().setEnabled(true);	
 						addToMovie.close();
@@ -2626,10 +2633,12 @@ public class CheckFlickGUI {
 					}
 				}
 				else{
+					//nothing was written
 					okMessageBox("Please insert information to add.");
 				}
 			}
 		});
+		//listen to the close button
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2638,6 +2647,7 @@ public class CheckFlickGUI {
 				addToMovie.close();
 			}
 		});
+		//listen to the X button
 		addToMovie.addDisposeListener( new DisposeListener(){
 			public void widgetDisposed(DisposeEvent e) {
 				shell.getShell().setEnabled(true);
@@ -2645,6 +2655,10 @@ public class CheckFlickGUI {
 		});
 		addToMovie.open();
 	}
+	
+	/**
+	 * Open a new window that say that the program is importing
+	 */
 	static protected void openImportMessage(Label label , Button close){
 		shell.getShell().setEnabled(false);
 		final Shell importShell = new Shell(SWT.CLOSE);
@@ -2663,11 +2677,10 @@ public class CheckFlickGUI {
 		gridData.horizontalAlignment = GridData.CENTER;
 		gridData.horizontalSpan = 2;
 		label.setLayoutData(gridData);
-		Label empty = new Label(importShell, SWT.NONE);
-		empty.setBackground(bgColor);
 		Button cancel =  new Button(importShell, SWT.PUSH);
 		cancel.setText("Cancel");
 		cancel.setBackground(bgColor);
+		//listen to the cancel button
 		cancel.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2690,6 +2703,7 @@ public class CheckFlickGUI {
 		close.setText("Close");
 		close.setBackground(bgColor);
 		close.setVisible(false);
+		//listen to the close button. it will be visible when the import is finished
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2698,6 +2712,7 @@ public class CheckFlickGUI {
 				importShell.close();
 			}
 		});
+		//listen to the X button
 		importShell.addDisposeListener( new DisposeListener(){
 			public void widgetDisposed(DisposeEvent e) {
 				shell.getShell().setEnabled(true);
@@ -2705,6 +2720,10 @@ public class CheckFlickGUI {
 		});
 		importShell.open();
 	}
+	
+	/**
+	 * Redrawing the person table in the extra data buttons after changes (insert/delete)
+	 */
 	static protected void redrawPersonTable(final int id ,final PersonDataEnum type){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2712,6 +2731,10 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * Redrawing the person movie table in the extra data buttons after changes (insert/delete)
+	 */
 	static protected void redrawMovieTable(final int id ,final MovieDataEnum type){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2720,6 +2743,9 @@ public class CheckFlickGUI {
 		});
 	}
 
+	/**
+	 * Showing message after inserting data
+	 */
 	static protected void drawInsertDataSuccess(final boolean ok) {
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2730,6 +2756,10 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * Showing message after updating data
+	 */
 	static protected void drawUpdateDataSuccess(final boolean ok) {
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2740,6 +2770,10 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * Showing message after deleting data
+	 */
 	static protected void drawDeleteDataFailure(final boolean result) {
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2748,6 +2782,12 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * After the import is done, changing the text in the opened window
+	 * that says if the import was successful or not
+	 * Changing the close button to be visible
+	 */
 	static protected void handleFinishImport(final boolean result){
 		display.asyncExec(new Runnable() {
 			public void run() {
