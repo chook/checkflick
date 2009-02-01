@@ -52,12 +52,7 @@ public class DBManager {
 	private static String LIMIT_RESULTS_PSTMT = "SELECT * FROM (SELECT bottomLimitTable.*, ROWNUM topLimit FROM (%s) bottomLimitTable WHERE ROWNUM <= %d) WHERE topLimit >= %d";
 	// used strings - not to delete
 	
-	private static String INSERT_SINGLE_DATATYPE = "INSERT INTO %s (%s) VALUES (?)";
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
-	
-	
-	private static String INSERT_MOVIE_LANGUAGES_TEST = "INSERT INTO %s (%s, %s) VALUES ((%s), (%s))";
-	private static String SELECT_GENERIC_DISTINCT = "SELECT DISTINCT %s FROM %s WHERE %s = ?";
 	
 	// Singleton instance
 	private static DBManager instance = null;
@@ -432,17 +427,16 @@ public class DBManager {
 	 * @return a list of named entities
 	 */
 	public static List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum entity) {
-		Connection c = pool.getConnection();
 		List<NamedEntity> list = new ArrayList<NamedEntity>();
 		Statement s;
 		ResultSet set;
 		String query = "SELECT * FROM ";
+		Connection c = pool.getConnection();
 		
 		// Trying to get a connection statement
 		try {
 			s = c.createStatement();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -655,9 +649,9 @@ public class DBManager {
 		Connection conn = pool.getConnection();
 		String statementStr;
 		statementStr = String.format(INSERT_MOVIE_SINGLE_DATATYPE, 
-										DBTablesEnum.MOVIE_LANGUAGES.getTableName(), 
-										DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
-										DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName());
+										table.getTableName(), 
+										field1.getFieldName(),
+										field2.getFieldName());
 
 		try {
 			pstmt = conn.prepareStatement(statementStr);
@@ -676,48 +670,6 @@ public class DBManager {
 		return bReturn;
 	}
 	
-	public boolean insertMovieLanguagesToDB(String[][] testArray, int stringArrayCount) {
-
-		PreparedStatement pstmt = null;
-		boolean bReturn = false;
-		Connection conn = pool.getConnection();
-		String statementStr, firstSelectForId, secondSelectForId;
-		
-		firstSelectForId = String.format(SELECT_GENERIC_DISTINCT,
-				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName(),
-				DBTablesEnum.MOVIES.getTableName(),
-				DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName());
-		secondSelectForId = String.format(SELECT_GENERIC_DISTINCT,
-				DBFieldsEnum.LANGUAGES_LANGUAGE_ID.getFieldName(),
-				DBTablesEnum.LANGUAGES.getTableName(),
-				DBFieldsEnum.LANGUAGES_LANGUAGE_NAME.getFieldName());
-		statementStr = String.format(INSERT_MOVIE_LANGUAGES_TEST, 
-				DBTablesEnum.MOVIE_LANGUAGES.getTableName(), 
-				DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
-				DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName(),
-				firstSelectForId,
-				secondSelectForId);
-		try {
-			pstmt = conn.prepareStatement(statementStr);
-
-			for (int i = 0; i < stringArrayCount; ++i) {
-
-//				System.out.println("SQL to be executed:");
-//				System.out.println(statementStr);
-				pstmt.setString(1, testArray[0][i]);
-				pstmt.setString(2, testArray[1][i]);
-				pstmt.addBatch();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("problematic SQL is:");
-			System.out.println(statementStr);
-		}
-		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
-		
-		return bReturn;
-	}
 	
 	/**
 	 * This function receives a set of values, and a definition of a table, and
@@ -819,36 +771,6 @@ public class DBManager {
 					pstmt.setString(4, "N");						
 				pstmt.setString(5, setRelation.getActorRole());
 				pstmt.setInt(6, setRelation.getActorCreditRank());
-				pstmt.addBatch();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
-		return bReturn;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param set
-	 * @return
-	 */
-	public boolean insertNamedEntitySetToDB(Set<NamedEntity> set) {
-
-		PreparedStatement pstmt = null;
-		boolean bReturn = false;
-		Connection conn = pool.getConnection();
-		String statementStr;
-		statementStr = String.format(INSERT_SINGLE_DATATYPE, 
-										DBTablesEnum.PERSONS.getTableName(), 
-										DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName());
-		try {
-			pstmt = conn.prepareStatement(statementStr);
-
-			for (NamedEntity setEntity : set) {
-				pstmt.setString(1, setEntity.getName());
 				pstmt.addBatch();
 			}
 		} catch (SQLException e) {
@@ -982,35 +904,15 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return arlSearchResults;
 	}
-
-	/**
-	 * executes the executePreparedStatement
-	 */
-	private boolean executePreparedStatement(PreparedStatement pstmt) {
-		int result;
-
-		try {
-			result = pstmt.executeUpdate();
-
-			// closing
-			pstmt.close();
-		} catch (SQLException e) {
-			System.out.println("ERROR executeUpdate - " + e.toString());
-			java.lang.System.exit(0);
-			return false;
-		}
-		return (result == 0);
-	}
 	
 	/**
 	 * executes the executePreparedStatementBatch TODO: check the return values
 	 * of the executeBatch method (Nadav 23/01/09 0:30am)
 	 */
 	private boolean executePreparedStatementBatch(PreparedStatement pstmt) {
-		int[] result;
 
 		try {
-			result = pstmt.executeBatch();
+			pstmt.executeBatch();
 
 			// closing
 			pstmt.close();
