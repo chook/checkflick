@@ -73,7 +73,6 @@ public class CheckFlickGUI {
 	static ExpandBar bar;
 	static ExpandItem otherResults;
 	static AppData settings = null; 
-//	static Color bgColor = new Color(display , 117 ,141 , 204);
 	public static void main(String args []) {
 		AppData.getInstance().parseINIFile("ini\\checkflick.ini");
 		pool = new ThreadPool(AppData.getInstance().getMaxThreads());
@@ -533,24 +532,15 @@ public class CheckFlickGUI {
 					langList = list;
 					break;
 				}
-				/*genresList = dm.getAllNamedEntities(NamedEntitiesEnum.GENRES);
-				colorList = dm.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS);
-				langList = dm.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES);
-				rolesList =dm.getAllNamedEntities(NamedEntitiesEnum.PRODUCTION_ROLES);
-				countriesList = dm.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES);*/
 			}
 		});
 	}
 	
 	private void createShell() {
 		shell = new RibbonShell(display);
-		shell.setButtonImage(ImageCache.getImage("selection_recycle_24.png"));
-		//Shell shell = new Shell(display);
 		shell.setText("DB Project, TAU 2009");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
 		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
-		//shell.setMaximized(true);
-		//shell.setSize(570, 550);
 		
 		shell.getShell().setMinimumSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
 		//closing the program.
@@ -566,51 +556,24 @@ public class CheckFlickGUI {
     			pool.stopRequestAllWorkers();
 			}
 		});
-//		QuickAccessShellToolbar mtb = shell.getToolbar();
-//		RibbonButton mtbtb1 = new RibbonButton(mtb, ImageCache.getImage("gear_ok_16.gif"), null, SWT.NONE);
-//		RibbonButton mtbtb2 = new RibbonButton(mtb, ImageCache.getImage("gantt_16.gif"), null, SWT.NONE);
-	//	shell.setBigButtonTooltip(new RibbonTooltip("Big", "I'm the tooltip for the big button"));
-	//	mtb.setArrowTooltip(new RibbonTooltip("Oh", "Jeez"));
-		
-//		Menu shellMenu = shell.getBigButtonMenu();
-//		MenuItem btest = new MenuItem(shellMenu, SWT.POP_UP);
-//		btest.setText("Testing a menu");
-		
-//		shell.addBigButtonListener(new SelectionListener() {
 
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//			}
-
-//			public void widgetSelected(SelectionEvent e) {
-//				System.err.println("Clicked big button");
-//				shell.showBigButtonMenu();
-//			}
-			
-//		});		
-		//getting the lists from the DB
-		//DataManager dm = DataManager.getInstance();
-		
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
-		
-		tabs.setHelpImage(ImageCache.getImage("questionmark.gif"));
-		tabs.getHelpButton().setToolTip(new RibbonTooltip("Title", "Get Help Using Whatever This Is"));
-		
+			
 		// Tabs
 		RibbonTab searchTab = new RibbonTab(tabs, "Search");
 		RibbonTab insertTab = new RibbonTab(tabs, "Insert");	
-		//RibbonTab triviaTab = new RibbonTab(tabs, "Trivia");
 		
-		// Tooltip
-		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
-	
-		// Groups
+		// Tooltips
+		RibbonTooltip searchToolTip = new RibbonTooltip("Search For", "Please click on one of the buttons to search."); 
+		RibbonTooltip insertToolTip = new RibbonTooltip("Insert", "Please click on one of the buttons to insert movie/person."); 
+		RibbonTooltip importToolTip = new RibbonTooltip("Import The Database", "Please click the button to import.\n \\bWARNING: this could take a while."); 
 
 		// Search tab
-		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , toolTip);
-		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , searchToolTip);
+		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(searching);
-		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
 		
 		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
 		searchByMovie.setBackground(shell.getShell().getBackground());
@@ -618,7 +581,6 @@ public class CheckFlickGUI {
 		searchByMovie.setVisible(false);
 		
 		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
-		//searchByPerson.setSize((shell.getShell().getSize().x)-5,(shell.getShell().getSize().y)/4);
 		searchByPerson.setBackground(shell.getShell().getBackground());
 		searchByPerson.setVisible(false);
 		
@@ -640,21 +602,17 @@ public class CheckFlickGUI {
 		insertPerson.setLocation(2, 145);
 		insertPerson.setVisible(false);
 		
-		// listeners for the buttons in the search tab
-		
 		// The Insert Tab
 		// Insert Tab
-		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , toolTip);
+		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , insertToolTip);
 		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(inserting);
 		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
-		RibbonGroup importing = new RibbonGroup(insertTab, "Import", toolTip);
+		RibbonGroup importing = new RibbonGroup(insertTab, "Import", importToolTip);
 		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", RibbonButton.STYLE_TWO_LINE_TEXT);
-
 		
 		ButtonSelectGroup group = new ButtonSelectGroup();
-		
-	
+			
 		movieInsert.setButtonSelectGroup(group);
 		personInsert.setButtonSelectGroup(group);
 		movieSearch.setButtonSelectGroup(group);
@@ -673,6 +631,20 @@ public class CheckFlickGUI {
 					insertMovie.dispose();
 				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
 					insertPerson.dispose();
+				if ((movieButtons != null) && !(movieButtons.isDisposed()))
+					movieButtons.dispose();
+				if ((personButtons != null) && !(personButtons.isDisposed()))
+					personButtons.dispose();
+				if ((otherResults != null) && !(otherResults.isDisposed()))
+					otherResults.dispose();
+				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
+					resultsMovieTable.dispose();
+				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
+					resultsPersonTable.dispose();
+				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+					entityDetails.dispose();
+				if ((bar!=null)&& !(bar.isDisposed()))
+					bar.dispose();
 				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
 					entityDetails.dispose();
 				searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
@@ -693,6 +665,20 @@ public class CheckFlickGUI {
 					insertMovie.dispose();
 				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
 					insertPerson.dispose();
+				if ((movieButtons != null) && !(movieButtons.isDisposed()))
+					movieButtons.dispose();
+				if ((personButtons != null) && !(personButtons.isDisposed()))
+					personButtons.dispose();
+				if ((otherResults != null) && !(otherResults.isDisposed()))
+					otherResults.dispose();
+				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
+					resultsMovieTable.dispose();
+				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
+					resultsPersonTable.dispose();
+				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+					entityDetails.dispose();
+				if ((bar!=null)&& !(bar.isDisposed()))
+					bar.dispose();
 				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
 					entityDetails.dispose();
 				searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
@@ -712,12 +698,22 @@ public class CheckFlickGUI {
 					insertMovie.dispose();
 				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
 					insertPerson.dispose();
+				if ((movieButtons != null) && !(movieButtons.isDisposed()))
+					movieButtons.dispose();
+				if ((personButtons != null) && !(personButtons.isDisposed()))
+					personButtons.dispose();
+				if ((otherResults != null) && !(otherResults.isDisposed()))
+					otherResults.dispose();
+				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
+					resultsMovieTable.dispose();
+				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
+					resultsPersonTable.dispose();
 				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
 					entityDetails.dispose();
-				if ((resultsMovieTable!= null) && !(resultsMovieTable.isDisposed()))
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!= null) && !(resultsPersonTable.isDisposed()))
-					resultsPersonTable.dispose();
+				if ((bar!=null)&& !(bar.isDisposed()))
+					bar.dispose();
+				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+					entityDetails.dispose();
 				insertMovie = new Composite(shell.getShell(),SWT.BORDER);
 				insertMovie.setBackground(shell.getShell().getBackground());
 				insertMovie(insertMovie);
@@ -735,12 +731,22 @@ public class CheckFlickGUI {
 					insertMovie.dispose();
 				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
 					insertPerson.dispose();
+				if ((movieButtons != null) && !(movieButtons.isDisposed()))
+					movieButtons.dispose();
+				if ((personButtons != null) && !(personButtons.isDisposed()))
+					personButtons.dispose();
+				if ((otherResults != null) && !(otherResults.isDisposed()))
+					otherResults.dispose();
+				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
+					resultsMovieTable.dispose();
+				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
+					resultsPersonTable.dispose();
 				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
 					entityDetails.dispose();
-				if ((resultsMovieTable!= null) && !(resultsMovieTable.isDisposed()))
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!= null) && !(resultsPersonTable.isDisposed()))
-					resultsPersonTable.dispose();
+				if ((bar!=null)&& !(bar.isDisposed()))
+					bar.dispose();
+				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+					entityDetails.dispose();
 				insertPerson = new Composite(shell.getShell(),SWT.BORDER);
 				insertPerson.setBackground(shell.getShell().getBackground());
 				insertPerson(insertPerson);
@@ -888,8 +894,6 @@ public class CheckFlickGUI {
 		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Age Range	From");
-		//label = new Label(composite,SWT.CHECK);
-		//label.setText("From");
 		final Spinner ageFrom = new Spinner (composite, SWT.BORDER);
 		ageFrom.setMinimum(0);
 		ageFrom.setMaximum(100);
@@ -1177,7 +1181,15 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		label.setText("Plot:");
 		final Text plotText = new Text(composite ,SWT.MULTI|SWT.BORDER| SWT.V_SCROLL);
-		label = new Label(composite,SWT.NONE);
+		Button edit = new Button(composite , SWT.PUSH);
+		edit.setText("Edit");
+		edit.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent arg0) {	
+			}
+			public void widgetSelected(SelectionEvent arg0) {
+				openEditWindow(null, plotText);
+			}
+		});
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
@@ -1706,11 +1718,18 @@ public class CheckFlickGUI {
 		final String oldTime = String.valueOf(movie.getRunningTime());
 		label = new Label(composite,SWT.NONE);
 		label.setText("Plot: ");
-		final Text plotText = new Text(composite ,SWT.WRAP|SWT.V_SCROLL);
+		final Text plotText = new Text(composite ,SWT.WRAP|SWT.V_SCROLL|SWT.MULTI);
 		if (movie.getPlot()!= null)
 			plotText.setText(movie.getPlot());
-		plotText.setSize(150, 150);
-		label= new Label(composite, SWT.NONE);
+		Button edit = new Button(composite, SWT.PUSH);
+		edit.setText("Edit");
+		edit.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+			public void widgetSelected(SelectionEvent arg0) {
+				openEditWindow(movie , plotText);
+			}
+		});
 		label= new Label(composite, SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
@@ -2664,6 +2683,58 @@ public class CheckFlickGUI {
 			}			
 		});
 		addToMovie.open();
+	}
+	static protected void openEditWindow(final MovieEntity movie , final Text plot){
+		shell.getShell().setEnabled(false);
+		//final RibbonShell personResults = new RibbonShell(display);	
+		final Shell editPlot = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		editPlot.setBackground(bgColor);
+		editPlot.setLayout(new RowLayout(SWT.WRAP));
+		
+		Rectangle monitor_bounds = editPlot.getShell().getMonitor().getBounds();
+		editPlot.setSize(new Point(monitor_bounds.width/2,200));		
+		editPlot.setText("Edit Plot");		
+		Label label = new Label(editPlot , SWT.NONE);
+		label.setBackground(bgColor);
+		label.setText("Plot");
+		final Text plotText = new Text(editPlot , SWT.V_SCROLL|SWT.WRAP);
+		if (movie!= null && movie.getPlot()!=null)
+			plotText.setText(movie.getPlot());
+		plotText.setSize(100 ,100);
+		Button add = new Button(editPlot, SWT.PUSH);
+		add.setText("Add");
+		add.setBackground(bgColor);
+		Button close = new Button(editPlot, SWT.PUSH);
+		close.setText("Close");
+		close.setBackground(bgColor);
+		add.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				
+				if (plotText.getText()!=""){
+					plot.setText(plotText.getText());
+				}
+				else{
+					okMessageBox("Please insert information to add.");
+				}
+			}
+		});
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);	
+				editPlot.close();
+			}
+		});
+		editPlot.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+			}			
+		});
+		editPlot.open();
 	}
 	static protected void redrawPersonTable(final int id ,final PersonDataEnum type){
 		display.asyncExec(new Runnable() {
