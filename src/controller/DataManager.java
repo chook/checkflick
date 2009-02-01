@@ -181,18 +181,23 @@ public class DataManager {
 	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list ) {
 		return new Runnable() {
 			public void run() {
+				List<DatedEntity> list2 = new ArrayList<DatedEntity>();
+				list2.add(new DatedEntity(1, "maayan", 2009));
+				list2.add(new DatedEntity(2, "chook", 2009));
+				
+				RibbonInterface.drawMovieSearch(list2, entity);
 				System.out.println("About to search for " + entity.toString());
-				switch(entity)
-				{
-					case MOVIES:
-						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity);
-						break;
-					case PERSONS:
-						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity );
-						break;
-					default:
-						break;
-				}
+//				switch(entity)
+//				{
+//					case MOVIES:
+//						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity);
+//						break;
+//					case PERSONS:
+//						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity );
+//						break;
+//					default:
+//						break;
+//				}
 			}
 		};
 	}
@@ -201,17 +206,23 @@ public class DataManager {
 		return new Runnable() {
 			public void run() {
 				System.out.println("About to search for " + entity.toString());
-				switch(entity)
-				{
-					case MOVIES:
-						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity );
-						break;
-					case PERSONS:
-						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity , id , update);
-						break;
-					default:
-						break;
-				}
+				List<DatedEntity> list2 = new ArrayList<DatedEntity>();
+				list2.add(new DatedEntity(1, "maayan", 2009));
+				list2.add(new DatedEntity(2, "chook", 2009));
+				
+				RibbonInterface.drawMovieSearch(list2, entity);
+				return;
+//				switch(entity)
+//				{
+//					case MOVIES:
+//						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity );
+//						break;
+//					case PERSONS:
+//						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity , id , update);
+//						break;
+//					default:
+//						break;
+//				}
 			}
 		};
 	}

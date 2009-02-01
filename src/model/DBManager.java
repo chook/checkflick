@@ -19,13 +19,13 @@ public class DBManager {
 	private static int CONNECTION_MAX_CONNECTIONS = 6;
 	private static int RESULTS_FETCH_SIZE = 1000;
 /** Chen's home server 1	**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-	private static String CONNECTION_USERNAME = "chook";
-	private static String CONNECTION_PASSWORD = "shoochi";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
+//	private static String CONNECTION_USERNAME = "chook";
+//	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "chenhare";
-//	private static String CONNECTION_PASSWORD = "Shoochi0";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "chenhare";
+	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "checkflick";
