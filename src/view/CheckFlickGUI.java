@@ -71,6 +71,7 @@ public class CheckFlickGUI {
 	static AppData settings = null; 
 	static Label importLabel;
 	static Button closeImportButton;
+	
 	public static void main(String args []) {
 		AppData.getInstance().parseINIFile("ini\\checkflick.ini");
 		pool = new ThreadPool(AppData.getInstance().getMaxThreads());
@@ -107,13 +108,6 @@ public class CheckFlickGUI {
 		display.dispose();
 	}
 	
-	public static void updateShellText(final String text) {
-		display.asyncExec(new Runnable() {
-			public void run() {
-				shell.setText(text);		
-			}
-		});
-	}
 	protected static void updateMovieTab(final MovieEntity movie){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -560,32 +554,26 @@ public class CheckFlickGUI {
 		new RibbonGroupSeparator(searching);
 		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
 		
-		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
-		searchByMovie.setBackground(shell.getShell().getBackground());
-		searchByMovie.setLocation(2, 145);
-		searchByMovie.setVisible(false);
-		
-		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
-		searchByPerson.setBackground(shell.getShell().getBackground());
-		searchByPerson.setVisible(false);
-		
-		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE);
-		resultsMovieTable.setVisible(false);
-		resultsMovieTable.setBackground(shell.getShell().getBackground());
-		
-		resultsPersonTable = new Composite(shell.getShell(),SWT.NONE);
-		resultsPersonTable.setBackground(shell.getShell().getBackground());
-		resultsPersonTable.setVisible(false);
-		
-		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
-		insertMovie.setBackground(shell.getShell().getBackground());
-		insertMovie.setLocation(2, 145);
-		insertMovie.setVisible(false);
-		
-		insertPerson = new Composite(shell.getShell(),SWT.BORDER);
-		insertPerson.setBackground(shell.getShell().getBackground());
-		insertPerson.setLocation(2, 145);
-		insertPerson.setVisible(false);
+//		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
+//		searchByMovie.setLocation(2, 145);
+//		searchByMovie.setVisible(false);
+//		
+//		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
+//		searchByPerson.setVisible(false);
+//		
+//		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE);
+//		resultsMovieTable.setVisible(false);
+//		
+//		resultsPersonTable = new Composite(shell.getShell(),SWT.NONE);
+//		resultsPersonTable.setVisible(false);
+//		
+//		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
+//		insertMovie.setLocation(2, 145);
+//		insertMovie.setVisible(false);
+//		
+//		insertPerson = new Composite(shell.getShell(),SWT.BORDER);
+//		insertPerson.setLocation(2, 145);
+//		insertPerson.setVisible(false);
 		
 		// The Insert Tab
 		// Insert Tab
@@ -608,31 +596,7 @@ public class CheckFlickGUI {
 			public void widgetDefaultSelected(SelectionEvent e) {	
 			}
 			public void widgetSelected(SelectionEvent e){
-				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-					searchByMovie.dispose();
-				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-					searchByPerson.dispose();
-				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-					insertMovie.dispose();
-				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-					insertPerson.dispose();
-				if ((movieButtons != null) && !(movieButtons.isDisposed()))
-					movieButtons.dispose();
-				if ((personButtons != null) && !(personButtons.isDisposed()))
-					personButtons.dispose();
-				if ((otherResults != null) && !(otherResults.isDisposed()))
-					otherResults.dispose();
-				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
-					resultsPersonTable.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
-				if ((bar!=null)&& !(bar.isDisposed()))
-					bar.dispose();
-				searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
-				searchByMovie.setBackground(shell.getShell().getBackground());
-				searchByMovie(searchByMovie);
+				searchByMovie();
 			}
 		});
 		
@@ -640,121 +604,28 @@ public class CheckFlickGUI {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-					searchByMovie.dispose();
-				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-					searchByPerson.dispose();
-				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-					insertMovie.dispose();
-				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-					insertPerson.dispose();
-				if ((movieButtons != null) && !(movieButtons.isDisposed()))
-					movieButtons.dispose();
-				if ((personButtons != null) && !(personButtons.isDisposed()))
-					personButtons.dispose();
-				if ((otherResults != null) && !(otherResults.isDisposed()))
-					otherResults.dispose();
-				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
-					resultsPersonTable.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
-				if ((bar!=null)&& !(bar.isDisposed()))
-					bar.dispose();
-				searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
-				searchByPerson.setBackground(shell.getShell().getBackground());
-				searchByPerson(searchByPerson);
+				searchByPerson();
 			}	
 		});
 		movieInsert.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-					searchByMovie.dispose();
-				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-					searchByPerson.dispose();
-				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-					insertMovie.dispose();
-				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-					insertPerson.dispose();
-				if ((movieButtons != null) && !(movieButtons.isDisposed()))
-					movieButtons.dispose();
-				if ((personButtons != null) && !(personButtons.isDisposed()))
-					personButtons.dispose();
-				if ((otherResults != null) && !(otherResults.isDisposed()))
-					otherResults.dispose();
-				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
-					resultsPersonTable.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
-				if ((bar!=null)&& !(bar.isDisposed()))
-					bar.dispose();
-				insertMovie = new Composite(shell.getShell(),SWT.BORDER);
-				insertMovie.setBackground(shell.getShell().getBackground());
-				insertMovie(insertMovie);
+				insertMovie();
 			}	
 		});
 		personInsert.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-					searchByMovie.dispose();
-				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-					searchByPerson.dispose();
-				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-					insertMovie.dispose();
-				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-					insertPerson.dispose();
-				if ((movieButtons != null) && !(movieButtons.isDisposed()))
-					movieButtons.dispose();
-				if ((personButtons != null) && !(personButtons.isDisposed()))
-					personButtons.dispose();
-				if ((otherResults != null) && !(otherResults.isDisposed()))
-					otherResults.dispose();
-				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
-					resultsPersonTable.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
-				if ((bar!=null)&& !(bar.isDisposed()))
-					bar.dispose();
-				insertPerson = new Composite(shell.getShell(),SWT.BORDER);
-				insertPerson.setBackground(shell.getShell().getBackground());
-				insertPerson(insertPerson);
+				insertPerson();
 			}	
 		});
 		importButton.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-					searchByMovie.dispose();
-				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-					searchByPerson.dispose();
-				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-					insertMovie.dispose();
-				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-					insertPerson.dispose();
-				if ((movieButtons != null) && !(movieButtons.isDisposed()))
-					movieButtons.dispose();
-				if ((personButtons != null) && !(personButtons.isDisposed()))
-					personButtons.dispose();
-				if ((otherResults != null) && !(otherResults.isDisposed()))
-					otherResults.dispose();
-				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
-					resultsMovieTable.dispose();
-				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
-					resultsPersonTable.dispose();
-				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-					entityDetails.dispose();
-				if ((bar!=null)&& !(bar.isDisposed()))
-					bar.dispose();
+				cleanAllComposites();
 				try {
 					openImportMessage(importLabel ,closeImportButton);
 					pool.execute(DataManager.importIntoDb(AppData.getInstance().getImportFolder()));
@@ -764,15 +635,40 @@ public class CheckFlickGUI {
 			}
 		});
 	}				
-	
-	public static void searchByMovie(Composite search){
+	private static void cleanAllComposites(){
+		if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
+			searchByMovie.dispose();
+		if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
+			searchByPerson.dispose();
+		if ((insertMovie!= null) && !(insertMovie.isDisposed()))
+			insertMovie.dispose();
+		if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
+			insertPerson.dispose();
+		if ((movieButtons != null) && !(movieButtons.isDisposed()))
+			movieButtons.dispose();
+		if ((personButtons != null) && !(personButtons.isDisposed()))
+			personButtons.dispose();
+		if ((otherResults != null) && !(otherResults.isDisposed()))
+			otherResults.dispose();
+		if ((resultsMovieTable!=null) && !(resultsMovieTable.isDisposed())) 
+			resultsMovieTable.dispose();
+		if ((resultsPersonTable!=null) && !(resultsPersonTable.isDisposed())) 
+			resultsPersonTable.dispose();
+		if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+			entityDetails.dispose();
+		if ((bar!=null)&& !(bar.isDisposed()))
+			bar.dispose();
+	}
+	public static void searchByMovie(){
+		cleanAllComposites();
+		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);;
 		Calendar toDay = Calendar.getInstance();
 		final int year = toDay.get(Calendar.YEAR);
-		search.setLocation(2,145);
-		search.setLayout(new FillLayout());
+		searchByMovie.setLocation(2,145);
+		searchByMovie.setLayout(new FillLayout());
 		if ((bar!= null) && !(bar.isDisposed()))
 				bar.dispose();
-		bar = new ExpandBar (search, SWT.V_SCROLL);
+		bar = new ExpandBar (searchByMovie, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
@@ -835,19 +731,12 @@ public class CheckFlickGUI {
 		
 		item0.setExpanded(true);
 		bar.setSpacing(8);
-		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		searchByMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 		//listener for the search button
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				if ((resultsPersonTable != null) && !(resultsPersonTable.isDisposed()))
-					resultsPersonTable.dispose();
-				if ((resultsMovieTable != null) && !(resultsMovieTable.isDisposed()))
-					resultsMovieTable.dispose();
-				resultsMovieTable = new Composite(shell.getShell(),SWT.NONE);
-				resultsMovieTable.setBackground(shell.getShell().getBackground());
-				resultsMovieTable.setLayout(new GridLayout());
 				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();;
 				System.out.println(nameText.getText());
@@ -877,18 +766,15 @@ public class CheckFlickGUI {
 				}
 			}
 		});
-		/* searchByMovie.addListener(SWT.Resize, new Listener() {
-			public void handleEvent(Event arg0) {
-				searchByMovie.redraw();
-			}
-		 });*/
 	}
-	public static void searchByPerson(Composite search){
-		search.setLocation(2, 145);
-		search.setLayout(new FillLayout());
+	public static void searchByPerson(){
+		cleanAllComposites();
+		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
+		searchByPerson.setLocation(2, 145);
+		searchByPerson.setLayout(new FillLayout());
 		if ((bar != null)&& !(bar.isDisposed()))
 			bar.dispose();
-		bar = new ExpandBar (search, SWT.V_SCROLL);
+		bar = new ExpandBar (searchByPerson, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
@@ -953,19 +839,11 @@ public class CheckFlickGUI {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		//searchByActor.setVisible(checked);
-		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		searchByPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
-			public void widgetSelected(SelectionEvent e) {
-				if ((resultsPersonTable != null) && !(resultsPersonTable.isDisposed()))
-					resultsPersonTable.dispose();
-				if ((resultsMovieTable != null) && !(resultsMovieTable.isDisposed()))
-					resultsMovieTable.dispose();
-				resultsPersonTable = new Composite(shell.getShell(),SWT.NONE);
-				resultsPersonTable.setBackground(shell.getShell().getBackground());
-				resultsPersonTable.setLayout(new GridLayout());
-				
+			public void widgetSelected(SelectionEvent e) {				
 				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();
 				System.out.println(nameText.getText());
@@ -1164,14 +1042,16 @@ public class CheckFlickGUI {
 			e.printStackTrace();
 		}
 	}
-	public void insertMovie(Composite insert){
+	public void insertMovie(){
+		cleanAllComposites();
+		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
 		Calendar toDay = Calendar.getInstance();
 		final int year = toDay.get(Calendar.YEAR);
-		insert.setLocation(2,145);
-		insert.setLayout(new FillLayout(1));
+		insertMovie.setLocation(2,145);
+		insertMovie.setLayout(new FillLayout(1));
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
-		bar = new ExpandBar (insert, SWT.V_SCROLL);
+		bar = new ExpandBar (insertMovie, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
@@ -1258,17 +1138,19 @@ public class CheckFlickGUI {
 		});
 		
 		bar.setSpacing(8);
-		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 	}
-	public void insertPerson(Composite insert){
-		
+	public void insertPerson(){
+		cleanAllComposites();
+		insertPerson = new Composite(shell.getShell(),SWT.BORDER);
+		insertPerson.setBackground(shell.getShell().getBackground());
 		Calendar toDay = Calendar.getInstance();
 		final int year = toDay.get(Calendar.YEAR);
-		insert.setLocation(2,145);
-		insert.setLayout(new FillLayout(1));
+		insertPerson.setLocation(2,145);
+		insertPerson.setLayout(new FillLayout(1));
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
-		bar = new ExpandBar (insert, SWT.V_SCROLL);
+		bar = new ExpandBar (insertPerson, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
@@ -1371,7 +1253,7 @@ public class CheckFlickGUI {
 		});
 		
 		bar.setSpacing(8);
-		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 	}
 	
 	static private String getID(List<NamedEntity> list , String name){
@@ -1889,8 +1771,14 @@ public class CheckFlickGUI {
 				final int count = searched.size();
 				System.out.println(count);
 				if (count > 0){
-					final Table table = new Table (resultsMovieTable, SWT.MULTI| SWT.BORDER|SWT.FULL_SELECTION);
+					if ((resultsPersonTable != null) && !(resultsPersonTable.isDisposed()))
+						resultsPersonTable.dispose();
+					if ((resultsMovieTable != null) && !(resultsMovieTable.isDisposed()))
+						resultsMovieTable.dispose();
+					resultsMovieTable = new Composite(shell.getShell(),SWT.NONE);
 					resultsMovieTable.setBackground( new Color(display , 177 ,200 , 231));
+					resultsMovieTable.setLayout(new GridLayout());
+					final Table table = new Table (resultsMovieTable, SWT.MULTI| SWT.BORDER|SWT.FULL_SELECTION);
 					table.setLinesVisible (true);
 					table.setHeaderVisible (true);
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -1949,8 +1837,14 @@ public class CheckFlickGUI {
 				final int count = searched.size();
 				//creating the search results table
 				if (count > 0){
-					final Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					if ((resultsPersonTable != null) && !(resultsPersonTable.isDisposed()))
+						resultsPersonTable.dispose();
+					if ((resultsMovieTable != null) && !(resultsMovieTable.isDisposed()))
+						resultsMovieTable.dispose();
+					resultsPersonTable = new Composite(shell.getShell(),SWT.NONE);
 					resultsPersonTable.setBackground( new Color(display , 177 ,200 , 231));
+					resultsPersonTable.setLayout(new GridLayout());
+					final Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
 					table.setLinesVisible (true);
 					table.setHeaderVisible (true);
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
