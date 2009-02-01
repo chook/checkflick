@@ -1842,7 +1842,7 @@ public class CheckFlickGUI {
 					}
 					table.getColumn(3).setWidth(0);
 					table.getColumn(3).setResizable(false);
-					//by double clicking a row you get a new tab with the whole informtaion
+					//by double clicking a row you get a new tab with the whole information
 					table.addListener(SWT.MouseDoubleClick, new Listener() {
 						public void handleEvent(Event event) {
 							Point pt = new Point(event.x, event.y);
@@ -1912,7 +1912,7 @@ public class CheckFlickGUI {
 					}	
 					table.getColumn(3).setWidth(0);
 					table.getColumn(3).setResizable(false);
-					//by double clicking a row you get a new tab with the whole informtaion
+					//by double clicking a row you get a new tab with the whole information
 					table.addListener(SWT.MouseDoubleClick, new Listener() {
 						public void handleEvent(Event event) {
 							Point pt = new Point(event.x, event.y);
