@@ -30,9 +30,7 @@ public class RibbonInterface {
 	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search) {
 		CheckFlickGUI.drawSearchMovieTable(list, search);
 	}
-	public static void drawMovieSearch(List<DatedEntity> list, SearchEntitiesEnum search ,int id) {
-		//	SampleRibbonClass.drawSearchMovieTable(list, search , id);
-	}
+
 	public static void drawPersonSearch(List<DatedEntity> list, SearchEntitiesEnum search ) {
 		CheckFlickGUI.drawSearchPersonTable(list, search);
 	}
@@ -44,28 +42,36 @@ public class RibbonInterface {
 	}
 	
 	public static void InsertMovieExtraData(int id , boolean update , MovieDataEnum type){
-		CheckFlickGUI.drawInsertDataSuccess();
+		CheckFlickGUI.drawInsertDataSuccess(id>0);
 		if (update)
 			CheckFlickGUI.redrawMovieTable(id , type );
 	}
 	public static void updateMovie(int id){
-		CheckFlickGUI.drawUpdateDataSuccess();
+		CheckFlickGUI.drawUpdateDataSuccess(id>0);
 	}
 	public static void InsertPerson(int id){
 		CheckFlickGUI.drawMoreInsertPerson(id);
 	}
 	public static void InsertPersonExtraData(int id , boolean update, PersonDataEnum type){
-		CheckFlickGUI.drawInsertDataSuccess();
+		CheckFlickGUI.drawInsertDataSuccess(id>0);
 		if (update)
 			CheckFlickGUI.redrawPersonTable(id , type );
 	}
 	public static void updatePerson(int id){
-		CheckFlickGUI.drawUpdateDataSuccess();
+		CheckFlickGUI.drawUpdateDataSuccess(id>0);
 	}
 	public static void SetNamedList(List<NamedEntity> list, NamedEntitiesEnum type) {
 		CheckFlickGUI.setList(list, type);
 	}
-	public static void deleteEntity(boolean ok) {
-		CheckFlickGUI.drawDeleteDataSuccess();
+	public static void deleteMovieExtraData(boolean result, int id, MovieDataEnum type){
+		deleteEntity(result);
+		CheckFlickGUI.redrawMovieTable(id , type );
+	}
+	public static void deletePersonExtraData(boolean result, int id, PersonDataEnum type){
+		deleteEntity(result);
+		CheckFlickGUI.redrawPersonTable(id , type );
+	}
+	public static void deleteEntity(boolean ok ) {
+		CheckFlickGUI.drawDeleteDataFailure(ok);
 	}
 }
