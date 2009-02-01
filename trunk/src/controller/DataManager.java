@@ -42,25 +42,6 @@ public class DataManager {
 		};
 	}
 	
-	public static Runnable importIntoDb(final String path) {
-		return new Runnable() {
-			public void run() {
-				ImportHandler ih = new ImportHandler();
-				ih.addListFile(ListFilesEnum.MOVIES, path + "movies.list");
-				ih.addListFile(ListFilesEnum.LANGUAGES, path + "language.list");
-				ih.addListFile(ListFilesEnum.GENRES, path + "genres.list");
-				ih.addListFile(ListFilesEnum.COUNTRIES, path + "countries.list");
-				ih.addListFile(ListFilesEnum.ACTORS, path + "actors.list");
-				ih.addListFile(ListFilesEnum.ACTRESSES, path + "actresses.list");
-				ih.addListFile(ListFilesEnum.DIRECTORS, path + "directors.list");
-				ih.addListFile(ListFilesEnum.PRODUCERS, path + "producers.list");
-				ih.addListFile(ListFilesEnum.WRITERS, path + "writers.list");
-				RibbonInterface.finishImport(ih.importIntoDB());
-			}
-		};
-	}
-	
-	
 	/**
 	 * This function retrieves the database object
 	 * @deprecated
@@ -73,6 +54,7 @@ public class DataManager {
 		return manager;
 	}
 	
+	
 	public static Runnable getMovieById(final int id) { 
 		return new Runnable() {
 			public void run() {
@@ -83,7 +65,7 @@ public class DataManager {
 			}
 		};
 	}
-
+	
 	public static Runnable getMovieData(final MovieDataEnum dataType, final int id) {
 		return new Runnable() {
 			public void run() {
@@ -103,6 +85,16 @@ public class DataManager {
 			}
 		};
 	}
+
+	public static Runnable getPersonData(final PersonDataEnum dataType, final int id) {
+		return new Runnable() {
+			public void run() {
+				if (id != 0){
+					RibbonInterface.drawPersonData(DBManager.getInstance().getPersonData(dataType, String.valueOf(id)), dataType , id);
+				}
+			}
+		};
+	}
 	
 	/*public synchronized List<NamedEntity> getAllNamedEntities(NamedEntitiesEnum name) {
 		if(!namedEntities.containsKey(name))
@@ -110,12 +102,20 @@ public class DataManager {
 		return namedEntities.get(name);
 	}*/
 	
-	public static Runnable getPersonData(final PersonDataEnum dataType, final int id) {
+	public static Runnable importIntoDb(final String path) {
 		return new Runnable() {
 			public void run() {
-				if (id != 0){
-					RibbonInterface.drawPersonData(DBManager.getInstance().getPersonData(dataType, String.valueOf(id)), dataType , id);
-				}
+				ImportHandler ih = new ImportHandler();
+				ih.addListFile(ListFilesEnum.MOVIES, path + "movies.list");
+				ih.addListFile(ListFilesEnum.LANGUAGES, path + "language.list");
+				ih.addListFile(ListFilesEnum.GENRES, path + "genres.list");
+				ih.addListFile(ListFilesEnum.COUNTRIES, path + "countries.list");
+				ih.addListFile(ListFilesEnum.ACTORS, path + "actors.list");
+				ih.addListFile(ListFilesEnum.ACTRESSES, path + "actresses.list");
+				ih.addListFile(ListFilesEnum.DIRECTORS, path + "directors.list");
+				ih.addListFile(ListFilesEnum.PRODUCERS, path + "producers.list");
+				ih.addListFile(ListFilesEnum.WRITERS, path + "writers.list");
+				RibbonInterface.finishImport(ih.importIntoDB());
 			}
 		};
 	}
@@ -260,16 +260,12 @@ public class DataManager {
 	public AbsFilter getFilter(SearchEntitiesEnum entity, String value, String value2) {
 		return getFilterFromDB(entity, value, value2);
 	}
-	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
-		return db.getSearchFilter(entity, value, value2);
-	}
 	public MovieEntity getMovieByIdOld(int id) {
 		if (id != 0)
 			return DBManager.getInstance().getMovieById(id);
 		else 
 			return null;
 	}
-	
 	/**
 	 * This function gets various data about a movie
 	 * @param dataType - Which data to get
@@ -282,13 +278,13 @@ public class DataManager {
 		else 
 			return null;
 	}
+	
 	public PersonEntity getPersonByIdOld(int id) {
 		if (id != 0)
 			return DBManager.getInstance().getPersonById(id);
 		else 
 			return null;
 	}
-
 	/**
 	 * This function gets various data about a person
 	 * @param dataType - Which data to get
@@ -301,10 +297,10 @@ public class DataManager {
 		else 
 			return null;
 	}
+
 	public int insertMovieDataOld(MovieDataEnum dataType, AbsType dataObject) {
 		return db.insertMovieData(dataType, dataObject, false);
 	}
-
 	/**
 	 * This function inserts a new person data object
 	 * @param dataType - Type of data
@@ -314,12 +310,16 @@ public class DataManager {
 	public int insertPersonDataOld(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, false);
 	}
-	
+
 	public int updateMovieDataOld(MovieDataEnum dataType, AbsType dataObject) {
 		return db.insertMovieData(dataType, dataObject, true);
 	}
-
+	
 	public int updatePersonDataOld(PersonDataEnum dataType, AbsType dataObject) {
 		return db.insertPersonData(dataType, dataObject, true);
+	}
+
+	private AbsFilter getFilterFromDB(SearchEntitiesEnum entity, String value, String value2) {
+		return db.getSearchFilter(entity, value, value2);
 	}
 }

@@ -115,415 +115,6 @@ public class CheckFlickGUI {
 		display.dispose();
 	}
 	/**
-	 * message box that is opened whenever OK question is asked
-	 */
-	protected static int okMessageBox(String q){	
-		shell.getShell().setEnabled(false);
-		MessageBox mb = new MessageBox(shell.getShell(), SWT.OK); 
-		mb.setMessage(q);
-		int answer = mb.open();	
-		shell.getShell().setEnabled(true);
-		return answer;		
-	}
-	/**
-	 * Open a composite with expanded bar.
-	 * In this composite one can search for a movie
-	 */
-	protected static void searchByMovie(){
-		//disposing all composites
-		cleanAllComposites();
-		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);;
-		Calendar toDay = Calendar.getInstance();
-		final int year = toDay.get(Calendar.YEAR);
-		searchByMovie.setLocation(2,145);
-		searchByMovie.setLayout(new FillLayout());
-		if ((bar!= null) && !(bar.isDisposed()))
-				bar.dispose();
-		bar = new ExpandBar (searchByMovie, SWT.V_SCROLL);
-		bar.setBackground( new Color(display , 177 ,200 , 231));
-		Image image = ImageCache.getImage("search_48.png");
-		Color frontColor = new Color(display , 222 ,235 , 247);
-		// Main item
-		final Composite composite = new Composite (bar, SWT.NONE);
-		composite.setBackground(frontColor);
-		GridLayout layout = new GridLayout (7,false);
-		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-		layout.verticalSpacing = 10;
-		composite.setLayout(layout); 
-		Label label = new Label(composite,SWT.NONE);
-		label.setText("Movie Name");
-		label.setBackground(frontColor);
-		final Button checkWildCard = new Button(composite, SWT.CHECK);
-		checkWildCard.setText("Wildcard");
-		checkWildCard.setSelection(true);
-		checkWildCard.setBackground(frontColor);
-		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite,SWT.NONE);
-		label.setText("Movie Year	From");
-		label.setBackground(frontColor);
-		final Spinner yearFrom = new Spinner (composite, SWT.BORDER);
-		yearFrom.setMinimum(1880);
-		yearFrom.setMaximum(year+100);
-		yearFrom.setSelection(1880);
-		yearFrom.setPageIncrement(1);
-		yearFrom.pack();
-		label = new Label(composite,SWT.NONE);
-		label.setText("To");
-		label.setBackground(frontColor);
-		final Spinner yearTo = new Spinner (composite, SWT.BORDER);
-		yearTo.setMinimum(1880);
-		yearTo.setMaximum(year+100);
-		yearTo.setSelection(year+100);
-		yearTo.setPageIncrement(1);
-		yearTo.pack();
-		Label movieGenres = new Label(composite ,SWT.NONE);
-		movieGenres.setText("Movie Genre");
-		movieGenres.setBackground(frontColor);
-		final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] genresString= new String[genresList.size()+1];
-		genresString[0]= "";
-		for (int i=0; i<genresList.size(); i++){
-			genresString[i+1]=genresList.get(i).getName();
-		}
-		genresCombo.setItems (genresString);
-		label = new Label(composite,SWT.NONE);
-		label.setText("Movie Language");
-		label.setBackground(frontColor);
-		final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
-		String[] langString= new String[langList.size()+1];
-		langString[0]="";
-		for (int i=0; i<langList.size(); i++){
-			langString[i+1]=langList.get(i).getName();
-		}
-		langCombo.setItems(langString);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.horizontalSpan = 4;
-		langCombo.setLayoutData(gridData);
-		Button button = new Button (composite, SWT.PUSH);
-		button.setText("Search");
-		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
-		item0.setText("Search for movie");
-		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-		item0.setControl(composite);
-		item0.setImage(image);
-		button.setBackground(frontColor);
-		
-		item0.setExpanded(true);
-		bar.setSpacing(8);
-		searchByMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
-		
-		//listener for the search button
-		button.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				//creating the filter to search by
-				List<AbsFilter> list = new ArrayList<AbsFilter>();;
-				System.out.println(nameText.getText());
-				if (nameText.getText()!= "" && nameText.getText().length() > 0){
-					// Search without wildcard
-					if(checkWildCard.getSelection())
-						list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME_WILDCARD, nameText.getText()));
-					else
-						list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
-				}
-				if (genresCombo.getText() != ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
-				}
-				if (langCombo.getText() != ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_LANGUAGES,getID(langList , langCombo.getText()) ));
-				}
-				//search by year only if the years parameters were changed
-				if ((Integer.parseInt(yearFrom.getText())!= 1880) || ((Integer.parseInt(yearTo.getText())!= (year+100))))
-					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
-				System.out.println(list.toString());
-
-				//search for movies
-				try {
-					pool.execute(DataManager.search(SearchEntitiesEnum.MOVIES, list));
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-	}
-	/**
-	 * Open a composite with expanded bar.
-	 * In this composite one can search for a person
-	 */
-	protected static void searchByPerson(){
-		cleanAllComposites();
-		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
-		searchByPerson.setLocation(2, 145);
-		searchByPerson.setLayout(new FillLayout());
-		Color frontColor = new Color(display , 222 ,235 , 247);
-		if ((bar != null)&& !(bar.isDisposed()))
-			bar.dispose();
-		bar = new ExpandBar (searchByPerson, SWT.V_SCROLL);
-		bar.setBackground( new Color(display , 177 ,200 , 231));
-		Image image = ImageCache.getImage("search_48.png");
-		// Main item
-		Composite composite = new Composite (bar, SWT.FILL);
-		composite.setBackground(frontColor);
-		GridLayout layout = new GridLayout (7,false);
-		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
-		layout.verticalSpacing = 10;
-		composite.setLayout(layout);
-		Label label= new Label(composite,SWT.NONE);
-		label.setText("Person Name");
-		label.setBackground(frontColor);
-		final Button checkWildCard = new Button(composite, SWT.CHECK);
-		checkWildCard.setText("Wildcard");
-		checkWildCard.setSelection(true);
-		checkWildCard.setBackground(frontColor);
-		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label = new Label(composite,SWT.NONE);
-		label.setText("Age Range	From");
-		label.setBackground(frontColor);
-		final Spinner ageFrom = new Spinner (composite, SWT.BORDER);
-		ageFrom.setMinimum(0);
-		ageFrom.setMaximum(100);
-		ageFrom.setSelection(0);
-		ageFrom.setPageIncrement(1);
-		ageFrom.pack();
-		label = new Label(composite , SWT.NONE);
-		label.setText("To");
-		label.setBackground(frontColor);
-		final Spinner ageTo = new Spinner (composite, SWT.BORDER);
-		ageTo.setMinimum(0);
-		ageTo.setMaximum(100);
-		ageTo.setSelection(100);
-		ageTo.setPageIncrement(1);
-		ageTo.pack();
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Production Role");
-		label.setBackground(frontColor);
-		final Combo rolesCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] rolesString= new String[rolesList.size()+1];
-		rolesString[0]="";
-		for (int i=0; i<rolesList.size(); i++){
-			rolesString[i+1]=rolesList.get(i).getName();
-		}
-		rolesCombo.setItems (rolesString);
-		label= new Label(composite, SWT.NONE);
-		label.setText("Origin Country");
-		label.setBackground(frontColor);
-		final Combo countryCombo = new Combo (composite, SWT.READ_ONLY);
-		String[] countryString= new String[countriesList.size()+1];
-		countryString[0]="";
-		for (int i=0; i<countriesList.size(); i++){
-			countryString[i+1]=countriesList.get(i).getName();
-		}
-		countryCombo.setItems (countryString);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.horizontalSpan = 4;
-		countryCombo.setLayoutData(gridData);
-		Button button = new Button (composite, SWT.PUSH);
-		button.setText("Search");
-		button.setBackground(frontColor);
-		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
-		item0.setText("Search for person");
-		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-		item0.setControl(composite);
-		item0.setImage(image);
-		
-		item0.setExpanded(true);
-		bar.setSpacing(8);
-		searchByPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
-		//listen for the search button
-		button.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {				
-				//creating the filter to search by
-				List<AbsFilter> list = new ArrayList<AbsFilter>();
-				System.out.println(nameText.getText());
-				if (nameText.getText()!= "" && nameText.getText().length() > 0){
-					if(checkWildCard.getSelection())
-						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME_WILDCARD, nameText.getText()));
-					else
-						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, nameText.getText()));
-				}
-				if (rolesCombo.getText() != ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_PRODUCTION_ROLE,getID(rolesList , rolesCombo.getText()) ));
-				}
-				if (countryCombo.getText() != ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY,getID(countriesList , countryCombo.getText()) ));
-				}
-				
-				//search by age only if the ages parameters were changed
-				if ((Integer.parseInt(ageFrom.getText())!= 0) || ((Integer.parseInt(ageTo.getText())!= (100))))
-					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_AGE, ageFrom.getText() , ageTo.getText()));
-				System.out.println(list.toString());
-				//search for persons
-				
-				try {
-					pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list ));
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}			
-		});
-
-	}
-	/**
-	 * Manage the movie tab
-	 * By clicking the buttons the user can see extra information
-	 */
-	protected static void ShowMovieResult(final RibbonTab tab, final MovieEntity movie){
-		searchByMovie.setVisible(false);
-		// Movie tab
-		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
-		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);
-		RibbonGroup results = new RibbonGroup(tab, "More Details");
-		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT );
-		new RibbonGroupSeparator(results);
-		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT );
-		new RibbonGroupSeparator(results);
-		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );
-		new RibbonGroupSeparator(results);
-		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );
-		RibbonGroup personsGroup = new RibbonGroup(tab, "Cast");
-		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );
-		
-		ButtonSelectGroup group = new ButtonSelectGroup();
-		
-		general.setButtonSelectGroup(group);
-		countries.setButtonSelectGroup(group);
-		genres.setButtonSelectGroup(group);
-		languages.setButtonSelectGroup(group);
-		quotes.setButtonSelectGroup(group);
-		persons.setButtonSelectGroup(group);
-		
-		//draw the general information of the movie
-		drawGeneralInformationMovie(movie , tab.getIndex());
-		
-		countries.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationMovie( movie, tab.getIndex());
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_COUNTRIES);
-			}
-		});
-		languages.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationMovie( movie, tab.getIndex());
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_LANGUAGES);
-		}});
-		quotes.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationMovie( movie, tab.getIndex());
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_QUOTES);
-			}
-		});
-		genres.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationMovie( movie, tab.getIndex());
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_GENRES);
-			}
-		});
-		persons.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationMovie( movie, tab.getIndex());
-				entityDetails.setVisible(true);
-				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_CAST);
-			}
-		});
-		general.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationMovie( movie, tab.getIndex());
-			}
-		});
-
-	}
-	/**
-	 * Manage the person tab
-	 * By clicking the buttons the user can see extra information
-	 */
-	protected static void ShowPersonResult(final RibbonTab tab,final PersonEntity person){
-		searchByPerson.setVisible(false);
-		// Person Tab
-		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
-		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonGroup results = new RibbonGroup(tab, "More Details");
-		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		new RibbonGroupSeparator(results);
-		RibbonButton role = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nRoles", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		new RibbonGroupSeparator(results);
-		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-
-		ButtonSelectGroup group = new ButtonSelectGroup();
-		
-		general.setButtonSelectGroup(group);
-		aka.setButtonSelectGroup(group);
-		role.setButtonSelectGroup(group);
-		quotes.setButtonSelectGroup(group);
-		
-		//draw the general information of the person
-		drawGeneralInformationPerson(person , tab.getIndex());
-	
-		aka.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationPerson(person ,tab.getIndex());
-				personButtonsResults(person.getId() , PersonDataEnum.PERSON_AKAS);
-			}			
-		});
-		role.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationPerson(person , tab.getIndex());
-				personButtonsResults(person.getId() , PersonDataEnum.PERSON_ROLES);
-			}			
-		});
-		quotes.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationPerson(person,tab.getIndex());
-				personButtonsResults(person.getId() , PersonDataEnum.PERSON_QUOTES);
-			}
-		});
-		general.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				drawGeneralInformationPerson(person, tab.getIndex());
-			}
-		});
-	
-	}
-	/**
-	 * message box that is opened whenever Yes/No question is asked
-	 */
-	protected static int yesNoMessageBox(String q){	
-		shell.getShell().setEnabled(false);
-		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
-		mb.setMessage(q);
-		int answer = mb.open();	
-		shell.getShell().setEnabled(true);
-		return answer;		
-	}	
-	/**
 	 * Disposing all the composites that are not disposed
 	 */
 	private static void cleanAllComposites(){
@@ -1035,7 +626,6 @@ public class CheckFlickGUI {
 		});
 		
 	}
-	
 	/**
 	 * Getting the id of a string according to one of the list that were received from the DB
 	 */
@@ -1049,7 +639,6 @@ public class CheckFlickGUI {
 		}
 		return id;
 	}
-	
 	/**
 	 * Getting the name of the id according to one of the list that were received from the DB
 	 */
@@ -1065,7 +654,6 @@ public class CheckFlickGUI {
 		}
 		return name;
 	}
-	
 	/**
 	 * Open a new window that adds an existing person as a cast to a movie
 	 */
@@ -1201,7 +789,7 @@ public class CheckFlickGUI {
 		});
 		personResults.open();
 		
-	}
+	}	
 	/**
 	 * Showing message after deleting data
 	 */
@@ -1213,7 +801,6 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	
 	/**
 	 * Showing message after inserting data
 	 */
@@ -1227,7 +814,6 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	
 	/**
 	 * After a movie was insert
 	 * Drawing the extra information you can insert to a movie
@@ -1907,7 +1493,6 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	
 	/**
 	 * Drawing the table with the search result about movies
 	 */
@@ -2050,6 +1635,7 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
 	/**
 	 * Showing message after updating data
 	 */
@@ -2090,6 +1676,18 @@ public class CheckFlickGUI {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * message box that is opened whenever OK question is asked
+	 */
+	protected static int okMessageBox(String q){	
+		shell.getShell().setEnabled(false);
+		MessageBox mb = new MessageBox(shell.getShell(), SWT.OK); 
+		mb.setMessage(q);
+		int answer = mb.open();	
+		shell.getShell().setEnabled(true);
+		return answer;		
 	}
 	
 	/**
@@ -2156,6 +1754,7 @@ public class CheckFlickGUI {
 		});
 		importShell.open();
 	}
+	
 	/**
 	 * Open a new window that adds extra data to a movie that is from tables
 	 */
@@ -2246,7 +1845,6 @@ public class CheckFlickGUI {
 		});
 		addToMovie.open();
 	}
-	
 	/**
 	 * Open a new window that adds extra data to a movie that is not from tables
 	 */
@@ -2443,7 +2041,6 @@ public class CheckFlickGUI {
 			e.printStackTrace();
 		}
 	}
-	
 	/**
 	 * Redrawing the person movie table in the extra data buttons after changes (insert/delete)
 	 */
@@ -2467,29 +2064,424 @@ public class CheckFlickGUI {
 	}
 	
 	/**
+	 * Open a composite with expanded bar.
+	 * In this composite one can search for a movie
+	 */
+	protected static void searchByMovie(){
+		//disposing all composites
+		cleanAllComposites();
+		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);;
+		Calendar toDay = Calendar.getInstance();
+		final int year = toDay.get(Calendar.YEAR);
+		searchByMovie.setLocation(2,145);
+		searchByMovie.setLayout(new FillLayout());
+		if ((bar!= null) && !(bar.isDisposed()))
+				bar.dispose();
+		bar = new ExpandBar (searchByMovie, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
+		Image image = ImageCache.getImage("search_48.png");
+		Color frontColor = new Color(display , 222 ,235 , 247);
+		// Main item
+		final Composite composite = new Composite (bar, SWT.NONE);
+		composite.setBackground(frontColor);
+		GridLayout layout = new GridLayout (7,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout); 
+		Label label = new Label(composite,SWT.NONE);
+		label.setText("Movie Name");
+		label.setBackground(frontColor);
+		final Button checkWildCard = new Button(composite, SWT.CHECK);
+		checkWildCard.setText("Wildcard");
+		checkWildCard.setSelection(true);
+		checkWildCard.setBackground(frontColor);
+		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		label = new Label(composite,SWT.NONE);
+		label.setText("Movie Year	From");
+		label.setBackground(frontColor);
+		final Spinner yearFrom = new Spinner (composite, SWT.BORDER);
+		yearFrom.setMinimum(1880);
+		yearFrom.setMaximum(year+100);
+		yearFrom.setSelection(1880);
+		yearFrom.setPageIncrement(1);
+		yearFrom.pack();
+		label = new Label(composite,SWT.NONE);
+		label.setText("To");
+		label.setBackground(frontColor);
+		final Spinner yearTo = new Spinner (composite, SWT.BORDER);
+		yearTo.setMinimum(1880);
+		yearTo.setMaximum(year+100);
+		yearTo.setSelection(year+100);
+		yearTo.setPageIncrement(1);
+		yearTo.pack();
+		Label movieGenres = new Label(composite ,SWT.NONE);
+		movieGenres.setText("Movie Genre");
+		movieGenres.setBackground(frontColor);
+		final Combo genresCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] genresString= new String[genresList.size()+1];
+		genresString[0]= "";
+		for (int i=0; i<genresList.size(); i++){
+			genresString[i+1]=genresList.get(i).getName();
+		}
+		genresCombo.setItems (genresString);
+		label = new Label(composite,SWT.NONE);
+		label.setText("Movie Language");
+		label.setBackground(frontColor);
+		final Combo langCombo = new Combo(composite ,SWT.READ_ONLY);
+		String[] langString= new String[langList.size()+1];
+		langString[0]="";
+		for (int i=0; i<langList.size(); i++){
+			langString[i+1]=langList.get(i).getName();
+		}
+		langCombo.setItems(langString);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 4;
+		langCombo.setLayoutData(gridData);
+		Button button = new Button (composite, SWT.PUSH);
+		button.setText("Search");
+		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
+		item0.setText("Search for movie");
+		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item0.setControl(composite);
+		item0.setImage(image);
+		button.setBackground(frontColor);
+		
+		item0.setExpanded(true);
+		bar.setSpacing(8);
+		searchByMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		
+		//listener for the search button
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				//creating the filter to search by
+				List<AbsFilter> list = new ArrayList<AbsFilter>();;
+				System.out.println(nameText.getText());
+				if (nameText.getText()!= "" && nameText.getText().length() > 0){
+					// Search without wildcard
+					if(checkWildCard.getSelection())
+						list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME_WILDCARD, nameText.getText()));
+					else
+						list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
+				}
+				if (genresCombo.getText() != ""){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
+				}
+				if (langCombo.getText() != ""){
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_LANGUAGES,getID(langList , langCombo.getText()) ));
+				}
+				//search by year only if the years parameters were changed
+				if ((Integer.parseInt(yearFrom.getText())!= 1880) || ((Integer.parseInt(yearTo.getText())!= (year+100))))
+					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
+				System.out.println(list.toString());
+
+				//search for movies
+				try {
+					pool.execute(DataManager.search(SearchEntitiesEnum.MOVIES, list));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Open a composite with expanded bar.
+	 * In this composite one can search for a person
+	 */
+	protected static void searchByPerson(){
+		cleanAllComposites();
+		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
+		searchByPerson.setLocation(2, 145);
+		searchByPerson.setLayout(new FillLayout());
+		Color frontColor = new Color(display , 222 ,235 , 247);
+		if ((bar != null)&& !(bar.isDisposed()))
+			bar.dispose();
+		bar = new ExpandBar (searchByPerson, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
+		Image image = ImageCache.getImage("search_48.png");
+		// Main item
+		Composite composite = new Composite (bar, SWT.FILL);
+		composite.setBackground(frontColor);
+		GridLayout layout = new GridLayout (7,false);
+		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
+		layout.verticalSpacing = 10;
+		composite.setLayout(layout);
+		Label label= new Label(composite,SWT.NONE);
+		label.setText("Person Name");
+		label.setBackground(frontColor);
+		final Button checkWildCard = new Button(composite, SWT.CHECK);
+		checkWildCard.setText("Wildcard");
+		checkWildCard.setSelection(true);
+		checkWildCard.setBackground(frontColor);
+		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		label = new Label(composite,SWT.NONE);
+		label.setText("Age Range	From");
+		label.setBackground(frontColor);
+		final Spinner ageFrom = new Spinner (composite, SWT.BORDER);
+		ageFrom.setMinimum(0);
+		ageFrom.setMaximum(100);
+		ageFrom.setSelection(0);
+		ageFrom.setPageIncrement(1);
+		ageFrom.pack();
+		label = new Label(composite , SWT.NONE);
+		label.setText("To");
+		label.setBackground(frontColor);
+		final Spinner ageTo = new Spinner (composite, SWT.BORDER);
+		ageTo.setMinimum(0);
+		ageTo.setMaximum(100);
+		ageTo.setSelection(100);
+		ageTo.setPageIncrement(1);
+		ageTo.pack();
+		label = new Label(composite ,SWT.NONE);
+		label.setText("Production Role");
+		label.setBackground(frontColor);
+		final Combo rolesCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] rolesString= new String[rolesList.size()+1];
+		rolesString[0]="";
+		for (int i=0; i<rolesList.size(); i++){
+			rolesString[i+1]=rolesList.get(i).getName();
+		}
+		rolesCombo.setItems (rolesString);
+		label= new Label(composite, SWT.NONE);
+		label.setText("Origin Country");
+		label.setBackground(frontColor);
+		final Combo countryCombo = new Combo (composite, SWT.READ_ONLY);
+		String[] countryString= new String[countriesList.size()+1];
+		countryString[0]="";
+		for (int i=0; i<countriesList.size(); i++){
+			countryString[i+1]=countriesList.get(i).getName();
+		}
+		countryCombo.setItems (countryString);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 4;
+		countryCombo.setLayoutData(gridData);
+		Button button = new Button (composite, SWT.PUSH);
+		button.setText("Search");
+		button.setBackground(frontColor);
+		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
+		item0.setText("Search for person");
+		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item0.setControl(composite);
+		item0.setImage(image);
+		
+		item0.setExpanded(true);
+		bar.setSpacing(8);
+		searchByPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		//listen for the search button
+		button.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {				
+				//creating the filter to search by
+				List<AbsFilter> list = new ArrayList<AbsFilter>();
+				System.out.println(nameText.getText());
+				if (nameText.getText()!= "" && nameText.getText().length() > 0){
+					if(checkWildCard.getSelection())
+						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME_WILDCARD, nameText.getText()));
+					else
+						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, nameText.getText()));
+				}
+				if (rolesCombo.getText() != ""){
+					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_PRODUCTION_ROLE,getID(rolesList , rolesCombo.getText()) ));
+				}
+				if (countryCombo.getText() != ""){
+					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_ORIGIN_COUNTRY,getID(countriesList , countryCombo.getText()) ));
+				}
+				
+				//search by age only if the ages parameters were changed
+				if ((Integer.parseInt(ageFrom.getText())!= 0) || ((Integer.parseInt(ageTo.getText())!= (100))))
+					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_AGE, ageFrom.getText() , ageTo.getText()));
+				System.out.println(list.toString());
+				//search for persons
+				
+				try {
+					pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list ));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}			
+		});
+
+	}
+	
+	/**
 	 * Setting the lists as they were received from the DB 
 	 */
 	protected static void setList(final List<NamedEntity> list, final NamedEntitiesEnum type) {
 		display.asyncExec(new Runnable() {
 			public void run() {
-				if (list == null)
-					okMessageBox("Cannot create a connection");
-				switch(type) {
-				case GENRES:
-					genresList = list;
-					break;
-				case COUNTRIES:
-					countriesList = list;
-					break;
-				case PRODUCTION_ROLES:
-					rolesList = list;
-					break;
-				case LANGUAGES:
-					langList = list;
-					break;
+				if (list == null && type == NamedEntitiesEnum.GENRES) {
+					okMessageBox("Cannot create a connection\nSome features will not work!\n(Check your INI file and DB connection)");
+					return;
+				}
+				if (list != null) {
+					switch(type) {
+					case GENRES:
+						genresList = list;
+						break;
+					case COUNTRIES:
+						countriesList = list;
+						break;
+					case PRODUCTION_ROLES:
+						rolesList = list;
+						break;
+					case LANGUAGES:
+						langList = list;
+						break;
+					} 
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Manage the movie tab
+	 * By clicking the buttons the user can see extra information
+	 */
+	protected static void ShowMovieResult(final RibbonTab tab, final MovieEntity movie){
+		searchByMovie.setVisible(false);
+		// Movie tab
+		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
+		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);
+		RibbonGroup results = new RibbonGroup(tab, "More Details");
+		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT );
+		new RibbonGroupSeparator(results);
+		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT );
+		new RibbonGroupSeparator(results);
+		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );
+		new RibbonGroupSeparator(results);
+		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );
+		RibbonGroup personsGroup = new RibbonGroup(tab, "Cast");
+		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );
+		
+		ButtonSelectGroup group = new ButtonSelectGroup();
+		
+		general.setButtonSelectGroup(group);
+		countries.setButtonSelectGroup(group);
+		genres.setButtonSelectGroup(group);
+		languages.setButtonSelectGroup(group);
+		quotes.setButtonSelectGroup(group);
+		persons.setButtonSelectGroup(group);
+		
+		//draw the general information of the movie
+		drawGeneralInformationMovie(movie , tab.getIndex());
+		
+		countries.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationMovie( movie, tab.getIndex());
+				entityDetails.setVisible(true);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_COUNTRIES);
+			}
+		});
+		languages.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationMovie( movie, tab.getIndex());
+				entityDetails.setVisible(true);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_LANGUAGES);
+		}});
+		quotes.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationMovie( movie, tab.getIndex());
+				entityDetails.setVisible(true);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_QUOTES);
+			}
+		});
+		genres.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationMovie( movie, tab.getIndex());
+				entityDetails.setVisible(true);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_GENRES);
+			}
+		});
+		persons.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationMovie( movie, tab.getIndex());
+				entityDetails.setVisible(true);
+				movieButtonsResults(movie.getId() , MovieDataEnum.MOVIE_CAST);
+			}
+		});
+		general.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationMovie( movie, tab.getIndex());
+			}
+		});
+
+	}
+	
+	/**
+	 * Manage the person tab
+	 * By clicking the buttons the user can see extra information
+	 */
+	protected static void ShowPersonResult(final RibbonTab tab,final PersonEntity person){
+		searchByPerson.setVisible(false);
+		// Person Tab
+		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
+		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonGroup results = new RibbonGroup(tab, "More Details");
+		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton role = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nRoles", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		new RibbonGroupSeparator(results);
+		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+
+		ButtonSelectGroup group = new ButtonSelectGroup();
+		
+		general.setButtonSelectGroup(group);
+		aka.setButtonSelectGroup(group);
+		role.setButtonSelectGroup(group);
+		quotes.setButtonSelectGroup(group);
+		
+		//draw the general information of the person
+		drawGeneralInformationPerson(person , tab.getIndex());
+	
+		aka.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationPerson(person ,tab.getIndex());
+				personButtonsResults(person.getId() , PersonDataEnum.PERSON_AKAS);
+			}			
+		});
+		role.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationPerson(person , tab.getIndex());
+				personButtonsResults(person.getId() , PersonDataEnum.PERSON_ROLES);
+			}			
+		});
+		quotes.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationPerson(person,tab.getIndex());
+				personButtonsResults(person.getId() , PersonDataEnum.PERSON_QUOTES);
+			}
+		});
+		general.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				drawGeneralInformationPerson(person, tab.getIndex());
+			}
+		});
+	
 	}
 	
 	/**
@@ -2510,7 +2502,7 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-
+	
 	/**
 	 * Open a new tab for the person with the person name as a title 
 	 */
@@ -2525,6 +2517,112 @@ public class CheckFlickGUI {
 					personTab = new RibbonTab(tabs, tabName);
 					ShowPersonResult(personTab, person);
 					tabs.selectTab(personTab);
+				}
+			}
+		});
+	}
+
+	/**
+	 * message box that is opened whenever Yes/No question is asked
+	 */
+	protected static int yesNoMessageBox(String q){	
+		shell.getShell().setEnabled(false);
+		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
+		mb.setMessage(q);
+		int answer = mb.open();	
+		shell.getShell().setEnabled(true);
+		return answer;		
+	}
+	
+	/**
+	 * Creating the Shell with all the tabs and buttons
+	 */
+	private void createShell() {
+		shell = new RibbonShell(display);
+		shell.setText("DB Project, TAU 2009");
+		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
+		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
+		
+		shell.getShell().setMinimumSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
+		//closing the program.
+		shell.getShell().addListener(SWT.Close, new Listener(){
+			public void handleEvent(Event e){    			
+    			pool.stopRequestAllWorkers();
+			}
+		});
+		// Tab folder
+		RibbonTabFolder tabs = shell.getRibbonTabFolder();
+			
+		// Tabs
+		RibbonTab searchTab = new RibbonTab(tabs, "Search");
+		RibbonTab insertTab = new RibbonTab(tabs, "Insert");	
+		
+		// Tooltips
+		RibbonTooltip searchToolTip = new RibbonTooltip("Search For", "Please click on one of the buttons to search."); 
+		RibbonTooltip insertToolTip = new RibbonTooltip("Insert", "Please click on one of the buttons to insert movie/person."); 
+		RibbonTooltip importToolTip = new RibbonTooltip("Import The Database", "Please click the button to import.\n \\bWARNING: this could take a while."); 
+
+		// Search tab
+		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , searchToolTip);
+		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
+		new RibbonGroupSeparator(searching);
+		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);		
+		
+		// Insert Tab
+		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , insertToolTip);
+		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
+		new RibbonGroupSeparator(inserting);
+		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
+		RibbonGroup importing = new RibbonGroup(insertTab, "Import", importToolTip);
+		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", RibbonButton.STYLE_TWO_LINE_TEXT);
+		
+		ButtonSelectGroup group = new ButtonSelectGroup();
+			
+		movieInsert.setButtonSelectGroup(group);
+		personInsert.setButtonSelectGroup(group);
+		movieSearch.setButtonSelectGroup(group);
+		personSearch.setButtonSelectGroup(group);
+		importButton.setButtonSelectGroup(group);
+		
+		movieSearch.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {	
+			}
+			public void widgetSelected(SelectionEvent e){
+				searchByMovie();
+			}
+		});
+		
+		personSearch.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				searchByPerson();
+			}	
+		});
+		movieInsert.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				insertMovie();
+			}	
+		});
+		personInsert.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				insertPerson();
+			}	
+		});
+		importButton.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				cleanAllComposites();
+				try {
+					openImportMessage(importLabel ,closeImportButton);
+					pool.execute(DataManager.importIntoDb(AppData.getInstance().getImportFolder()));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -2775,99 +2873,5 @@ public class CheckFlickGUI {
 		
 		bar.setSpacing(8);
 		insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
-	}
-	
-	/**
-	 * Creating the Shell with all the tabs and buttons
-	 */
-	private void createShell() {
-		shell = new RibbonShell(display);
-		shell.setText("DB Project, TAU 2009");
-		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
-		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
-		
-		shell.getShell().setMinimumSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
-		//closing the program.
-		shell.getShell().addListener(SWT.Close, new Listener(){
-			public void handleEvent(Event e){    			
-    			pool.stopRequestAllWorkers();
-			}
-		});
-		// Tab folder
-		RibbonTabFolder tabs = shell.getRibbonTabFolder();
-			
-		// Tabs
-		RibbonTab searchTab = new RibbonTab(tabs, "Search");
-		RibbonTab insertTab = new RibbonTab(tabs, "Insert");	
-		
-		// Tooltips
-		RibbonTooltip searchToolTip = new RibbonTooltip("Search For", "Please click on one of the buttons to search."); 
-		RibbonTooltip insertToolTip = new RibbonTooltip("Insert", "Please click on one of the buttons to insert movie/person."); 
-		RibbonTooltip importToolTip = new RibbonTooltip("Import The Database", "Please click the button to import.\n \\bWARNING: this could take a while."); 
-
-		// Search tab
-		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , searchToolTip);
-		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
-		new RibbonGroupSeparator(searching);
-		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);		
-		
-		// Insert Tab
-		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , insertToolTip);
-		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
-		new RibbonGroupSeparator(inserting);
-		RibbonButton personInsert = new RibbonButton(inserting, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
-		RibbonGroup importing = new RibbonGroup(insertTab, "Import", importToolTip);
-		RibbonButton importButton = new RibbonButton(importing , ImageCache.getImage("star_48.png"), " \nImport", RibbonButton.STYLE_TWO_LINE_TEXT);
-		
-		ButtonSelectGroup group = new ButtonSelectGroup();
-			
-		movieInsert.setButtonSelectGroup(group);
-		personInsert.setButtonSelectGroup(group);
-		movieSearch.setButtonSelectGroup(group);
-		personSearch.setButtonSelectGroup(group);
-		importButton.setButtonSelectGroup(group);
-		
-		movieSearch.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {	
-			}
-			public void widgetSelected(SelectionEvent e){
-				searchByMovie();
-			}
-		});
-		
-		personSearch.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				searchByPerson();
-			}	
-		});
-		movieInsert.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				insertMovie();
-			}	
-		});
-		personInsert.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				insertPerson();
-			}	
-		});
-		importButton.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				cleanAllComposites();
-				try {
-					openImportMessage(importLabel ,closeImportButton);
-					pool.execute(DataManager.importIntoDb(AppData.getInstance().getImportFolder()));
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
 	}
 }
