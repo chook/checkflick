@@ -810,6 +810,10 @@ public class CheckFlickGUI {
 			langString[i+1]=langList.get(i).getName();
 		}
 		langCombo.setItems(langString);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 4;
+		langCombo.setLayoutData(gridData);
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
@@ -1181,18 +1185,13 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		label.setText("Plot:");
 		final Text plotText = new Text(composite ,SWT.MULTI|SWT.BORDER| SWT.V_SCROLL);
-		Button edit = new Button(composite , SWT.PUSH);
-		edit.setText("Edit");
-		edit.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent arg0) {	
-			}
-			public void widgetSelected(SelectionEvent arg0) {
-				openEditWindow(null, plotText);
-			}
-		});
-		label = new Label(composite,SWT.NONE);
-		label = new Label(composite,SWT.NONE);
-		label = new Label(composite,SWT.NONE);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 5;
+		gridData.verticalAlignment = GridData.FILL;
+		gridData.verticalSpan = 2;
+		plotText.setLayoutData(gridData);
+		label = new Label(composite , SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Insert");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -1258,7 +1257,7 @@ public class CheckFlickGUI {
 		});
 		
 		bar.setSpacing(8);
-		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3-60);
+		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 	}
 	public void insertPerson(Composite insert){
 		
@@ -1721,18 +1720,13 @@ public class CheckFlickGUI {
 		final Text plotText = new Text(composite ,SWT.WRAP|SWT.V_SCROLL|SWT.MULTI);
 		if (movie.getPlot()!= null)
 			plotText.setText(movie.getPlot());
-		Button edit = new Button(composite, SWT.PUSH);
-		edit.setText("Edit");
-		edit.addSelectionListener(new SelectionListener(){
-			public void widgetDefaultSelected(SelectionEvent arg0) {
-			}
-			public void widgetSelected(SelectionEvent arg0) {
-				openEditWindow(movie , plotText);
-			}
-		});
-		label= new Label(composite, SWT.NONE);
-		label = new Label(composite,SWT.NONE);
-		label = new Label(composite,SWT.NONE);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 5;
+		gridData.verticalAlignment = GridData.FILL;
+		gridData.verticalSpan = 2;
+		plotText.setLayoutData(gridData);
+		label = new Label(composite ,SWT.NONE);
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.addSelectionListener(new SelectionListener() {
@@ -2684,58 +2678,7 @@ public class CheckFlickGUI {
 		});
 		addToMovie.open();
 	}
-	static protected void openEditWindow(final MovieEntity movie , final Text plot){
-		shell.getShell().setEnabled(false);
-		//final RibbonShell personResults = new RibbonShell(display);	
-		final Shell editPlot = new Shell(SWT.CLOSE);
-		Color bgColor = new Color(display , 177 ,200 , 231);
-		editPlot.setBackground(bgColor);
-		editPlot.setLayout(new RowLayout(SWT.WRAP));
-		
-		Rectangle monitor_bounds = editPlot.getShell().getMonitor().getBounds();
-		editPlot.setSize(new Point(monitor_bounds.width/2,200));		
-		editPlot.setText("Edit Plot");		
-		Label label = new Label(editPlot , SWT.NONE);
-		label.setBackground(bgColor);
-		label.setText("Plot");
-		final Text plotText = new Text(editPlot , SWT.V_SCROLL|SWT.WRAP);
-		if (movie!= null && movie.getPlot()!=null)
-			plotText.setText(movie.getPlot());
-		plotText.setSize(100 ,100);
-		Button add = new Button(editPlot, SWT.PUSH);
-		add.setText("Add");
-		add.setBackground(bgColor);
-		Button close = new Button(editPlot, SWT.PUSH);
-		close.setText("Close");
-		close.setBackground(bgColor);
-		add.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				
-				if (plotText.getText()!=""){
-					plot.setText(plotText.getText());
-				}
-				else{
-					okMessageBox("Please insert information to add.");
-				}
-			}
-		});
-		close.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-			public void widgetSelected(SelectionEvent e) {
-				shell.getShell().setEnabled(true);	
-				editPlot.close();
-			}
-		});
-		editPlot.addDisposeListener( new DisposeListener(){
-			public void widgetDisposed(DisposeEvent e) {
-				shell.getShell().setEnabled(true);
-			}			
-		});
-		editPlot.open();
-	}
+
 	static protected void redrawPersonTable(final int id ,final PersonDataEnum type){
 		display.asyncExec(new Runnable() {
 			public void run() {
