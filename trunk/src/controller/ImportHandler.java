@@ -78,7 +78,10 @@ public class ImportHandler {
 		
 		// removing the temp field used to import movies and other entities
 		importer.deleteMoviesTempField();
-
+		
+		// add references to new primary keys that were created during the import
+		importer.finishImport();
+		
 		return true;
 		
 	}

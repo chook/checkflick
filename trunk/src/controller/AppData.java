@@ -3,17 +3,22 @@ package controller;
 import java.io.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.xml.parsers.*;
 import org.ini4j.*;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 /**
- * This class represents the configurations of the application (fetched from an INI file)
+ * This class represents the configurations of the application (fetched from an
+ * INI file)
+ * 
  * @author Chook
- *
+ * 
  */
 public class AppData {
+	public synchronized static AppData getInstance() {
+		if (instance == null)
+			instance = new AppData();
+		return instance;
+	}
+
 	private String importFolder;
 	private String dbHost;
 	private String dbUsername;
@@ -24,30 +29,18 @@ public class AppData {
 	private int maxConnections;
 	private int bucketMaxSize;
 	private int preparedStatementMaxBatchSize;
+
 	private static AppData instance = null;
-	
+
 	protected AppData() {
-		parseINIFile("");
+		resetToDefaults();
 	}
 
-	public synchronized static AppData getInstance() {
-		if(instance == null)
-			instance = new AppData();
-		return instance;
-	}
-	
 	/**
 	 * @return the bucketMaxSize
 	 */
 	public int getBucketMaxSize() {
 		return bucketMaxSize;
-	}
-
-	/**
-	 * @return the dbConnectionString
-	 */
-	public String getDbConnectionString() {
-		return dbHost;
 	}
 
 	/**
@@ -113,78 +106,49 @@ public class AppData {
 		return preparedStatementMaxBatchSize;
 	}
 
+	/**
+	 * Parsing the ini file to get the configurations
+	 * 
+	 * @param fullpath
+	 *            - The path of the ini file
+	 */
 	public void parseINIFile(String fullpath) {
 		Preferences prefs = null;
 		try {
 			prefs = new IniFile(new File(fullpath));
-			setBucketMaxSize(Integer.parseInt(prefs.node("settings").get("maxbucket", null)));
+			setBucketMaxSize(Integer.parseInt(prefs.node("settings").get(
+					"maxbucket", null)));
 			setDbHost(prefs.node("db").get("host", null));
 			setDbPassword(prefs.node("db").get("host", null));
 			setDbPort(prefs.node("db").get("port", null));
 			setDbServer(prefs.node("db").get("server", null));
 			setDbUsername(prefs.node("db").get("username", null));
 			setImportFolder(prefs.node("settings").get("importpath", null));
-			setMaxConnections(Integer.parseInt(prefs.node("db").get("connections", null)));
-			setMaxThreads(Integer.parseInt(prefs.node("settings").get("threads", null)));
-			setPreparedStatementMaxBatchSize(Integer.parseInt(prefs.node("settings").get("maxbatch", null)));
+			setMaxConnections(Integer.parseInt(prefs.node("db").get(
+					"connections", null)));
+			setMaxThreads(Integer.parseInt(prefs.node("settings").get(
+					"threads", null)));
+			setPreparedStatementMaxBatchSize(Integer.parseInt(prefs.node(
+					"settings").get("maxbatch", null)));
 		} catch (BackingStoreException e) {
-			setBucketMaxSize(100000);
-			setDbHost("orasrv");
-			setDbPassword("nadavsh2");
-			setDbPort("1521");
-			setDbServer("csodb");
-			setDbUsername("nadavsh2");
-			setImportFolder("~/users/courses/database/imdb/extracted/");
-			setMaxConnections(6);
-			setMaxThreads(6);
-			setPreparedStatementMaxBatchSize(20000);
+			resetToDefaults();
 		}
 	}
 
 	/**
-	 * Parsing the configuration xml file
+	 * Reseting to defaults
 	 */
-	@Deprecated
-	public void parseXMLFile() {
-		// TODO: For now this sucks. big time.
-		try {
-			File file = new File("c:\\MyFile.xml");
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.parse(file);
-			document.getDocumentElement().normalize();
-			System.out.println("Root element "
-					+ document.getDocumentElement().getNodeName());
-			NodeList node = document.getElementsByTagName("checkflick");
-
-			for (int i = 0; i < node.getLength(); i++) {
-				Node firstNode = node.item(i);
-				if (firstNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element element = (Element) firstNode;
-					NodeList firstNameElemntList = element
-							.getElementsByTagName("dbUsername");
-					Element firstNameElement = (Element) firstNameElemntList
-							.item(0);
-					NodeList firstName = firstNameElement.getChildNodes();
-					dbUsername = ((Node) firstName.item(0)).getNodeValue();
-
-					NodeList lastNameElementList = element
-							.getElementsByTagName("dbPassword");
-					Element lastNameElement = (Element) lastNameElementList
-							.item(0);
-					NodeList lastName = lastNameElement.getChildNodes();
-					dbPassword = ((Node) lastName.item(0)).getNodeValue();
-				}
-			}
-		} catch (IOException ioe) {
-
-		} catch (SAXException saxe) {
-
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void resetToDefaults() {
+		setBucketMaxSize(100000);
+		setDbHost("orasrv");
+		setDbPassword("nadavsh2");
+		setDbPort("1521");
+		setDbServer("csodb");
+		setDbUsername("nadavsh2");
+		setImportFolder("~/users/courses/database/imdb/extracted/");
+		setMaxConnections(6);
+		setMaxThreads(6);
+		setPreparedStatementMaxBatchSize(20000);
 	}
 
 	/**

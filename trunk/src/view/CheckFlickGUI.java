@@ -73,7 +73,14 @@ public class CheckFlickGUI {
 	static Button closeImportButton;
 	
 	public static void main(String args []) {
-		AppData.getInstance().parseINIFile("ini\\checkflick.ini");
+		try {
+			if(args.length > 0)
+				AppData.getInstance().parseINIFile(args[0]);
+			else
+				AppData.getInstance().resetToDefaults();
+		} catch (ClassFormatError cfe) {
+			AppData.getInstance().resetToDefaults();
+		}
 		pool = new ThreadPool(AppData.getInstance().getMaxThreads());
 		dm = new DataManager();
 		display = new Display();

@@ -2,6 +2,7 @@ package model;
 
 import java.sql.*;
 import java.util.*;
+import controller.AppData;
 import controller.filter.*;
 import controller.entity.*;
 import controller.enums.*;
@@ -16,14 +17,14 @@ public class DBManager {
 
 	// Different Connections used in testings
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
-	private static int CONNECTION_MAX_CONNECTIONS = 6;
+	private static int CONNECTION_MAX_CONNECTIONS = AppData.getInstance().getMaxConnections();
 	private static int RESULTS_FETCH_SIZE = 1000;
 /** Chen's home server 1	**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "chook";
 //	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@";
 	private static String CONNECTION_USERNAME = "chenhare";
 	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
@@ -74,11 +75,15 @@ public class DBManager {
 	 * Default Constructor - Initiates the connection pool
 	 */
 	protected DBManager() {
-		pool = DBConnectionPool.getInstance(CONNECTION_URI, 
-											CONNECTION_USERNAME, 
-											CONNECTION_PASSWORD, 
+		String conURI = CONNECTION_URI + AppData.getInstance().getDbHost() + ":" +
+			AppData.getInstance().getDbPort() + ":" +
+			AppData.getInstance().getDbServer();
+			
+		pool = DBConnectionPool.getInstance(conURI, 
+											AppData.getInstance().getDbUsername(), 
+											AppData.getInstance().getDbPassword(), 
 											CONNECTION_DRIVER_NAME, 
-											CONNECTION_MAX_CONNECTIONS);
+											AppData.getInstance().getMaxConnections());
 		
 		filters = OracleFilterManager.getInstance();
 	}
@@ -105,6 +110,8 @@ public class DBManager {
 		// Trying to get a connection statement
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -175,6 +182,8 @@ public class DBManager {
 	
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
@@ -230,6 +239,8 @@ public class DBManager {
 		System.out.println(pstmtStr);
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(1000);
@@ -268,6 +279,8 @@ public class DBManager {
 		System.out.println(pstmtStr);
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return;
 			pstmt = conn.prepareStatement(pstmtStr);
 			pstmt.executeQuery();
 			pstmt.close();
@@ -290,6 +303,8 @@ public class DBManager {
 		System.out.println(pstmtStr);
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return;
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
@@ -339,7 +354,6 @@ public class DBManager {
 		}
 		
 		pool.returnConnection(conn);
-		
 	}
 	
 	public void updateDuplicates(Set<Relation> duplicatesSet) {
@@ -353,6 +367,8 @@ public class DBManager {
 		System.out.println("updating duplicates");
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return;
 			pstmt = conn.prepareStatement(pstmtStr);
 
 			for (Relation setEntity : duplicatesSet) {
@@ -396,6 +412,8 @@ public class DBManager {
 		System.out.println(pstmtStr);
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
@@ -444,6 +462,8 @@ public class DBManager {
 		// Trying to get a connection statement
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			s = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -494,6 +514,8 @@ public class DBManager {
 
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			pstmt = conn.prepareStatement(SELECT_MOVIE_PSTMT);
 			pstmt.setInt(1, id);
 
@@ -552,6 +574,8 @@ public class DBManager {
 
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			pstmt = conn.prepareStatement(SELECT_PERSON_PSTMT);
 			pstmt.setInt(1, id);
 
@@ -665,6 +689,8 @@ public class DBManager {
 
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return false;
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (NamedRelation setNamedRelation : set) {
@@ -700,6 +726,8 @@ public class DBManager {
 		Connection conn = null;
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return false;
 			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)", 
 														DBTablesEnum.MOVIES.getTableName(), 
 														DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
@@ -736,6 +764,8 @@ public class DBManager {
 										DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return false;
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (NamedEntity setEntity : set) {
@@ -769,6 +799,8 @@ public class DBManager {
 		System.out.println(statementStr);
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return false;
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (CastingRelation setRelation : set) {
@@ -842,6 +874,8 @@ public class DBManager {
 
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return false;
 			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s) VALUES (?)",
 														table.getTableName(),
 														field.getFieldName()));
@@ -877,6 +911,8 @@ public class DBManager {
 
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return null;
 			stmt = conn.createStatement();
 			switch (tableToSearch) {
 			case MOVIES:
@@ -1025,9 +1061,12 @@ public class DBManager {
 		// Trying to get a connection statement
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return -2;
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return -2;
 		}
 	
 		// Executing the query and building the movies array
@@ -1157,6 +1196,8 @@ public class DBManager {
 		// Trying to get a connection statement
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return -2;
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1217,6 +1258,8 @@ public class DBManager {
 		// Trying to get a connection statement
 		try {
 			conn = pool.getConnection();
+			if(conn == null)
+				return false;
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
