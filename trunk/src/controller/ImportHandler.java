@@ -61,39 +61,24 @@ public class ImportHandler {
 		
 		DataImporter importer;
 		
-		// TODO: bring back the verification when testings are over
-		// check all files were given and that they exist 
-/*		if (!verifyFiles())
+		// check that all files were given 
+		if (!verifyFiles())
 			return false;
-*/	
+	
 		importer = new DataImporter(listfilesMap);
 		
-		importer.importLanguagesGenresCountries();
-//		importer.importMovies();
-		importer.importMoviesLanguagesGenresCountries();
-//		importer.importPersonsAndCredits();
+		importer.importDataTypes();
+		
+		// creating temp field used to import movies and other entities
+		importer.createMoviesTempField();
+		importer.importMovies();
+		
+		importer.importMoviesDataTypes();
+		importer.importPersonsAndCredits();
+		
+		// removing the temp field used to import movies and other entities
+		importer.deleteMoviesTempField();
 
-/*		importer.getMoviesColorInfo();
-		importer.getMoviesAKATitles();
-		importer.getMoviesCrazyCredits();
-		importer.getMoviesGoofs();
-		importer.getMoviesLocations();
-		importer.getMoviesConnections();
-		importer.getMoviesQuotes();
-		importer.getMoviesPlots();
-		importer.getMoviesRunningTimes();
-		importer.getMoviesTaglines();
-		importer.getMoviesTrivias();
-*/		
-		// removing temporary fields TEMP_MOVIE_FULL_NAME
-		
-/*		// ------------------ dependent only on Persons
-		importer.getAKANames();
-		importer.getBiographies();
-		
-*/		// ------------------ dependent on both Persons and Movies
-		
-		
 		return true;
 		
 	}

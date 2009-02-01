@@ -48,7 +48,6 @@ public class Parser {
 			// Opening the file
 			FileInputStream fstream = new FileInputStream(filename);
 			// Convert our input stream to a DataInputStream
-			//InputStreamReader insr = new InputStreamReader(fstream, "UTF-8");
 			InputStreamReader insr = new InputStreamReader(fstream);
 			listFile =  new BufferedReader(insr);
 			this.listType = listType;
@@ -237,23 +236,6 @@ public class Parser {
 			System.err.println("File input error");
 		}
 		return -2;
-	}
-	
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	public boolean printLine() {
-		try {
-			if (!isEOF()) {
-				System.out.println(readLine());
-			}
-		}
-		catch (Exception e) {
-			System.err.println("File input error");
-		}
-		
-		return false;
 	}
 	
 	/**
