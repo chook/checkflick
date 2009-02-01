@@ -552,7 +552,6 @@ public class CheckFlickGUI {
     			pool.stopRequestAllWorkers();
 			}
 		});
-
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
 			
@@ -1383,7 +1382,6 @@ public class CheckFlickGUI {
 				}
 			}
 		}
-		//else return "";
 		return name;
 	}
 	static private void drawGeneralInformationPerson(final PersonEntity person , final int tabIndex){
