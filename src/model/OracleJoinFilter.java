@@ -29,7 +29,6 @@ public class OracleJoinFilter extends AbsJoinFilter {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		StringBuffer buffer = new StringBuffer();
 		if(single != null) {
 			buffer.append(single);

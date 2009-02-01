@@ -36,8 +36,7 @@ public class OracleSingleFilter extends AbsSingleFilter {
 		case NUMBER:
 			strFilter = table + "." + column + "=" + value;
 			break;
-		case DATE: // TODO: This is wrong but i still haven't checked how to
-			// properly do it
+		case DATE: 
 		case STRING:
 			strFilter = table + "." + column + " = '" + value + "'";
 			break;

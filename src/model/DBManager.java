@@ -195,10 +195,6 @@ public class DBManager {
 				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
 				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
 				moviesMap.put(tempMovieName, tempMovieId);
-				
-				// TODO: alive check
-				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
-					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
 			}
 			set.close();
 			pstmt.close();
@@ -493,7 +489,6 @@ public class DBManager {
 					break;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		pool.returnConnection(conn);
@@ -896,7 +891,6 @@ public class DBManager {
 	 * The search function - searches movies/persons
 	 * @param arlFilters - List of filters
 	 * @param tableToSearch - The table to search
-	 * TODO: Change this function a little bit, we know which table we use from the filters,
 	 * no need to send it as an extra parameter (Chen 24.01.09)
 	 * @return List of search objects
 	 */
@@ -954,11 +948,9 @@ public class DBManager {
 	}
 	
 	/**
-	 * executes the executePreparedStatementBatch TODO: check the return values
-	 * of the executeBatch method (Nadav 23/01/09 0:30am)
+	 * executes the executePreparedStatementBatch
 	 */
 	private boolean executePreparedStatementBatch(PreparedStatement pstmt) {
-
 		try {
 			pstmt.executeBatch();
 
@@ -990,7 +982,6 @@ public class DBManager {
 			movie.setName(set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName()));
 			movie.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName()));
 			movie.setRunningTime(set.getInt(DBFieldsEnum.MOVIES_MOVIE_RUNNING_TIME.getFieldName()));
-			movie.setFullMovieName(set.getString(DBFieldsEnum.MOVIES_MOVIE_TAGLINE.getFieldName()));
 			movie.setPlot(set.getString(DBFieldsEnum.MOVIES_MOVIE_PLOT_TEXT.getFieldName()));
 		} catch (SQLException e) {
 			System.out.println("SQLException error");
@@ -1225,14 +1216,12 @@ public class DBManager {
 				}
 			}
 			stbQuery.append(stbWhere);
-			stmt.executeUpdate(stbQuery.toString(), Statement.RETURN_GENERATED_KEYS);
-			set = stmt.getGeneratedKeys();
-			returnValue = set.getInt(1);
+			stmt.executeUpdate(stbQuery.toString());
 		} catch (SQLException e) {
 			return -1;
 		}
 		pool.returnConnection(conn);
-		return returnValue;
+		return 1;
 	}
 
 	/**
