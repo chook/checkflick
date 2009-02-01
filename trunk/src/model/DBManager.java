@@ -2,7 +2,6 @@ package model;
 
 import java.sql.*;
 import java.util.*;
-
 import controller.filter.*;
 import controller.entity.*;
 import controller.enums.*;
@@ -94,7 +93,7 @@ public class DBManager {
 		return getAbsDataType(data, filter, null);
 	}
 	public List<AbsType> getAbsDataType(EntityEnum data, AbsFilter filter, AbsFilter filter2) {
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		List<AbsType> retList = new ArrayList<AbsType>();
 		Statement stmt;
 		ResultSet resultSet;
@@ -105,6 +104,7 @@ public class DBManager {
 		
 		// Trying to get a connection statement
 		try {
+			conn = pool.getConnection();
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -163,7 +163,7 @@ public class DBManager {
 		Map<String, Integer> moviesMap = null;
 		
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		
 		// creating the generic statement that contains the table and field names
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, "*", DBTablesEnum.MOVIES, DBFieldsEnum.MOVIES_MOVIE_ID);
@@ -174,17 +174,20 @@ public class DBManager {
 		System.out.println(pstmtStr);
 	
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
 			moviesMap = new HashMap<String, Integer>();
+			
 			// going over the movies retrieved from the DB and adding the full movie name to the map for comparison
 			while (set.next()) {
 				// retrieving the different fields
 				tempMovieId = set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName());
 				tempMovieName = set.getString(DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName());
 				moviesMap.put(tempMovieName, tempMovieId);
-				// alive check
+				
+				// TODO: alive check
 				if (moviesMap.size() > 0 && moviesMap.size() % 10000 == 0)
 					System.out.println("- already entered " + moviesMap.size() + " elements to the moviesMap");
 			}
@@ -214,7 +217,7 @@ public class DBManager {
 		ResultSet set = null;
 
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		// creating the generic statement that contains the table and field names
 		String fields = DBFieldsEnum.PERSONS_PERSON_ID + "," + DBFieldsEnum.PERSONS_PERSON_NAME;
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, fields, DBTablesEnum.PERSONS, DBFieldsEnum.PERSONS_PERSON_NAME);
@@ -226,6 +229,7 @@ public class DBManager {
 		Map<String, Integer> personsMap = null;
 		System.out.println(pstmtStr);
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(1000);
@@ -258,11 +262,12 @@ public class DBManager {
 	public void executeSQL(String query) {
 		
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		String pstmtStr = query;
 		
 		System.out.println(pstmtStr);
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(pstmtStr);
 			pstmt.executeQuery();
 			pstmt.close();
@@ -278,12 +283,13 @@ public class DBManager {
 		Set<Relation> duplicatesSet = new LinkedHashSet<Relation>();
 
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		String pstmtStr = "SELECT * FROM " + DBTablesEnum.PERSONS.getTableName() +
 							" ORDER BY " + DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName() + ", "
 										+ DBFieldsEnum.PERSONS_PERSON_ID.getFieldName();
 		System.out.println(pstmtStr);
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
@@ -339,13 +345,14 @@ public class DBManager {
 	public void updateDuplicates(Set<Relation> duplicatesSet) {
 
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		String pstmtStr = "UPDATE " + DBTablesEnum.PERSONS.getTableName() + " SET " +
 							DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName() + " = 'Y', " +
 							DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName() + " = ? " +
 							"WHERE " + DBFieldsEnum.PERSONS_PERSON_ID.getFieldName() + " = ?";
 		System.out.println("updating duplicates");
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(pstmtStr);
 
 			for (Relation setEntity : duplicatesSet) {
@@ -377,7 +384,7 @@ public class DBManager {
 
 		System.out.println("getting " + bucketSize + " persons from the DB");
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		// creating the generic statement that contains the table and field names
 		String fields = "TEMP_PERSON_ID," + DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER;
 		String genericStr = String.format(SELECT_GENERIC_ORDERED_STMT, fields, DBTablesEnum.PERSONS, DBFieldsEnum.PERSONS_PERSON_ID);
@@ -388,6 +395,7 @@ public class DBManager {
 		int tempPersonLineNumber = 0;
 		System.out.println(pstmtStr);
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(pstmtStr);
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
@@ -431,11 +439,12 @@ public class DBManager {
 		Statement s;
 		ResultSet set;
 		String query = "SELECT * FROM ";
-		Connection c = pool.getConnection();
+		Connection conn = null;
 		
 		// Trying to get a connection statement
 		try {
-			s = c.createStatement();
+			conn = pool.getConnection();
+			s = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
@@ -467,7 +476,7 @@ public class DBManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		pool.returnConnection(c);
+		pool.returnConnection(conn);
 		return list;
 	}
 
@@ -481,9 +490,10 @@ public class DBManager {
 		ResultSet set = null;
 
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(SELECT_MOVIE_PSTMT);
 			pstmt.setInt(1, id);
 
@@ -538,9 +548,10 @@ public class DBManager {
 		PersonEntity tempMovie = null;
 		ResultSet set = null;
 		PreparedStatement pstmt = null;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(SELECT_PERSON_PSTMT);
 			pstmt.setInt(1, id);
 
@@ -594,7 +605,6 @@ public class DBManager {
 			String value2) {
 		return filters.getSearchFilter(entity, value, value2);
 	}
-
 	
 	/**
 	 * This function inserts a movie data into the DB
@@ -646,7 +656,7 @@ public class DBManager {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		String statementStr;
 		statementStr = String.format(INSERT_MOVIE_SINGLE_DATATYPE, 
 										table.getTableName(), 
@@ -654,6 +664,7 @@ public class DBManager {
 										field2.getFieldName());
 
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (NamedRelation setNamedRelation : set) {
@@ -669,7 +680,6 @@ public class DBManager {
 		pool.returnConnection(conn);
 		return bReturn;
 	}
-	
 	
 	/**
 	 * This function receives a set of values, and a definition of a table, and
@@ -687,10 +697,9 @@ public class DBManager {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = pool.getConnection();
-		
-
+		Connection conn = null;
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)", 
 														DBTablesEnum.MOVIES.getTableName(), 
 														DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName(),
@@ -716,17 +725,17 @@ public class DBManager {
 		return bReturn;
 	}
 	public boolean insertPersonsSetToDB(Set<NamedEntity> set) {
-	
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		String statementStr;
 		statementStr = String.format("INSERT INTO %s (%s, %s) VALUES (?, ?)", 
 										DBTablesEnum.PERSONS.getTableName(), 
 										DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName(),
 										DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (NamedEntity setEntity : set) {
@@ -747,7 +756,7 @@ public class DBManager {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		String statementStr;
 		statementStr = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)", 
 										DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
@@ -759,6 +768,7 @@ public class DBManager {
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_CREDITS_RANK.getFieldName());
 		System.out.println(statementStr);
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(statementStr);
 
 			for (CastingRelation setRelation : set) {
@@ -828,9 +838,10 @@ public class DBManager {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 
 		try {
+			conn = pool.getConnection();
 			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s) VALUES (?)",
 														table.getTableName(),
 														field.getFieldName()));
@@ -861,18 +872,19 @@ public class DBManager {
 		List<DatedEntity> arlSearchResults = new ArrayList<DatedEntity>();
 		DatedEntity result = null;
 		ResultSet set = null;
-		Statement s = null;
-		Connection conn = pool.getConnection();
+		Statement stmt = null;
+		Connection conn = null;
 
 		try {
-			s = conn.createStatement();
+			conn = pool.getConnection();
+			stmt = conn.createStatement();
 			switch (tableToSearch) {
 			case MOVIES:
 				
 				if(arlFilters.size() == 0)
-					set = s.executeQuery(SEARCH_MOVIE_STMT + DBTablesEnum.MOVIES);
+					set = stmt.executeQuery(SEARCH_MOVIE_STMT + DBTablesEnum.MOVIES);
 				else
-					set = s.executeQuery(SEARCH_MOVIE_STMT
+					set = stmt.executeQuery(SEARCH_MOVIE_STMT
 							+ parseClauseFromFilters(arlFilters));
 				
 				System.out.println("top important: " + set.getFetchSize());
@@ -880,9 +892,9 @@ public class DBManager {
 
 			case PERSONS:
 				if(arlFilters.size() == 0)
-					set = s.executeQuery(SEARCH_PERSON_STMT + DBTablesEnum.PERSONS);
+					set = stmt.executeQuery(SEARCH_PERSON_STMT + DBTablesEnum.PERSONS);
 				else
-					set = s.executeQuery(SEARCH_PERSON_STMT
+					set = stmt.executeQuery(SEARCH_PERSON_STMT
 							+ parseClauseFromFilters(arlFilters));
 				break;
 
@@ -1000,7 +1012,7 @@ public class DBManager {
 	 */
 	private int insertAbsDataType(EntityEnum entity,
 								  List<AbsSingleFilter> filterList) {
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		Statement stmt = null;
 		StringBuffer stbQuery = new StringBuffer();
 		int i = 0;
@@ -1012,6 +1024,7 @@ public class DBManager {
 		
 		// Trying to get a connection statement
 		try {
+			conn = pool.getConnection();
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1133,7 +1146,7 @@ public class DBManager {
 
 	private int updateAbsDataType(EntityEnum entity,
 			  						List<AbsSingleFilter> filterList) {							
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		Statement stmt = null;
 		StringBuffer stbQuery = new StringBuffer();
 		StringBuffer stbWhere = new StringBuffer();
@@ -1143,6 +1156,7 @@ public class DBManager {
 		
 		// Trying to get a connection statement
 		try {
+			conn = pool.getConnection();
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1184,7 +1198,7 @@ public class DBManager {
 	 * Deletes a movie 
 	 * @param dataType - The movie data type
 	 * @param dataObject - The object
-	 * @return True if delete successfuly or False otherwise
+	 * @return True if delete was successful or False otherwise
 	 */
 	public boolean deleteMovieEntity(MovieDataEnum dataType, AbsType dataObject) {
 		return deleteAbsDataType(filters.getMovieDeleteFilter(dataType, dataObject));
@@ -1195,13 +1209,14 @@ public class DBManager {
 	}
 
 	private boolean deleteAbsDataType(List<AbsSingleFilter> filterList) {
-		Connection conn = pool.getConnection();
+		Connection conn = null;
 		Statement stmt = null;
 		StringBuffer stbQuery = new StringBuffer();
 		int i = 0;
 		
 		// Trying to get a connection statement
 		try {
+			conn = pool.getConnection();
 			stmt = conn.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
