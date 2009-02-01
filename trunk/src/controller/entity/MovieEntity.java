@@ -11,11 +11,9 @@ public class MovieEntity extends NamedEntity {
 	private int year;
 	private String romanNotation;
 	private String madeFor;
-	private int colorInfo;
 	private int runningTime;
 	private String fullMovieName;
 	private String plot;
-	private String filmingLocations;
 
 	/**
 	 * Default Constructor
@@ -76,21 +74,6 @@ public class MovieEntity extends NamedEntity {
 	public void setMadeFor(String madeFor) {
 		this.madeFor = madeFor;
 	}
-	
-	/**
-	 * @return the colorInfo
-	 */
-	public int getColorInfo() {
-		return colorInfo;
-	}
-
-	/**
-	 * @param colorInfo
-	 *            the colorInfo to set
-	 */
-	public void setColorInfo(int colorInfo) {
-		this.colorInfo = colorInfo;
-	}
 
 	/**
 	 * @return the runningTime
@@ -108,7 +91,7 @@ public class MovieEntity extends NamedEntity {
 	}
 
 	/**
-	 * @return the taglines
+	 * @return the the fule movie name
 	 */
 	public String getFullMovieName() {
 		return fullMovieName;
@@ -138,18 +121,17 @@ public class MovieEntity extends NamedEntity {
 	}
 
 	/**
-	 * @return the filmingLocations
+	 * Movie entity
 	 */
-	public String getFilmingLocations() {
-		return filmingLocations;
-	}
-
-	/**
-	 * @param filmingLocations
-	 *            the filmingLocations to set
-	 */
-	public void setFilmingLocations(String filmingLocations) {
-		this.filmingLocations = filmingLocations;
+	public MovieEntity(int id, String name, int year, String romanNotation, String madeFor,
+			int runningTime, String fullMovieName, String plot) {
+		super(id, name);
+		this.year = year;
+		this.romanNotation = romanNotation;
+		this.madeFor = madeFor;
+		this.runningTime = runningTime;
+		this.fullMovieName = fullMovieName;
+		this.plot = plot;
 	}
 
 	/**
@@ -158,24 +140,19 @@ public class MovieEntity extends NamedEntity {
 	 * @param id
 	 * @param name
 	 * @param year
-	 * @param colorInfo
 	 * @param runningTime
 	 * @param fullMovieNames
 	 * @param plot
-	 * @param filmingLocations
 	 */
 	public MovieEntity(int id, String name, int year, String romanNotation, String madeFor, int colorInfo, int runningTime,
 			String fullMovieNames, String plot, String filmingLocations) {
 		super(id, name);
-
 		this.year = year;
 		this.romanNotation = romanNotation;
 		this.madeFor = madeFor;
-		this.colorInfo = colorInfo;
 		this.runningTime = runningTime;
 		this.fullMovieName = fullMovieNames;
 		this.plot = plot;
-		this.filmingLocations = filmingLocations;
 	}
 
 	/**
@@ -204,19 +181,16 @@ public class MovieEntity extends NamedEntity {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "id: " + getId() + ". Name: " + getName() + ". Was filmed in: "
-				+ getFilmingLocations();
+		return "id: " + getId() + ". Name: " + getName() + ".";
 	}
 
 	@Override
 	public List<String> toStringList() {
 		List<String> list = super.toStringList();
 		list.add(String.valueOf(getYear()));
-		list.add(String.valueOf(getColorInfo()));
 		list.add(String.valueOf(getRunningTime()));
 		list.add(getFullMovieName());
 		list.add(getPlot());
-		list.add(getFilmingLocations());
 		return list;
 	}
 }
