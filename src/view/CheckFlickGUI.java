@@ -1077,6 +1077,11 @@ public class CheckFlickGUI {
 		}
 	}
 	
+	/**
+	 * Open a composite with expanded bar.
+	 * In this composite one can add a movie
+	 * Name and year must be entered
+	 */
 	public void insertMovie(){
 		cleanAllComposites();
 		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
@@ -1089,7 +1094,8 @@ public class CheckFlickGUI {
 		bar = new ExpandBar (insertMovie, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("add_48.png");
-		// First item
+		
+		// Main item
 		Composite composite = new Composite (bar, SWT.NONE);
 		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
@@ -1121,8 +1127,9 @@ public class CheckFlickGUI {
 		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 		item0.setControl(composite);
 		item0.setImage(image);
-		
 		item0.setExpanded(true);
+		
+		//listen to the insert button
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1161,6 +1168,7 @@ public class CheckFlickGUI {
 					if (plotText.getText() != "")
 						plot = plotText.getText();
 					if (valid){
+						//inserting
 						AbsType movie = new MovieEntity(0, nameText.getText(),mYear,null , null, time ,null, plot);
 						try {
 							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE, movie , false));
@@ -1175,6 +1183,12 @@ public class CheckFlickGUI {
 		bar.setSpacing(8);
 		insertMovie.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 	}
+	
+	/**
+	 * Open a composite with expanded bar.
+	 * In this composite one can add a person
+	 * Name , year and origin country must be entered
+	 */
 	public void insertPerson(){
 		cleanAllComposites();
 		insertPerson = new Composite(shell.getShell(),SWT.BORDER);
@@ -1188,7 +1202,7 @@ public class CheckFlickGUI {
 		bar = new ExpandBar (insertPerson, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("add_48.png");
-		// First item
+		// Main item
 		Composite composite = new Composite (bar, SWT.NONE);
 		GridLayout layout = new GridLayout (6,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
@@ -1226,8 +1240,9 @@ public class CheckFlickGUI {
 		item0.setHeight(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 		item0.setControl(composite);
 		item0.setImage(image);
-		
 		item0.setExpanded(true);
+		
+		//listen to the insert button
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1276,6 +1291,7 @@ public class CheckFlickGUI {
 						valid = false;
 					}
 					if (valid){
+						// inserting
 						AbsType person = new PersonEntity(0,nameText.getText() ,bYear , city , country , dYear);
 						try {
 							pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON, person , false));
@@ -1291,6 +1307,9 @@ public class CheckFlickGUI {
 		insertPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 	}
 	
+	/**
+	 * Getting the id of a string according to one of the list that were received from the DB
+	 */
 	static private String getID(List<NamedEntity> list , String name){
 		String id=null;
 		for (int i=0; i<list.size(); i++){
@@ -1301,6 +1320,10 @@ public class CheckFlickGUI {
 		}
 		return id;
 	}
+	
+	/**
+	 * Getting the name of the id according to one of the list that were received from the DB
+	 */
 	static private String getName(List<NamedEntity> list , String id){
 		String name=null;
 		if (id != null){
@@ -1313,32 +1336,12 @@ public class CheckFlickGUI {
 		}
 		return name;
 	}
+	
+	/**
+	 * Drawing the general information about a person
+	 */
 	static private void drawGeneralInformationPerson(final PersonEntity person , final int tabIndex){
-		if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-			searchByMovie.dispose();
-		if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-			searchByPerson.dispose();
-		if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-			insertMovie.dispose();
-		if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-			insertPerson.dispose();
-		if ((movieButtons != null) && !(movieButtons.isDisposed()))
-			movieButtons.dispose();
-		if ((personButtons != null) && !(personButtons.isDisposed()))
-			personButtons.dispose();
-		if ((otherResults != null) && !(otherResults.isDisposed()))
-			otherResults.dispose();
-		if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
-			resultsMovieTable.dispose();
-		if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
-			resultsPersonTable.dispose();
-		if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-			entityDetails.dispose();
-		if ((bar!=null)&& !(bar.isDisposed()))
-			bar.dispose();
-		if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-			entityDetails.dispose();
-		
+		cleanAllComposites();
 		entityDetails = new Composite(shell.getShell(),SWT.BORDER);
 		entityDetails.setLocation(2, 145);
 		entityDetails.setLayout(new FillLayout());
@@ -1393,6 +1396,7 @@ public class CheckFlickGUI {
 
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
+		//listen to the save button
 		save.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1469,6 +1473,7 @@ public class CheckFlickGUI {
 					}
 				}
 				if (update && valid){
+					//saving
 					person.setCityOfBirth(newCity);
 					person.setCountryOfBirth(newCountry);
 					person.setName(newName);
@@ -1481,6 +1486,7 @@ public class CheckFlickGUI {
 					}
 				}
 				else{
+					//couldn't save
 					if (!update)
 						okMessageBox("You didn't change anything.");
 				}
@@ -1489,6 +1495,7 @@ public class CheckFlickGUI {
 		});
 		Button reset = new Button(composite , SWT.PUSH);
 		reset.setText("Reset");
+		//listen to the reset button
 		reset.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1519,6 +1526,7 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		Button delete = new Button(composite , SWT.PUSH);
 		delete.setText("Delete Person");
+		// listen to the delete button
 		delete.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
@@ -1526,6 +1534,7 @@ public class CheckFlickGUI {
 				switch(yesNoMessageBox("Are you sure you want to delete this person?")){
 				case (SWT.YES):{
 					try {
+						//deleting
 						pool.execute(DataManager.deletePersonEntity(PersonDataEnum.PERSON, person , person.getId()));
 						RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
 						entityDetails.setVisible(false);
@@ -1552,6 +1561,7 @@ public class CheckFlickGUI {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		entityDetails.setSize(shell.getShell().getSize().x-5, shell.getShell().getSize().y/4);
+		//listen to the close tab button
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1567,26 +1577,11 @@ public class CheckFlickGUI {
 		});
 		
 	}
+	/**
+	 * Drawing the general information about a movie
+	 */
 	static private void drawGeneralInformationMovie(final MovieEntity movie , final int tabIndex){
-		if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
-			searchByMovie.dispose();
-		if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
-			searchByPerson.dispose();
-		if ((insertMovie!= null) && !(insertMovie.isDisposed()))
-			insertMovie.dispose();
-		if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
-			insertPerson.dispose();
-		if ((movieButtons != null) && !(movieButtons.isDisposed()))
-			movieButtons.dispose();
-		if ((personButtons != null) && !(personButtons.isDisposed()))
-			personButtons.dispose();
-		if ((otherResults != null) && !(otherResults.isDisposed()))
-			otherResults.dispose();
-		if ((entityDetails!= null) && !(entityDetails.isDisposed()))
-			entityDetails.dispose();
-		if ((bar!=null)&& !(bar.isDisposed()))
-			bar.dispose();
-		
+		cleanAllComposites();		
 		entityDetails = new Composite(shell.getShell(),SWT.BORDER);
 		entityDetails.setLocation(2, 145);
 		entityDetails.setLayout(new FillLayout());
@@ -1636,6 +1631,7 @@ public class CheckFlickGUI {
 		label = new Label(composite ,SWT.NONE);
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
+		//listen to the save button
 		save.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1714,12 +1710,14 @@ public class CheckFlickGUI {
 					movie.setYear(newYear);
 					movie.setRunningTime(newTime);
 					try {
+						//saving
 						pool.execute(DataManager.updateMovieData(MovieDataEnum.MOVIE, movie));
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
 				}
 				else{
+					//can't save
 					if (!update)
 						okMessageBox("You didn't change anything.");
 				}
@@ -1728,6 +1726,7 @@ public class CheckFlickGUI {
 		});
 		Button reset = new Button(composite , SWT.PUSH);
 		reset.setText("Reset");
+		//listen to the reset button
 		reset.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1752,6 +1751,7 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		Button delete = new Button(composite , SWT.PUSH);
 		delete.setText("Delete Movie");
+		//listen to the delete button
 		delete.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
@@ -1759,6 +1759,7 @@ public class CheckFlickGUI {
 				switch(yesNoMessageBox("Are you sure you want to delete this movie?")){
 				case (SWT.YES):{
 					try {
+						//deleting
 						pool.execute(DataManager.deleteMovieEntity(MovieDataEnum.MOVIE, movie , movie.getId()));
 						RibbonTab current = shell.getRibbonTabFolder().getSelectedTab();
 						entityDetails.setVisible(false);
@@ -1783,6 +1784,7 @@ public class CheckFlickGUI {
 		item0.setControl(composite);
 		item0.setImage(image);
 		item0.setExpanded(true);
+		//listen to the close tab button
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1799,6 +1801,10 @@ public class CheckFlickGUI {
 		bar.setSpacing(8);
 		entityDetails.setSize(shell.getShell().getSize().x-5, (shell.getShell().getSize().y)/4);
 	}
+	
+	/**
+	 * Drawing the table with the search result about movies
+	 */
 	static protected void drawSearchMovieTable(final List<DatedEntity> searched, final SearchEntitiesEnum search) {
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -1836,6 +1842,7 @@ public class CheckFlickGUI {
 					}
 					table.getColumn(3).setWidth(0);
 					table.getColumn(3).setResizable(false);
+					//by double clicking a row you get a new tab with the whole informtaion
 					table.addListener(SWT.MouseDoubleClick, new Listener() {
 						public void handleEvent(Event event) {
 							Point pt = new Point(event.x, event.y);
@@ -1866,6 +1873,9 @@ public class CheckFlickGUI {
 		});
 	}
 	
+	/**
+	 * Drawing the table with the search result about persons
+	 */
 	static protected void drawSearchPersonTable(final List<DatedEntity> searched, final SearchEntitiesEnum search) {
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -1902,6 +1912,7 @@ public class CheckFlickGUI {
 					}	
 					table.getColumn(3).setWidth(0);
 					table.getColumn(3).setResizable(false);
+					//by double clicking a row you get a new tab with the whole informtaion
 					table.addListener(SWT.MouseDoubleClick, new Listener() {
 						public void handleEvent(Event event) {
 							Point pt = new Point(event.x, event.y);
@@ -1933,19 +1944,26 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * After a movie was insert
+	 * Drawing the extra information you can insert to a movie
+	 */
 	protected static void drawMoreInsertMovie(final int id){
 		display.asyncExec(new Runnable() {
 			public void run() {
-				//genres- 2nd item
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
 				
 				if(id == -1) {
+					//couldn't insert the movie
 					okMessageBox("There was a problem inserting the movie. Sorry for the inconvenience :)");
 				}
 				else {
 					moreInsert = new ExpandBar(insertMovie, SWT.V_SCROLL);
 					moreInsert.setBackground( new Color(display , 177 ,200 , 231));
+					
+					//genres
 					Composite composite = new Composite (moreInsert, SWT.NONE);
 					GridLayout layout = new GridLayout (6,false);
 					Image image = ImageCache.getImage("pie_chart_48.png");
@@ -1984,7 +2002,7 @@ public class CheckFlickGUI {
 					item1.setImage(image);
 					item1.setExpanded(false);
 					
-					//languages- 3rd item
+					//languages
 					composite = new Composite (moreInsert, SWT.NONE);
 					layout = new GridLayout (6,false);
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
@@ -2023,7 +2041,7 @@ public class CheckFlickGUI {
 					item2.setImage(image);
 					item2.setExpanded(false);
 					
-					//countries - 4th item
+					//countries
 					composite = new Composite (moreInsert, SWT.NONE);
 					image =ImageCache.getImage("globe_48.png");
 					layout = new GridLayout (6,false);
@@ -2062,8 +2080,7 @@ public class CheckFlickGUI {
 					item3.setImage(image);
 					item3.setExpanded(false);
 					
-					
-					//quotes - 5th item
+					//quotes
 					composite = new Composite (moreInsert, SWT.NONE);
 					image = ImageCache.getImage("speech_bubble_48.png");
 					layout = new GridLayout (6,false);
@@ -2113,10 +2130,8 @@ public class CheckFlickGUI {
 						}
 						public void widgetSelected(SelectionEvent e) {
 							List<AbsFilter> list = new ArrayList<AbsFilter>();
-							//System.out.println(castText.getText());
 							if (castText.getText()!= ""){
 								list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, castText.getText()));
-							/*	AbsType t = new NamedEntity(id, akaText.getText());*/
 								try {
 									pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list , id , false));
 								} catch (InterruptedException e1) {
@@ -2138,12 +2153,17 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	/**
+	 * After a person was insert
+	 * Drawing the extra information you can insert to a person
+	 */
 	protected static void drawMoreInsertPerson(final int id){
 		display.asyncExec(new Runnable() {
 			public void run() {
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
 				if(id == -1) {
+					//couldn't insert the person
 					okMessageBox("There was a problem inserting the person. Sorry for the inconvenience :)");
 				}
 				else{
@@ -2155,7 +2175,7 @@ public class CheckFlickGUI {
 					layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 					layout.verticalSpacing = 10;
 					composite.setLayout(layout); 
-					//aka names- 2nd item
+					//aka names
 					Label label = new Label(composite ,SWT.NONE);
 					label.setText("AKA Name:");
 					final Text akaText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
@@ -2182,7 +2202,7 @@ public class CheckFlickGUI {
 					item1.setImage(image);
 					item1.setExpanded(false);
 					
-					//quotes - 3rd item
+					//quotes
 					composite = new Composite (moreInsert, SWT.NONE);
 					image = ImageCache.getImage("speech_bubble_48.png");
 					layout = new GridLayout (6,false);
@@ -2221,6 +2241,11 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * Calling a function that open a new window after a person
+	 * was searched in a purpose of adding it as a cast to a movie 
+	 */
 	static protected void peopleToInsertTable(final List<DatedEntity> searched, final SearchEntitiesEnum search ,final int movieId , final boolean update) {
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2237,9 +2262,12 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	
+	/**
+	 * Open a new window that adds an existing person as a cast to a movie
+	 */
 	static protected void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id , final boolean update){	
 		shell.getShell().setEnabled(false);
-		//final RibbonShell personResults = new RibbonShell(display);	
 		final Shell personResults = new Shell(SWT.CLOSE);
 		Color bgColor = new Color(display , 177 ,200 , 231);
 		personResults.setBackground(bgColor);
@@ -2294,6 +2322,7 @@ public class CheckFlickGUI {
 		Button close = new Button(personResults, SWT.PUSH);
 		close.setText("Close");
 		close.setBackground(bgColor);
+		//listen to the add button
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2310,6 +2339,7 @@ public class CheckFlickGUI {
 							secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
 							AbsType relation = new CastingRelation(secondId, id, role);
 							try {
+								//inserting a cast that is not an actor
 								pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation , update ));
 							} catch (InterruptedException e1) {
 								e1.printStackTrace();
@@ -2337,6 +2367,7 @@ public class CheckFlickGUI {
 									secondId = Integer.parseInt(table.getItem(t[i]).getText(3));
 									AbsType relation = new CastingRelation(secondId, id, role , true , part , rank);
 									try {
+										//inserting actor
 										pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE_CAST,relation , false));
 										shell.getShell().setEnabled(true);	
 										personResults.close();
@@ -2351,6 +2382,7 @@ public class CheckFlickGUI {
 				}
 			}
 		});
+		//listen to the close button
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2359,6 +2391,7 @@ public class CheckFlickGUI {
 				personResults.close();
 			}
 		});
+		//listen to the X button
 		personResults.addDisposeListener( new DisposeListener(){
 			public void widgetDisposed(DisposeEvent e) {
 				shell.getShell().setEnabled(true);}			
@@ -2366,9 +2399,12 @@ public class CheckFlickGUI {
 		personResults.open();
 		
 	}
+	
+	/**
+	 * Open a new window that adds extra data to a person
+	 */
 	static protected void openPersonAddWindow(final PersonDataEnum type , final int personId){
 		shell.getShell().setEnabled(false);
-		//final RibbonShell personResults = new RibbonShell(display);	
 		final Shell addToPerson = new Shell(SWT.CLOSE);
 		Utils.centerDialogOnScreen(addToPerson);
 		Color bgColor = new Color(display , 177 ,200 , 231);
@@ -2400,6 +2436,7 @@ public class CheckFlickGUI {
 		Button close = new Button(addToPerson, SWT.PUSH);
 		close.setText("Close");
 		close.setBackground(bgColor);
+		//listen to the add button
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2415,10 +2452,12 @@ public class CheckFlickGUI {
 					}
 				}
 				else{
+					//no information was inserted
 					okMessageBox("Please insert information to add.");
 				}
 			}
 		});
+		//listen to the close button
 		close.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2427,6 +2466,7 @@ public class CheckFlickGUI {
 				addToPerson.close();
 			}
 		});
+		//listen to the X button
 		addToPerson.addDisposeListener( new DisposeListener(){
 			public void widgetDisposed(DisposeEvent e) {
 				shell.getShell().setEnabled(true);
@@ -2434,6 +2474,10 @@ public class CheckFlickGUI {
 		});
 		addToPerson.open();
 	}
+	
+	/**
+	 * Open a new window that adds extra data to a movie that is not from tables
+	 */
 	static protected void openMovieAddWindow(final MovieDataEnum type , final int id){
 		shell.getShell().setEnabled(false);
 		final Shell addToMovie = new Shell(SWT.CLOSE);
@@ -2514,6 +2558,10 @@ public class CheckFlickGUI {
 		});
 		addToMovie.open();
 	}
+	
+	/**
+	 * Open a new window that adds extra data to a movie that is from tables
+	 */
 	static protected void openMovieAddFromListWindow(final MovieDataEnum type , final int id){
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
