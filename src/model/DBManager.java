@@ -24,17 +24,17 @@ public class DBManager {
 //	private static String CONNECTION_USERNAME = "chook";
 //	private static String CONNECTION_PASSWORD = "shoochi";
 /** Chen's TAU server		**/
-	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-	private static String CONNECTION_USERNAME = "chenhare";
-	private static String CONNECTION_PASSWORD = "Shoochi0";
+//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+//	private static String CONNECTION_USERNAME = "chenhare";
+//	private static String CONNECTION_PASSWORD = "Shoochi0";
 /** Nadav's home server		**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
 //	private static String CONNECTION_USERNAME = "checkflick";
 //	private static String CONNECTION_PASSWORD = "checkflick";
 /** Nadav's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "nadavsh2";
-//	private static String CONNECTION_PASSWORD = "nadavsh2";
+	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
+	private static String CONNECTION_USERNAME = "nadavsh2";
+	private static String CONNECTION_PASSWORD = "nadavsh2";
 /** Nadav's TAU server - Local connection 	**/
 //	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
 //	private static String CONNECTION_USERNAME = "nadavsh2";
@@ -1039,12 +1039,9 @@ public class DBManager {
 			movie.setId(set.getInt(DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 			movie.setName(set.getString(DBFieldsEnum.MOVIES_MOVIE_NAME.getFieldName()));
 			movie.setYear(set.getInt(DBFieldsEnum.MOVIES_MOVIE_YEAR.getFieldName()));
-			movie.setColorInfo(set.getInt(DBFieldsEnum.MOVIES_MOVIE_COLOR_INFO_ID.getFieldName()));
 			movie.setRunningTime(set.getInt(DBFieldsEnum.MOVIES_MOVIE_RUNNING_TIME.getFieldName()));
 			movie.setFullMovieName(set.getString(DBFieldsEnum.MOVIES_MOVIE_TAGLINE.getFieldName()));
 			movie.setPlot(set.getString(DBFieldsEnum.MOVIES_MOVIE_PLOT_TEXT.getFieldName()));
-			movie.setFilmingLocations(set
-					.getString(DBFieldsEnum.MOVIES_MOVIE_FILMING_LOCATION_NAME.getFieldName()));
 		} catch (SQLException e) {
 			System.out.println("SQLException error");
 			return null;
