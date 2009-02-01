@@ -35,7 +35,7 @@ public class OracleFilterManager {
 	 * @param entity
 	 *            - the Movie entity
 	 * @param id
-	 *            - The movie id TODO: Add more enum values here
+	 *            - The movie id
 	 * @return
 	 */
 	protected AbsFilter getMovieDataFilter(MovieDataEnum entity, String id) {

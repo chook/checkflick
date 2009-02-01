@@ -119,7 +119,7 @@ public class AppData {
 			setBucketMaxSize(Integer.parseInt(prefs.node("settings").get(
 					"maxbucket", null)));
 			setDbHost(prefs.node("db").get("host", null));
-			setDbPassword(prefs.node("db").get("host", null));
+			setDbPassword(prefs.node("db").get("password", null));
 			setDbPort(prefs.node("db").get("port", null));
 			setDbServer(prefs.node("db").get("server", null));
 			setDbUsername(prefs.node("db").get("username", null));

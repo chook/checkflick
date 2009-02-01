@@ -39,9 +39,7 @@ public class ImportHandler {
 			if (!(listfilesMap.containsKey(enumField))) {
 				isError = true;
 				errMsg += "a filename for the " + enumField.toString().toLowerCase() + " wasn't given\n";
-			} else {
-				// TODO: check if the filename that was given actually exists
-			}
+			} 
 		}
 		
 		if (isError)

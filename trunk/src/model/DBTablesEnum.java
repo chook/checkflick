@@ -42,7 +42,6 @@ public enum DBTablesEnum {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return getTableName();
 	}
 	

@@ -180,7 +180,6 @@ public class MovieEntity extends NamedEntity {
 		
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "id: " + getId() + ". Name: " + getName() + ".";
 	}
 

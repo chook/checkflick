@@ -3,6 +3,7 @@ package model;
 import java.util.regex.*;
 import java.util.*;
 
+import controller.AppData;
 import controller.ImportHandler;
 import controller.enums.*;
 import controller.entity.MovieEntity;
@@ -13,8 +14,8 @@ import controller.entity.CastingRelation;
 
 public class DataImporter {
 
-	static int PSTMT_BATCH_SIZE = 50000;
-	static int SELECT_BUCKET_SIZE = 1000000;
+	static int PSTMT_BATCH_SIZE = AppData.getInstance().getPreparedStatementMaxBatchSize();
+	static int SELECT_BUCKET_SIZE = AppData.getInstance().getBucketMaxSize();
 	// languagePattern explanation:
 	// ([^\"].+[)}])					- group 1: movie name
 	//									- 		ignore lines that start with '"' (since they are TV shows) and find the end of the movie name
@@ -59,41 +60,19 @@ public class DataImporter {
 	 **/
 	public static void main(String argv[]) {
 	 
-		ImportHandler ih;
-		
 		// create new ImportHandler
-		ih = new ImportHandler();
+		ImportHandler ih = new ImportHandler();
+
 		// add the different list files given from the GUI
-//		ih.addListFile(ListFilesEnum.LANGUAGES, "lists\\language.list");
-//		ih.addListFile(ListFilesEnum.GENRES, "lists\\genres.list");
-//		ih.addListFile(ListFilesEnum.COUNTRIES, "lists\\countries.list");
-//		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
-//		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
-//		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses.list");
-//		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors.list");
-//		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers.list");
-//		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers.list");
-//		ih.addListFile(ListFilesEnum.MOVIES, "lists\\moviesSHORT.list");
-//		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actorsSHORT.list");
-//		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actressesSHORT.list");
-//		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directorsSHORT.list");
-//		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producersSHORT.list");
-//		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writersSHORT.list");
-//		ih.addListFile(ListFilesEnum.MOVIES, "lists\\movies.list");
-//		ih.addListFile(ListFilesEnum.ACTORS, "lists\\actors.list");
-//		ih.addListFile(ListFilesEnum.ACTRESSES, "lists\\actresses.list");
-//		ih.addListFile(ListFilesEnum.DIRECTORS, "lists\\directors.list");
-//		ih.addListFile(ListFilesEnum.PRODUCERS, "lists\\producers.list");
-//		ih.addListFile(ListFilesEnum.WRITERS, "lists\\writers.list");
-		ih.addListFile(ListFilesEnum.MOVIES, "/users/courses/databases/imdb/extracted/movies.list");
-		ih.addListFile(ListFilesEnum.LANGUAGES, "/users/courses/databases/imdb/extracted/language.list");
-		ih.addListFile(ListFilesEnum.GENRES, "/users/courses/databases/imdb/extracted/genres.list");
-		ih.addListFile(ListFilesEnum.COUNTRIES, "/users/courses/databases/imdb/extracted/countries.list");
-		ih.addListFile(ListFilesEnum.ACTORS, "/users/courses/databases/imdb/extracted/actors.list");
-		ih.addListFile(ListFilesEnum.ACTRESSES, "/users/courses/databases/imdb/extracted/actresses.list");
-		ih.addListFile(ListFilesEnum.DIRECTORS, "/users/courses/databases/imdb/extracted/directors.list");
-		ih.addListFile(ListFilesEnum.PRODUCERS, "/users/courses/databases/imdb/extracted/producers.list");
-		ih.addListFile(ListFilesEnum.WRITERS, "/users/courses/databases/imdb/extracted/writers.list");
+		ih.addListFile(ListFilesEnum.MOVIES, AppData.getInstance().getImportFolder() + "movies.list");
+		ih.addListFile(ListFilesEnum.LANGUAGES, AppData.getInstance().getImportFolder() + "language.list");
+		ih.addListFile(ListFilesEnum.GENRES, AppData.getInstance().getImportFolder() + "genres.list");
+		ih.addListFile(ListFilesEnum.COUNTRIES, AppData.getInstance().getImportFolder() + "countries.list");
+		ih.addListFile(ListFilesEnum.ACTORS, AppData.getInstance().getImportFolder() + "actors.list");
+		ih.addListFile(ListFilesEnum.ACTRESSES, AppData.getInstance().getImportFolder() + "actresses.list");
+		ih.addListFile(ListFilesEnum.DIRECTORS, AppData.getInstance().getImportFolder() + "directors.list");
+		ih.addListFile(ListFilesEnum.PRODUCERS, AppData.getInstance().getImportFolder() + "producers.list");
+		ih.addListFile(ListFilesEnum.WRITERS, AppData.getInstance().getImportFolder() + "writers.list");
 		
 		// run the importing
 		ih.importIntoDB();
