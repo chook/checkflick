@@ -770,6 +770,9 @@ public class CheckFlickGUI {
 		composite.setLayout(layout); 
 		Label label = new Label(composite,SWT.NONE);
 		label.setText("Movie Name");
+		final Button checkWildCard = new Button(composite, SWT.CHECK);
+		checkWildCard.setText("Wildcard");
+		checkWildCard.setSelection(true);
 		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Movie Year	From");
@@ -833,8 +836,12 @@ public class CheckFlickGUI {
 				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();;
 				System.out.println(nameText.getText());
-				if (nameText.getText()!= ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
+				if (nameText.getText()!= "" && nameText.getText().length() > 0){
+					// Search without wildcard
+					if(checkWildCard.getSelection())
+						list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME_WILDCARD, nameText.getText()));
+					else
+						list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_NAME, nameText.getText()));
 				}
 				if (genresCombo.getText() != ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_GENRE,getID(genresList , genresCombo.getText()) ));
@@ -877,6 +884,9 @@ public class CheckFlickGUI {
 		//to add- search by origin country, age-range 
 		Label label= new Label(composite,SWT.NONE);
 		label.setText("Person Name");
+		final Button checkWildCard = new Button(composite, SWT.CHECK);
+		checkWildCard.setText("Wildcard");
+		checkWildCard.setSelection(true);
 		final Text nameText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Age Range	From");
@@ -943,8 +953,11 @@ public class CheckFlickGUI {
 				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();
 				System.out.println(nameText.getText());
-				if (nameText.getText()!= ""){
-					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, nameText.getText()));
+				if (nameText.getText()!= "" && nameText.getText().length() > 0){
+					if(checkWildCard.getSelection())
+						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME_WILDCARD, nameText.getText()));
+					else
+						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME, nameText.getText()));
 				}
 				if (rolesCombo.getText() != ""){
 					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_PRODUCTION_ROLE,getID(rolesList , rolesCombo.getText()) ));
