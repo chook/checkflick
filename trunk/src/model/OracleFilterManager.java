@@ -260,50 +260,22 @@ public class OracleFilterManager {
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName(), ls
 							.get(1)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_REAL_NAME
-							.getFieldName(), ls.get(2)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_NICKNAMES.getFieldName(), ls
-							.get(3)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.DATE,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_DATE_OF_BIRTH.getFieldName(),
-					ls.get(4)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_YEAR_OF_BIRTH
-							.getFieldName(), ls.get(5)));
+							.getFieldName(), ls.get(2)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_CITY_OF_BIRTH
-							.getFieldName(), ls.get(6)));
+							.getFieldName(), ls.get(3)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_COUNTRY_OF_BIRTH_ID
-							.getFieldName(), ls.get(7)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.DATE,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_DATE_OF_DEATH
-							.getFieldName(), ls.get(8)));
+							.getFieldName(), ls.get(4)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
 					DBTablesEnum.PERSONS.getTableName(),
 					DBFieldsEnum.PERSONS_YEAR_OF_DEATH
-							.getFieldName(), ls.get(9)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_HEIGHT
-							.getFieldName(), ls.get(10)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_TRADEMARK
-							.getFieldName(), ls.get(11)));
-			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
-					DBTablesEnum.PERSONS.getTableName(),
-					DBFieldsEnum.PERSONS_BIOGRAPHY_TEXT
-							.getFieldName(), ls.get(12)));
+							.getFieldName(), ls.get(5)));
 		default:
 			break;
 		}
