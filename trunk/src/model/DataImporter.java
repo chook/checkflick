@@ -2,7 +2,6 @@ package model;
 
 import java.util.regex.*;
 import java.util.*;
-
 import controller.AppData;
 import controller.enums.*;
 import controller.entity.MovieEntity;
