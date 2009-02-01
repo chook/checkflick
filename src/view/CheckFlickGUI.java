@@ -551,11 +551,9 @@ public class CheckFlickGUI {
 		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
 		//shell.setMaximized(true);
 		//shell.setSize(570, 550);
+		
 		shell.getShell().setMinimumSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
 		//closing the program.
-	/* shell.(new ShellEvent(){
-			
-		}*/
 		shell.getShell().addListener(SWT.Close, new Listener(){
 			public void handleEvent(Event e){    			
     		/*	switch(yesNoMessageBox("Are you sure you want to exit?")){
@@ -568,27 +566,27 @@ public class CheckFlickGUI {
     			pool.stopRequestAllWorkers();
 			}
 		});
-		QuickAccessShellToolbar mtb = shell.getToolbar();
-		RibbonButton mtbtb1 = new RibbonButton(mtb, ImageCache.getImage("gear_ok_16.gif"), null, SWT.NONE);
-		RibbonButton mtbtb2 = new RibbonButton(mtb, ImageCache.getImage("gantt_16.gif"), null, SWT.NONE);
-		shell.setBigButtonTooltip(new RibbonTooltip("Big", "I'm the tooltip for the big button"));
-		mtb.setArrowTooltip(new RibbonTooltip("Oh", "Jeez"));
+//		QuickAccessShellToolbar mtb = shell.getToolbar();
+//		RibbonButton mtbtb1 = new RibbonButton(mtb, ImageCache.getImage("gear_ok_16.gif"), null, SWT.NONE);
+//		RibbonButton mtbtb2 = new RibbonButton(mtb, ImageCache.getImage("gantt_16.gif"), null, SWT.NONE);
+	//	shell.setBigButtonTooltip(new RibbonTooltip("Big", "I'm the tooltip for the big button"));
+	//	mtb.setArrowTooltip(new RibbonTooltip("Oh", "Jeez"));
 		
-		Menu shellMenu = shell.getBigButtonMenu();
-		MenuItem btest = new MenuItem(shellMenu, SWT.POP_UP);
-		btest.setText("Testing a menu");
+//		Menu shellMenu = shell.getBigButtonMenu();
+//		MenuItem btest = new MenuItem(shellMenu, SWT.POP_UP);
+//		btest.setText("Testing a menu");
 		
-		shell.addBigButtonListener(new SelectionListener() {
+//		shell.addBigButtonListener(new SelectionListener() {
 
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+//			public void widgetDefaultSelected(SelectionEvent e) {
+//			}
 
-			public void widgetSelected(SelectionEvent e) {
-				System.err.println("Clicked big button");
-				shell.showBigButtonMenu();
-			}
+//			public void widgetSelected(SelectionEvent e) {
+//				System.err.println("Clicked big button");
+//				shell.showBigButtonMenu();
+//			}
 			
-		});		
+//		});		
 		//getting the lists from the DB
 		//DataManager dm = DataManager.getInstance();
 		
