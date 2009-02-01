@@ -17,28 +17,8 @@ public class DBManager {
 
 	// Different Connections used in testings
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
-	private static int CONNECTION_MAX_CONNECTIONS = AppData.getInstance().getMaxConnections();
-	private static int RESULTS_FETCH_SIZE = 1000;
-/** Chen's home server 1	**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-//	private static String CONNECTION_USERNAME = "chook";
-//	private static String CONNECTION_PASSWORD = "shoochi";
-/** Chen's TAU server		**/
 	private static String CONNECTION_URI = "jdbc:oracle:thin:@";
-	private static String CONNECTION_USERNAME = "chenhare";
-	private static String CONNECTION_PASSWORD = "Shoochi0";
-/** Nadav's home server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1521:XE";
-//	private static String CONNECTION_USERNAME = "checkflick";
-//	private static String CONNECTION_PASSWORD = "checkflick";
-/** Nadav's TAU server		**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@localhost:1555:csodb";
-//	private static String CONNECTION_USERNAME = "nadavsh2";
-//	private static String CONNECTION_PASSWORD = "nadavsh2";
-/** Nadav's TAU server - Local connection 	**/
-//	private static String CONNECTION_URI = "jdbc:oracle:thin:@orasrv:1521:csodb";
-//	private static String CONNECTION_USERNAME = "nadavsh2";
-//	private static String CONNECTION_PASSWORD = "nadavsh2";
+	private static int RESULTS_FETCH_SIZE = 1000;
 
 	// The strings for prepared statements
 	private static String SEARCH_MOVIE_STMT = "SELECT MOVIES.MOVIE_ID, MOVIES.MOVIE_NAME, MOVIES.MOVIE_YEAR FROM ";
@@ -1181,8 +1161,6 @@ public class DBManager {
 		StringBuffer stbQuery = new StringBuffer();
 		StringBuffer stbWhere = new StringBuffer();
 		int i = 0;
-		ResultSet set = null;
-		int returnValue = 0;
 		
 		// Trying to get a connection statement
 		try {
