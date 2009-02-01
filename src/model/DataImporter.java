@@ -322,7 +322,130 @@ public class DataImporter {
 		removeDuplicates();
 		deletePersonsTempFields();
 	}
+	
+	/**
+	 * adds references to new primary keys that were created during the import
+	 * @return
+	 */
+	public boolean finishImport() {
 		
+		String sql = "ALTER TABLE %s ADD CONSTRAINT %s_FK%d FOREIGN KEY (%s) REFERENCES %s (%s) ON DELETE CASCADE ENABLE";
+		
+		// Ref Constraints for Table PERSON_MOVIE_CREDITS
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+				1,
+				DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(),
+				DBTablesEnum.MOVIES.getTableName(),
+				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+				2,
+				DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
+				DBTablesEnum.PERSONS.getTableName(),
+				DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+				3,
+				DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName(),
+				DBTablesEnum.PRODUCTION_ROLES.getTableName(),
+				DBFieldsEnum.PRODUCTION_ROLES_PRODUCTION_ROLE_ID.getFieldName()));
+		
+		// Ref Constraints for Table MOVIE_COUNTRIES
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+				1,
+				DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID.getFieldName(),
+				DBTablesEnum.COUNTRIES.getTableName(),
+				DBFieldsEnum.COUNTRIES_COUNTRY_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+				2,
+				DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(),
+				DBTablesEnum.MOVIES.getTableName(),
+				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+		
+		// Ref Constraints for Table MOVIE_GENRES
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_GENRES.getTableName(),
+				DBTablesEnum.MOVIE_GENRES.getTableName(),
+				1,
+				DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName(),
+				DBTablesEnum.GENRES.getTableName(),
+				DBFieldsEnum.GENRES_GENRE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_GENRES.getTableName(),
+				DBTablesEnum.MOVIE_GENRES.getTableName(),
+				2,
+				DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(),
+				DBTablesEnum.MOVIES.getTableName(),
+				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+		
+		// Ref Constraints for Table MOVIE_LANGUAGES
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+				1,
+				DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName(),
+				DBTablesEnum.LANGUAGES.getTableName(),
+				DBFieldsEnum.LANGUAGES_LANGUAGE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+				2,
+				DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
+				DBTablesEnum.MOVIES.getTableName(),
+				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+
+		// Ref Constraints for Table MOVIE_QUOTES
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.MOVIE_QUOTES.getTableName(),
+				DBTablesEnum.MOVIE_QUOTES.getTableName(),
+				1,
+				DBFieldsEnum.MOVIE_QUOTES_MOVIE_ID.getFieldName(),
+				DBTablesEnum.MOVIES.getTableName(),
+				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+
+		// Ref Constraints for Table PERSON_AKA_NAMES
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
+				DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
+				1,
+				DBFieldsEnum.PERSON_AKA_NAMES_PERSON_ID.getFieldName(),
+				DBTablesEnum.PERSONS.getTableName(),
+				DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+
+		// Ref Constraints for Table PERSON_QUOTES
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.PERSON_QUOTES.getTableName(),
+				DBTablesEnum.PERSON_QUOTES.getTableName(),
+				1,
+				DBFieldsEnum.PERSON_QUOTES_PERSON_ID.getFieldName(),
+				DBTablesEnum.PERSONS.getTableName(),
+				DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+
+		// Ref Constraints for Table PERSONS
+		DBManager.getInstance().executeSQL(String.format(sql,
+				DBTablesEnum.PERSONS.getTableName(),
+				DBTablesEnum.PERSONS.getTableName(),
+				1,
+				DBFieldsEnum.PERSONS_COUNTRY_OF_BIRTH_ID.getFieldName(),
+				DBTablesEnum.COUNTRIES.getTableName(),
+				DBFieldsEnum.COUNTRIES_COUNTRY_ID.getFieldName()));
+
+		return true;
+	}
+	
 	private boolean createDataTypesIndex() {
 		
 		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",

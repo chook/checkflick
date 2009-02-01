@@ -12,9 +12,6 @@ import controller.enums.PersonDataEnum;
 import controller.enums.SearchEntitiesEnum;
 
 public class RibbonInterface {
-	public static void settingShellText(final String text) {
-		CheckFlickGUI.updateShellText(text);		
-	}
 	public static void settingMovieTab(MovieEntity movie){
 		CheckFlickGUI.updateMovieTab(movie);
 	}
