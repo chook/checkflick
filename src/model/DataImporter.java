@@ -65,39 +65,6 @@ public class DataImporter {
 		this.listfilesMap = listfilesMap;
 	}
 	
-	private boolean createDataTypesIndex() {
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
-											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
-											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
-											DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
-											DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
-											DBTablesEnum.MOVIE_GENRES.getTableName(),
-											DBTablesEnum.MOVIE_GENRES.getTableName(),
-											DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(),
-											DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
-											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
-											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
-											DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(),
-											DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID.getFieldName()));
-
-		return true;
-	}
-	
-	private boolean createMoviesIndex() {
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
-											DBTablesEnum.MOVIES.getTableName(),
-											DBTablesEnum.MOVIES.getTableName(), 
-											DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
-		
-		return true;
-	}
-	
 	/**
 	 * creates a field needed for the import in the MOVIES table:
 	 * TEMP_MOVIE_NAME
@@ -107,46 +74,6 @@ public class DataImporter {
 		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s VARCHAR2(300 CHAR)",
 														DBTablesEnum.MOVIES.getTableName(), 
 														DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName()));
-	}
-
-	private boolean createPersonMovieCreditsIndex() {
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s, %s) ENABLE",
-											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
-											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
-											DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
-											DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
-											DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName()));
-		return true;
-	}
-	
-	private boolean createPersonsIndex() {
-
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
-														DBTablesEnum.PERSONS.getTableName(),
-														DBTablesEnum.PERSONS.getTableName(), 
-														DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
-
-		return true;
-	}
-	
-	/**
-	 * creates 3 fields needed for the import in the PERSONS table:
-	 * TEMP_PERSON_ID, TEMP_PERSON_LINE_NUMBER & TEMP_IS_DUPLICATE
-	 */
-	private void createPersonsTempFields() {
-
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
-														DBTablesEnum.PERSONS.getTableName(), 
-														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
-														DBTablesEnum.PERSONS.getTableName(), 
-														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s CHAR(1)",
-														DBTablesEnum.PERSONS.getTableName(), 
-														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
 	
 	/**
@@ -158,29 +85,6 @@ public class DataImporter {
 		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
 														DBTablesEnum.MOVIES.getTableName(),
 														DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName()));
-	}
-	
-	/**
-	 * TEMP_PERSON_ID, TEMP_PERSON_LINE_NUMBER & TEMP_IS_DUPLICATE
-	 * removes the temporary fields that were used for the import in the PERSONS table:
-	 */
-	private void deletePersonsTempFields() {
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
-														DBTablesEnum.PERSONS.getTableName(),
-														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
-														DBTablesEnum.PERSONS.getTableName(),
-														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
-														DBTablesEnum.PERSONS.getTableName(),
-														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
-	}
-	
-	private void findAndUpdateDuplicates() {
-		DBManager.getInstance().findAndUpdateDuplicates();
 	}
 	
 	/**
@@ -305,112 +209,7 @@ public class DataImporter {
 
 		return true;
 	}
-	
-	/**
-	 * parses the languages, genres & countries lists
-	 * and adds all the data to the DB
-	 * @return boolean if the method succeeded
-	 */
-	private boolean getDatatypes(ListFilesEnum dataType, 
-			String patternRegExp, DBTablesEnum tablesEnum, DBFieldsEnum fieldsEnum) {
-		
-		Parser parser = new Parser();
-		Set<String> elementsSet = new HashSet<String>();		// a dictionary to collect all the different elements
-		Pattern pattern;
-		Matcher matcher;
 
-		parser.loadFile(listfilesMap.get(dataType), dataType);		
-
-		// Making sure we find the start of the list
-		if (parser.findStartOfList()) {
-			System.out.println("Found the start of the list!");
-
-			pattern = Pattern.compile(patternRegExp);
-			elementsSet.clear();
-
-			while (!parser.isEOF()) {
-				matcher = pattern.matcher(parser.readLine());
-				if (matcher.matches())
-					elementsSet.add(matcher.group(2));
-			}
-
-			System.out.println("Inserting " + elementsSet.size() + " elements to the DB");
-			DBManager.getInstance().insertSingleDataTypeSetToDB(elementsSet, tablesEnum, fieldsEnum);
-		} else
-			return false;
-
-		parser.closeFile();
-		return true;
-	}
-
-	private boolean getMovies() {
-
-		Parser parser = new Parser();
-		Set<MovieEntity> moviesSet = new LinkedHashSet<MovieEntity>();
-		String patternRegExp = null;
-		String fullMovieName, movieName, movieRomanNotation, movieMadeFor;
-		int movieYear;
-		Pattern pattern;
-		Matcher matcher;
-		int totalElementsNum = 0;
-		
-		// add temp field
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
-				DBTablesEnum.PERSONS.getTableName(), 
-				DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
-		
-		parser.loadFile(listfilesMap.get(ListFilesEnum.MOVIES), ListFilesEnum.MOVIES);
-		patternRegExp = moviesPattern;
-			
-		// Making sure we find the start of the list
-		if (parser.findStartOfList()) {
-			System.out.println("Found the start of the list!");
-			
-			pattern = Pattern.compile(patternRegExp);
-			
-			while (!parser.isEOF()) {
-				matcher = pattern.matcher(parser.readLine());
-				if (matcher.matches()) {
-					fullMovieName = matcher.group(1).trim();
-					movieName = matcher.group(2);
-					movieRomanNotation = matcher.group(3);
-					movieMadeFor = matcher.group(4);
-					try {
-						movieYear = Integer.parseInt(matcher.group(5));
-					} catch (Exception e) {
-						if (matcher.group(5).equals("????")) {
-							movieYear = 0;
-						} else
-							movieYear = 1900;
-					}
-					// NOTE: the fullMovieName is a temporary field used during the import and dropped from the DB at the end
-					// it doesn't have a field in the MovieEntity, so for this occasion only, it is sent instead of the taglines field
-					moviesSet.add(new MovieEntity(0, movieName, movieYear, movieRomanNotation, movieMadeFor, 0, 0, fullMovieName, null, null));
-				}
-				// flush results every BATCH_SIZE 
-				if ((moviesSet.size() > 0) && (moviesSet.size() % PSTMT_BATCH_SIZE == 0)) {
-					System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-					DBManager.getInstance().insertMoviesSetToDB(moviesSet);
-					totalElementsNum += moviesSet.size();
-					moviesSet.clear();
-				}
-			}
-			// flush the results that were left
-			if ((moviesSet.size() > 0)) {
-				System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-				DBManager.getInstance().insertMoviesSetToDB(moviesSet);
-				totalElementsNum += moviesSet.size();
-			}
-			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
-
-		} else
-			return false;
-
-		parser.closeFile();
-
-		return true;
-	}
-	
 	/**
 	 * retrieves all the different languages for each and every movie
 	 * @return boolean whether the method succeeded
@@ -491,6 +290,311 @@ public class DataImporter {
 			parser.closeFile();
 			System.gc();
 		} while (!isEmpty);
+
+		return true;
+	}
+	
+	public boolean importDataTypes() {
+		
+		for (int i = 1; i < 4; ++i) {
+			switch (i) {
+			case 1:
+				System.out.println("Working on the languages file");
+				getDatatypes(ListFilesEnum.LANGUAGES, languagePattern, DBTablesEnum.LANGUAGES, DBFieldsEnum.LANGUAGES_LANGUAGE_NAME);
+				break;
+
+			case 2:
+				System.out.println("Working on the genres file");
+				getDatatypes(ListFilesEnum.LANGUAGES, genresCountriesPattern, DBTablesEnum.GENRES, DBFieldsEnum.GENRES_GENRE_NAME);
+				break;
+
+			case 3:
+				System.out.println("Working on the countries file");
+				getDatatypes(ListFilesEnum.LANGUAGES, genresCountriesPattern, DBTablesEnum.COUNTRIES, DBFieldsEnum.COUNTRIES_COUNTRY_NAME);
+				break;
+			}
+		}
+
+		createDataTypesIndex();
+		
+		return true;
+	}
+	
+	/**
+	 * imports all the different movie names from the movies list
+	 * @return boolean whether the method succeeded
+	 */
+	public boolean importMovies() {
+		
+		getMovies();
+		createMoviesIndex();
+		
+		return true;
+	}
+	
+	public boolean importMoviesDataTypes() {
+
+		for (int i = 1; i < 4; ++i) {
+			switch (i) {
+			case 1:
+				System.out.println("Working on the languages file - entering movies");
+				getMoviesDataTypes(ListFilesEnum.LANGUAGES, languagePattern, DBTablesEnum.MOVIE_LANGUAGES,
+						DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID, NamedEntitiesEnum.LANGUAGES);
+				break;
+
+			case 2:
+				System.out.println("Working on the genres file - entering movies");
+				getMoviesDataTypes(ListFilesEnum.GENRES, genresCountriesPattern, DBTablesEnum.MOVIE_GENRES,
+						DBFieldsEnum.MOVIE_GENRES_MOVIE_ID, DBFieldsEnum.MOVIE_GENRES_GENRE_ID, NamedEntitiesEnum.GENRES);
+				break;
+
+			case 3:
+				System.out.println("Working on the countries file - entering movies");
+				getMoviesDataTypes(ListFilesEnum.COUNTRIES, genresCountriesPattern, DBTablesEnum.MOVIE_COUNTRIES,
+						DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID, DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID, NamedEntitiesEnum.COUNTRIES);
+				break;
+			}
+		}
+
+		createDataTypesIndex();
+
+		return true;
+	}
+	
+	public void importPersonsAndCredits() {
+		
+		int[] personIndexNextMarkStart = new int[5]; 
+		
+		// creating the temporary fields in PERSONS needed for the import
+		createPersonsTempFields();
+		
+		System.out.println("==========================================================");
+		// adding the different persons from all the different lists
+		personIndexNextMarkStart[0] = 1;
+		personIndexNextMarkStart[1] = personIndexNextMarkStart[0] + getPersons(ListFilesEnum.ACTORS);
+		personIndexNextMarkStart[2] = personIndexNextMarkStart[1] + getPersons(ListFilesEnum.ACTRESSES);
+		personIndexNextMarkStart[3] = personIndexNextMarkStart[2] + getPersons(ListFilesEnum.DIRECTORS);
+		personIndexNextMarkStart[4] = personIndexNextMarkStart[3] + getPersons(ListFilesEnum.PRODUCERS);
+		getPersons(ListFilesEnum.WRITERS);
+		
+		// creating the PERSONS indexes
+		createPersonsIndex();
+		
+		// entering a tempPersonID for the persons, exactly as their personID
+		preparePersonsTempFields();
+		findAndUpdateDuplicates();
+		
+		getPersonMovieCredits(ListFilesEnum.ACTORS, personIndexNextMarkStart[0]);
+		getPersonMovieCredits(ListFilesEnum.ACTRESSES, personIndexNextMarkStart[1]);
+		getPersonMovieCredits(ListFilesEnum.DIRECTORS, personIndexNextMarkStart[2]);
+		getPersonMovieCredits(ListFilesEnum.PRODUCERS, personIndexNextMarkStart[3]);
+		getPersonMovieCredits(ListFilesEnum.WRITERS, personIndexNextMarkStart[4]);
+		
+		// creating the PERSONS indexes
+		createPersonMovieCreditsIndex();
+		
+		// removing the records in the PRESONS table marked as duplicates
+		removeDuplicates();
+		deletePersonsTempFields();
+	}
+	
+	private boolean createDataTypesIndex() {
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
+											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
+											DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
+											DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
+											DBTablesEnum.MOVIE_GENRES.getTableName(),
+											DBTablesEnum.MOVIE_GENRES.getTableName(),
+											DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(),
+											DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
+											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
+											DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(),
+											DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID.getFieldName()));
+
+		return true;
+	}
+	
+	private boolean createMoviesIndex() {
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+											DBTablesEnum.MOVIES.getTableName(),
+											DBTablesEnum.MOVIES.getTableName(), 
+											DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
+		
+		return true;
+	}
+	
+	private boolean createPersonMovieCreditsIndex() {
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s, %s) ENABLE",
+											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
+											DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
+											DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
+											DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName()));
+		return true;
+	}
+
+	private boolean createPersonsIndex() {
+
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
+
+		return true;
+	}
+	
+	/**
+	 * creates 3 fields needed for the import in the PERSONS table:
+	 * TEMP_PERSON_ID, TEMP_PERSON_LINE_NUMBER & TEMP_IS_DUPLICATE
+	 */
+	private void createPersonsTempFields() {
+
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s CHAR(1)",
+														DBTablesEnum.PERSONS.getTableName(), 
+														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
+	}
+	
+	/**
+	 * TEMP_PERSON_ID, TEMP_PERSON_LINE_NUMBER & TEMP_IS_DUPLICATE
+	 * removes the temporary fields that were used for the import in the PERSONS table:
+	 */
+	private void deletePersonsTempFields() {
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+														DBTablesEnum.PERSONS.getTableName(),
+														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
+	}
+
+	private void findAndUpdateDuplicates() {
+		DBManager.getInstance().findAndUpdateDuplicates();
+	}
+	
+	/**
+	 * parses the languages, genres & countries lists
+	 * and adds all the data to the DB
+	 * @return boolean if the method succeeded
+	 */
+	private boolean getDatatypes(ListFilesEnum dataType, 
+			String patternRegExp, DBTablesEnum tablesEnum, DBFieldsEnum fieldsEnum) {
+		
+		Parser parser = new Parser();
+		Set<String> elementsSet = new HashSet<String>();		// a dictionary to collect all the different elements
+		Pattern pattern;
+		Matcher matcher;
+
+		parser.loadFile(listfilesMap.get(dataType), dataType);		
+
+		// Making sure we find the start of the list
+		if (parser.findStartOfList()) {
+			System.out.println("Found the start of the list!");
+
+			pattern = Pattern.compile(patternRegExp);
+			elementsSet.clear();
+
+			while (!parser.isEOF()) {
+				matcher = pattern.matcher(parser.readLine());
+				if (matcher.matches())
+					elementsSet.add(matcher.group(2));
+			}
+
+			System.out.println("Inserting " + elementsSet.size() + " elements to the DB");
+			DBManager.getInstance().insertSingleDataTypeSetToDB(elementsSet, tablesEnum, fieldsEnum);
+		} else
+			return false;
+
+		parser.closeFile();
+		return true;
+	}
+	
+	private boolean getMovies() {
+
+		Parser parser = new Parser();
+		Set<MovieEntity> moviesSet = new LinkedHashSet<MovieEntity>();
+		String patternRegExp = null;
+		String fullMovieName, movieName, movieRomanNotation, movieMadeFor;
+		int movieYear;
+		Pattern pattern;
+		Matcher matcher;
+		int totalElementsNum = 0;
+		
+		// add temp field
+		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+				DBTablesEnum.PERSONS.getTableName(), 
+				DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
+		
+		parser.loadFile(listfilesMap.get(ListFilesEnum.MOVIES), ListFilesEnum.MOVIES);
+		patternRegExp = moviesPattern;
+			
+		// Making sure we find the start of the list
+		if (parser.findStartOfList()) {
+			System.out.println("Found the start of the list!");
+			
+			pattern = Pattern.compile(patternRegExp);
+			
+			while (!parser.isEOF()) {
+				matcher = pattern.matcher(parser.readLine());
+				if (matcher.matches()) {
+					fullMovieName = matcher.group(1).trim();
+					movieName = matcher.group(2);
+					movieRomanNotation = matcher.group(3);
+					movieMadeFor = matcher.group(4);
+					try {
+						movieYear = Integer.parseInt(matcher.group(5));
+					} catch (Exception e) {
+						if (matcher.group(5).equals("????")) {
+							movieYear = 0;
+						} else
+							movieYear = 1900;
+					}
+					// NOTE: the fullMovieName is a temporary field used during the import and dropped from the DB at the end
+					// it doesn't have a field in the MovieEntity, so for this occasion only, it is sent instead of the taglines field
+					moviesSet.add(new MovieEntity(0, movieName, movieYear, movieRomanNotation, movieMadeFor, 0, 0, fullMovieName, null, null));
+				}
+				// flush results every BATCH_SIZE 
+				if ((moviesSet.size() > 0) && (moviesSet.size() % PSTMT_BATCH_SIZE == 0)) {
+					System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
+					DBManager.getInstance().insertMoviesSetToDB(moviesSet);
+					totalElementsNum += moviesSet.size();
+					moviesSet.clear();
+				}
+			}
+			// flush the results that were left
+			if ((moviesSet.size() > 0)) {
+				System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
+				DBManager.getInstance().insertMoviesSetToDB(moviesSet);
+				totalElementsNum += moviesSet.size();
+			}
+			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
+
+		} else
+			return false;
+
+		parser.closeFile();
 
 		return true;
 	}
@@ -700,110 +804,6 @@ public class DataImporter {
 		parser.closeFile();
 
 		return totalElementsNum;
-	}
-	
-	public boolean importDataTypes() {
-		
-		for (int i = 1; i < 4; ++i) {
-			switch (i) {
-			case 1:
-				System.out.println("Working on the languages file");
-				getDatatypes(ListFilesEnum.LANGUAGES, languagePattern, DBTablesEnum.LANGUAGES, DBFieldsEnum.LANGUAGES_LANGUAGE_NAME);
-				break;
-
-			case 2:
-				System.out.println("Working on the genres file");
-				getDatatypes(ListFilesEnum.LANGUAGES, genresCountriesPattern, DBTablesEnum.GENRES, DBFieldsEnum.GENRES_GENRE_NAME);
-				break;
-
-			case 3:
-				System.out.println("Working on the countries file");
-				getDatatypes(ListFilesEnum.LANGUAGES, genresCountriesPattern, DBTablesEnum.COUNTRIES, DBFieldsEnum.COUNTRIES_COUNTRY_NAME);
-				break;
-			}
-		}
-
-		createDataTypesIndex();
-		
-		return true;
-	}
-	
-	/**
-	 * imports all the different movie names from the movies list
-	 * @return boolean whether the method succeeded
-	 */
-	public boolean importMovies() {
-		
-		getMovies();
-		createMoviesIndex();
-		
-		return true;
-	}
-	
-	public boolean importMoviesDataTypes() {
-
-		for (int i = 1; i < 4; ++i) {
-			switch (i) {
-			case 1:
-				System.out.println("Working on the languages file - entering movies");
-				getMoviesDataTypes(ListFilesEnum.LANGUAGES, languagePattern, DBTablesEnum.MOVIE_LANGUAGES,
-						DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID, DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID, NamedEntitiesEnum.LANGUAGES);
-				break;
-
-			case 2:
-				System.out.println("Working on the genres file - entering movies");
-				getMoviesDataTypes(ListFilesEnum.GENRES, genresCountriesPattern, DBTablesEnum.MOVIE_GENRES,
-						DBFieldsEnum.MOVIE_GENRES_MOVIE_ID, DBFieldsEnum.MOVIE_GENRES_GENRE_ID, NamedEntitiesEnum.GENRES);
-				break;
-
-			case 3:
-				System.out.println("Working on the countries file - entering movies");
-				getMoviesDataTypes(ListFilesEnum.COUNTRIES, genresCountriesPattern, DBTablesEnum.MOVIE_COUNTRIES,
-						DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID, DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID, NamedEntitiesEnum.COUNTRIES);
-				break;
-			}
-		}
-
-		createDataTypesIndex();
-
-		return true;
-	}
-
-	public void importPersonsAndCredits() {
-		
-		int[] personIndexNextMarkStart = new int[5]; 
-		
-		// creating the temporary fields in PERSONS needed for the import
-		createPersonsTempFields();
-		
-		System.out.println("==========================================================");
-		// adding the different persons from all the different lists
-		personIndexNextMarkStart[0] = 1;
-		personIndexNextMarkStart[1] = personIndexNextMarkStart[0] + getPersons(ListFilesEnum.ACTORS);
-		personIndexNextMarkStart[2] = personIndexNextMarkStart[1] + getPersons(ListFilesEnum.ACTRESSES);
-		personIndexNextMarkStart[3] = personIndexNextMarkStart[2] + getPersons(ListFilesEnum.DIRECTORS);
-		personIndexNextMarkStart[4] = personIndexNextMarkStart[3] + getPersons(ListFilesEnum.PRODUCERS);
-		getPersons(ListFilesEnum.WRITERS);
-		
-		// creating the PERSONS indexes
-		createPersonsIndex();
-		
-		// entering a tempPersonID for the persons, exactly as their personID
-		preparePersonsTempFields();
-		findAndUpdateDuplicates();
-		
-		getPersonMovieCredits(ListFilesEnum.ACTORS, personIndexNextMarkStart[0]);
-		getPersonMovieCredits(ListFilesEnum.ACTRESSES, personIndexNextMarkStart[1]);
-		getPersonMovieCredits(ListFilesEnum.DIRECTORS, personIndexNextMarkStart[2]);
-		getPersonMovieCredits(ListFilesEnum.PRODUCERS, personIndexNextMarkStart[3]);
-		getPersonMovieCredits(ListFilesEnum.WRITERS, personIndexNextMarkStart[4]);
-		
-		// creating the PERSONS indexes
-		createPersonMovieCreditsIndex();
-		
-		// removing the records in the PRESONS table marked as duplicates
-		removeDuplicates();
-		deletePersonsTempFields();
 	}
 
 	/**
