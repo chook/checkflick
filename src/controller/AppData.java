@@ -116,6 +116,7 @@ public class AppData {
 		Preferences prefs = null;
 		try {
 			prefs = new IniFile(new File(fullpath));
+			System.out.println("About to parse the ini !! my precious");
 			setBucketMaxSize(Integer.parseInt(prefs.node("settings").get(
 					"maxbucket", null)));
 			setDbHost(prefs.node("db").get("host", null));

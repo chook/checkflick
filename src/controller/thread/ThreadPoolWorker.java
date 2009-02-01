@@ -9,7 +9,6 @@ package controller.thread;
 class ThreadPoolWorker extends Object {
 	private static int nextWorkerID = 0;
 	private ObjectFIFO idleWorkers;
-	private int workerID;
 	private ObjectFIFO handoffBox;
 	private Thread internalThread;
 	private volatile boolean noStopRequested;
@@ -17,7 +16,7 @@ class ThreadPoolWorker extends Object {
 	public ThreadPoolWorker(ObjectFIFO idleWorkers) {
 		this.idleWorkers = idleWorkers;
 
-		workerID = getNextWorkerID();
+		getNextWorkerID();
 		handoffBox = new ObjectFIFO(1); // only one slot
 
 		// just before returning, the thread should be created and started.
@@ -52,14 +51,9 @@ class ThreadPoolWorker extends Object {
 	private void runWork() {
 		while (noStopRequested) {
 			try {
-				System.out.println("workerID=" + workerID + ", ready for work");
-
 				idleWorkers.add(this);
 
 				Runnable r = (Runnable) handoffBox.remove();
-
-				System.out.println("workerID=" + workerID
-						+ ", starting execution of new Runnable: " + r);
 				runIt(r);
 			} catch (InterruptedException x) {
 				Thread.currentThread().interrupt(); // re-assert
@@ -79,8 +73,6 @@ class ThreadPoolWorker extends Object {
 	}
 
 	public void stopRequest() {
-		System.out
-				.println("workerID=" + workerID + ", stopRequest() received.");
 		noStopRequested = false;
 		internalThread.interrupt();
 	}
