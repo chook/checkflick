@@ -74,4 +74,7 @@ public class RibbonInterface {
 	public static void deleteEntity(boolean ok ) {
 		CheckFlickGUI.drawDeleteDataFailure(ok);
 	}
+	public static void finishImport(boolean importIntoDB) {
+		CheckFlickGUI.handleFinishImport(importIntoDB);
+	}
 }
