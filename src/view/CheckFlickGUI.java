@@ -107,7 +107,9 @@ public class CheckFlickGUI {
 		}
 		display.dispose();
 	}
-	
+	/**
+	 * Open a new tab for the movie with the movie name as a title 
+	 */
 	protected static void updateMovieTab(final MovieEntity movie){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -120,6 +122,9 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	/**
+	 * Open a new tab for the person with the person name as a title 
+	 */
 	protected static void updatePersonTab(final PersonEntity person){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -132,6 +137,9 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	/**
+	 * Draw the data of a person when clicking on one of the person's buttons 
+	 */
 	protected static void drawPersonData(final List<AbsType> result ,final PersonDataEnum type , final int personId){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -293,7 +301,9 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	
+	/**
+	 * Draw the data of a movie when clicking on one of the movie's buttons 
+	 */
 	protected static void drawMovieData(final List<AbsType> result ,final MovieDataEnum type , final int movieId){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -499,12 +509,14 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	
+	/**
+	 * Setting the lists as they were received from the DB 
+	 */
 	protected static void setList(final List<NamedEntity> list, final NamedEntitiesEnum type) {
 		display.asyncExec(new Runnable() {
 			public void run() {
-				System.out.println("Got list: " + type.toString());
-			
+				if (list == null)
+					okMessageBox("Cannot create a connection");
 				switch(type) {
 				case GENRES:
 					genresList = list;
@@ -522,7 +534,9 @@ public class CheckFlickGUI {
 			}
 		});
 	}
-	
+	/**
+	 * Creating the Shell with all the tabs and buttons
+	 */
 	private void createShell() {
 		shell = new RibbonShell(display);
 		shell.setText("DB Project, TAU 2009");
@@ -552,30 +566,8 @@ public class CheckFlickGUI {
 		RibbonGroup searching = new RibbonGroup(searchTab, "Search For" , searchToolTip);
 		RibbonButton movieSearch = new RibbonButton(searching, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(searching);
-		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);
+		RibbonButton personSearch = new RibbonButton(searching, ImageCache.getImage("user_48.png"), " \nPerson", RibbonButton.STYLE_TWO_LINE_TEXT);		
 		
-//		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);
-//		searchByMovie.setLocation(2, 145);
-//		searchByMovie.setVisible(false);
-//		
-//		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
-//		searchByPerson.setVisible(false);
-//		
-//		resultsMovieTable = new Composite(shell.getShell(),SWT.NONE);
-//		resultsMovieTable.setVisible(false);
-//		
-//		resultsPersonTable = new Composite(shell.getShell(),SWT.NONE);
-//		resultsPersonTable.setVisible(false);
-//		
-//		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
-//		insertMovie.setLocation(2, 145);
-//		insertMovie.setVisible(false);
-//		
-//		insertPerson = new Composite(shell.getShell(),SWT.BORDER);
-//		insertPerson.setLocation(2, 145);
-//		insertPerson.setVisible(false);
-		
-		// The Insert Tab
 		// Insert Tab
 		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert" , insertToolTip);
 		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache.getImage("camera_48.png"), " \nMovie", RibbonButton.STYLE_TWO_LINE_TEXT);
@@ -634,7 +626,10 @@ public class CheckFlickGUI {
 				}
 			}
 		});
-	}				
+	}	
+	/**
+	 * Disposing all the composites that are not disposed
+	 */
 	private static void cleanAllComposites(){
 		if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
 			searchByMovie.dispose();
@@ -659,7 +654,12 @@ public class CheckFlickGUI {
 		if ((bar!=null)&& !(bar.isDisposed()))
 			bar.dispose();
 	}
+	/**
+	 * Open a composite with expanded bar.
+	 * In this composite one can search for a movie
+	 */
 	public static void searchByMovie(){
+		//disposing all composites
 		cleanAllComposites();
 		searchByMovie = new Composite(shell.getShell(),SWT.BORDER);;
 		Calendar toDay = Calendar.getInstance();
@@ -671,7 +671,7 @@ public class CheckFlickGUI {
 		bar = new ExpandBar (searchByMovie, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("search_48.png");
-		// First item
+		// Main item
 		final Composite composite = new Composite (bar, SWT.NONE);
 		GridLayout layout = new GridLayout (7,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
@@ -767,6 +767,10 @@ public class CheckFlickGUI {
 			}
 		});
 	}
+	/**
+	 * Open a composite with expanded bar.
+	 * In this composite one can search for a person
+	 */
 	public static void searchByPerson(){
 		cleanAllComposites();
 		searchByPerson = new Composite(shell.getShell(),SWT.BORDER);
@@ -777,13 +781,12 @@ public class CheckFlickGUI {
 		bar = new ExpandBar (searchByPerson, SWT.V_SCROLL);
 		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("search_48.png");
-		// First item
+		// Main item
 		Composite composite = new Composite (bar, SWT.FILL);
 		GridLayout layout = new GridLayout (7,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
-		//to add- search by origin country, age-range 
 		Label label= new Label(composite,SWT.NONE);
 		label.setText("Person Name");
 		final Button checkWildCard = new Button(composite, SWT.CHECK);
@@ -838,8 +841,8 @@ public class CheckFlickGUI {
 		
 		item0.setExpanded(true);
 		bar.setSpacing(8);
-		//searchByActor.setVisible(checked);
 		searchByPerson.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
+		//listen for the search button
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -875,7 +878,10 @@ public class CheckFlickGUI {
 		});
 
 	}
-	//message box that is opened whenever Yes/No/Cancel question is asked
+	
+	/**
+	 * message box that is opened whenever Yes/No question is asked
+	 */
 	static public int yesNoMessageBox(String q){	
 		shell.getShell().setEnabled(false);
 		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
@@ -884,7 +890,10 @@ public class CheckFlickGUI {
 		shell.getShell().setEnabled(true);
 		return answer;		
 	}
-	//message box that is opened whenever OK statement is asked
+	
+	/**
+	 * message box that is opened whenever OK question is asked
+	 */
 	static public int okMessageBox(String q){	
 		shell.getShell().setEnabled(false);
 		MessageBox mb = new MessageBox(shell.getShell(), SWT.OK); 
@@ -893,32 +902,37 @@ public class CheckFlickGUI {
 		shell.getShell().setEnabled(true);
 		return answer;		
 	}
+	
+	/**
+	 * Manage the movie tab
+	 * By clicking the buttons the user can see extra information
+	 */
 	public static void ShowMovieResult(final RibbonTab tab, final MovieEntity movie){
 		searchByMovie.setVisible(false);
-		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
-
-		// Groups
-
 		// Movie tab
-		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info" , toolTip);
-		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonGroup results = new RibbonGroup(tab, "More Details" , toolTip);
-		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
+		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);
+		RibbonGroup results = new RibbonGroup(tab, "More Details");
+		RibbonButton countries = new RibbonButton(results, ImageCache.getImage("globe_48.png"), " \nCountries", RibbonButton.STYLE_TWO_LINE_TEXT );
 		new RibbonGroupSeparator(results);
-		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton languages = new RibbonButton(results, ImageCache.getImage("furl_48.png"), " \nLanguages", RibbonButton.STYLE_TWO_LINE_TEXT );
 		new RibbonGroupSeparator(results);
-		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT );
 		new RibbonGroupSeparator(results);
-		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonGroup personsGroup = new RibbonGroup(tab, "Cast" , toolTip);
-		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
+		RibbonButton genres = new RibbonButton(results, ImageCache.getImage("pie_chart_48.png"), " \nGenres", RibbonButton.STYLE_TWO_LINE_TEXT );
+		RibbonGroup personsGroup = new RibbonGroup(tab, "Cast");
+		RibbonButton persons = new RibbonButton(personsGroup, ImageCache.getImage("users_two_48.png"), " \nPersons", RibbonButton.STYLE_TWO_LINE_TEXT );
+		
 		ButtonSelectGroup group = new ButtonSelectGroup();
+		
 		general.setButtonSelectGroup(group);
 		countries.setButtonSelectGroup(group);
 		genres.setButtonSelectGroup(group);
 		languages.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
 		persons.setButtonSelectGroup(group);
+		
+		//draw the general information of the movie
 		drawGeneralInformationMovie(movie , tab.getIndex());
 		
 		countries.addSelectionListener(new SelectionListener() {
@@ -974,14 +988,16 @@ public class CheckFlickGUI {
 		});
 
 	}
-	
+	/**
+	 * Manage the person tab
+	 * By clicking the buttons the user can see extra information
+	 */
 	public static void ShowPersonResult(final RibbonTab tab,final PersonEntity person){
 		searchByPerson.setVisible(false);
-		RibbonTooltip toolTip = new RibbonTooltip("Some Action Title", "This is content text that\nsplits over\nmore than one\nline\n\\b\\c255000000and \\xhas \\bdifferent \\c000000200look \\xand \\bfeel.", ImageCache.getImage("tooltip.jpg"), ImageCache.getImage("questionmark.gif"), "Press F1 for more help"); 
 		// Person Tab
-		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info" , toolTip);
+		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
 		RibbonButton general = new RibbonButton(generalInfo, ImageCache.getImage("book_48.png"), " \nInformation", RibbonButton.STYLE_TWO_LINE_TEXT);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
-		RibbonGroup results = new RibbonGroup(tab, "More Details" , toolTip);
+		RibbonGroup results = new RibbonGroup(tab, "More Details");
 		RibbonButton aka = new RibbonButton(results, ImageCache.getImage("book_48.png"), " \nAKA names", RibbonButton.STYLE_TWO_LINE_TEXT | RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
 		RibbonButton role = new RibbonButton(results, ImageCache.getImage("camera_48.png"), " \nRoles", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
@@ -989,10 +1005,13 @@ public class CheckFlickGUI {
 		RibbonButton quotes = new RibbonButton(results, ImageCache.getImage("speech_bubble_48.png"), " \nQuotes", RibbonButton.STYLE_TWO_LINE_TEXT |RibbonButton.STYLE_ARROW_DOWN);//RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 
 		ButtonSelectGroup group = new ButtonSelectGroup();
+		
 		general.setButtonSelectGroup(group);
 		aka.setButtonSelectGroup(group);
 		role.setButtonSelectGroup(group);
 		quotes.setButtonSelectGroup(group);
+		
+		//draw the general information of the person
 		drawGeneralInformationPerson(person , tab.getIndex());
 	
 		aka.addSelectionListener(new SelectionListener() {
@@ -1028,6 +1047,10 @@ public class CheckFlickGUI {
 		});
 	
 	}
+	
+	/**
+	 * Calling for the DM to get person extra data
+	 */
 	static protected void personButtonsResults(int id, PersonDataEnum type){
 		try {
 			pool.execute(DataManager.getPersonData(type, id));
@@ -1035,6 +1058,10 @@ public class CheckFlickGUI {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Calling for the DM to get movie extra data
+	 */
 	static protected void movieButtonsResults(int id, MovieDataEnum type){
 		try {
 			pool.execute(DataManager.getMovieData(type, id));
@@ -1042,6 +1069,7 @@ public class CheckFlickGUI {
 			e.printStackTrace();
 		}
 	}
+	
 	public void insertMovie(){
 		cleanAllComposites();
 		insertMovie = new Composite(shell.getShell(),SWT.BORDER);
