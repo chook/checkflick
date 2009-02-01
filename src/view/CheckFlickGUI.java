@@ -91,7 +91,6 @@ public class CheckFlickGUI {
 			rolesList = new ArrayList<NamedEntity>();
 			rolesList.add(new NamedEntity(0,""));
 			
-			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COLOR_INFOS));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.COUNTRIES));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.GENRES));
 			pool.execute(DataManager.getAllNamedEntities(NamedEntitiesEnum.LANGUAGES));

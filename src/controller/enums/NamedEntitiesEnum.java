@@ -7,9 +7,9 @@ package controller.enums;
  */
 public enum NamedEntitiesEnum {
 	GENRES,
-	COLOR_INFOS,
+	//COLOR_INFOS,
 	LANGUAGES,
 	PRODUCTION_ROLES,
-	CONNECTION_RELATIONS,
+	//CONNECTION_RELATIONS,
 	COUNTRIES
 }
