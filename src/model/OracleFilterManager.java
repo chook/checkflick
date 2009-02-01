@@ -172,11 +172,11 @@ public class OracleFilterManager {
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.NUMBER,
 					DBTablesEnum.MOVIES.getTableName(),
 					DBFieldsEnum.MOVIES_MOVIE_RUNNING_TIME.getFieldName(),
-					ls.get(4)));
+					ls.get(3)));
 			filterList.add(new OracleSingleFilter(FilterOptionEnum.STRING,
 					DBTablesEnum.MOVIES.getTableName(),
 					DBFieldsEnum.MOVIES_MOVIE_PLOT_TEXT.getFieldName(),
-					ls.get(6)));
+					ls.get(4)));
 			break;
 		default:
 			break;
