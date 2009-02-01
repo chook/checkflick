@@ -280,7 +280,7 @@ public class DataManager {
 				switch(entity)
 				{
 					case MOVIES:
-						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity , id);
+						RibbonInterface.drawMovieSearch(DBManager.getInstance().search(list, DBTablesEnum.MOVIES), entity );
 						break;
 					case PERSONS:
 						RibbonInterface.drawPersonSearch(DBManager.getInstance().search(list, DBTablesEnum.PERSONS), entity , id , update);
@@ -296,18 +296,24 @@ public class DataManager {
 		return db.getSearchFilter(entity, value, value2);
 	}
 	
-	public static Runnable deleteMovieEntity(final MovieDataEnum dataType, final AbsType entity) {
+	public static Runnable deleteMovieEntity(final MovieDataEnum dataType, final AbsType entity , final int id) {
 		return new Runnable() {
 			public void run() {
-				RibbonInterface.deleteEntity(DBManager.getInstance().deleteMovieEntity(dataType, entity));
+				if (dataType == MovieDataEnum.MOVIE)
+					RibbonInterface.deleteEntity(DBManager.getInstance().deleteMovieEntity(dataType, entity));
+				else
+					RibbonInterface.deleteMovieExtraData(DBManager.getInstance().deleteMovieEntity(dataType, entity) , id , dataType);
 			}
 		};
 	}
 
-	public static Runnable deletePersonEntity(final PersonDataEnum dataType, final AbsType entity) {
+	public static Runnable deletePersonEntity(final PersonDataEnum dataType, final AbsType entity , final int id) {
 		return new Runnable() {
 			public void run() {
-				RibbonInterface.deleteEntity(DBManager.getInstance().deletePersonEntity(dataType, entity));
+				if (dataType == PersonDataEnum.PERSON)
+					RibbonInterface.deleteEntity(DBManager.getInstance().deletePersonEntity(dataType, entity));
+				else
+					RibbonInterface.deletePersonExtraData(DBManager.getInstance().deletePersonEntity(dataType, entity),id ,dataType );
 			}
 		};
 	}
