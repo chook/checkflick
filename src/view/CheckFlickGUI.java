@@ -73,7 +73,7 @@ public class CheckFlickGUI {
 	static ExpandBar bar;
 	static ExpandItem otherResults;
 	static AppData settings = null; 
-//	static Color backgroundColor = new Color(new Device() , 117 ,141 , 204);
+//	static Color bgColor = new Color(display , 117 ,141 , 204);
 	public static void main(String args []) {
 		AppData.getInstance().parseINIFile("ini\\checkflick.ini");
 		pool = new ThreadPool(AppData.getInstance().getMaxThreads());
@@ -551,7 +551,7 @@ public class CheckFlickGUI {
 		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
 		//shell.setMaximized(true);
 		//shell.setSize(570, 550);
-		
+		shell.getShell().setMinimumSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
 		//closing the program.
 	/* shell.(new ShellEvent(){
 			
@@ -758,12 +758,11 @@ public class CheckFlickGUI {
 		if ((bar!= null) && !(bar.isDisposed()))
 				bar.dispose();
 		bar = new ExpandBar (search, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
 		final Composite composite = new Composite (bar, SWT.NONE);
-		//composite.setSize(search.getSize());
-		//createMovieForm(composite);
-		GridLayout layout = new GridLayout (6,false);
+		GridLayout layout = new GridLayout (7,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout); 
@@ -807,6 +806,7 @@ public class CheckFlickGUI {
 			langString[i+1]=langList.get(i).getName();
 		}
 		langCombo.setItems(langString);
+		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		label = new Label(composite,SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
@@ -873,10 +873,11 @@ public class CheckFlickGUI {
 		if ((bar != null)&& !(bar.isDisposed()))
 			bar.dispose();
 		bar = new ExpandBar (search, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("search_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.FILL);
-		GridLayout layout = new GridLayout (6,false);
+		GridLayout layout = new GridLayout (7,false);
 		layout.marginLeft = layout.marginTop = layout.marginRight = layout.marginBottom = 5;
 		layout.verticalSpacing = 10;
 		composite.setLayout(layout);
@@ -925,6 +926,7 @@ public class CheckFlickGUI {
 		countryCombo.setItems (countryString);
 		label= new Label(composite, SWT.NONE);
 		label= new Label(composite, SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -1157,6 +1159,7 @@ public class CheckFlickGUI {
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
 		bar = new ExpandBar (insert, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.NONE);
@@ -1256,6 +1259,7 @@ public class CheckFlickGUI {
 		if ((bar!= null) && !(bar.isDisposed()))
 			bar.dispose();
 		bar = new ExpandBar (insert, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("add_48.png");
 		// First item
 		Composite composite = new Composite (bar, SWT.NONE);
@@ -1421,6 +1425,7 @@ public class CheckFlickGUI {
 		entityDetails.setLocation(2, 145);
 		entityDetails.setLayout(new FillLayout());
 		bar = new ExpandBar (entityDetails, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("paper_content_48.png");
 		
 		// general information
@@ -1566,7 +1571,7 @@ public class CheckFlickGUI {
 				
 		});
 		Button reset = new Button(composite , SWT.PUSH);
-		reset.setText("Cancel");
+		reset.setText("Reset");
 		reset.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1593,6 +1598,8 @@ public class CheckFlickGUI {
 				
 			}
 		});
+		label = new Label(composite,SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		Button delete = new Button(composite , SWT.PUSH);
 		delete.setText("Delete Person");
 		delete.addSelectionListener(new SelectionListener(){
@@ -1618,8 +1625,6 @@ public class CheckFlickGUI {
 				}
 			}
 		});
-		label= new Label(composite, SWT.NONE);
-		label= new Label(composite, SWT.NONE);
 		
 		Button close = new Button(composite , SWT.PUSH);
 		close.setText("Close Tab");
@@ -1670,6 +1675,7 @@ public class CheckFlickGUI {
 		entityDetails.setLocation(2, 145);
 		entityDetails.setLayout(new FillLayout());
 		bar = new ExpandBar (entityDetails, SWT.V_SCROLL);
+		bar.setBackground( new Color(display , 177 ,200 , 231));
 		Image image = ImageCache.getImage("paper_content_48.png");
 		
 		// general information
@@ -1702,10 +1708,10 @@ public class CheckFlickGUI {
 		final String oldTime = String.valueOf(movie.getRunningTime());
 		label = new Label(composite,SWT.NONE);
 		label.setText("Plot: ");
-		final Text plotText = new Text(composite ,SWT.MULTI|SWT.V_SCROLL);
-		plotText.setBounds(100,100,100, 100);
+		final Text plotText = new Text(composite ,SWT.WRAP|SWT.V_SCROLL);
 		if (movie.getPlot()!= null)
 			plotText.setText(movie.getPlot());
+		plotText.setSize(150, 150);
 		label= new Label(composite, SWT.NONE);
 		label= new Label(composite, SWT.NONE);
 		label = new Label(composite,SWT.NONE);
@@ -1804,7 +1810,7 @@ public class CheckFlickGUI {
 				
 		});
 		Button reset = new Button(composite , SWT.PUSH);
-		reset.setText("Cancel");
+		reset.setText("Reset");
 		reset.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1825,6 +1831,8 @@ public class CheckFlickGUI {
 				
 			}
 		});
+		label = new Label(composite,SWT.NONE);
+		label = new Label(composite,SWT.NONE);
 		Button delete = new Button(composite , SWT.PUSH);
 		delete.setText("Delete Movie");
 		delete.addSelectionListener(new SelectionListener(){
@@ -1850,8 +1858,6 @@ public class CheckFlickGUI {
 				}
 			}
 		});
-		label= new Label(composite, SWT.NONE);
-		label= new Label(composite, SWT.NONE);
 		
 		Button close = new Button(composite , SWT.PUSH);
 		close.setText("Close Tab");
@@ -1885,6 +1891,7 @@ public class CheckFlickGUI {
 				System.out.println(count);
 				if (count > 0){
 					final Table table = new Table (resultsMovieTable, SWT.MULTI| SWT.BORDER|SWT.FULL_SELECTION);
+					resultsMovieTable.setBackground( new Color(display , 177 ,200 , 231));
 					table.setLinesVisible (true);
 					table.setHeaderVisible (true);
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -1945,6 +1952,7 @@ public class CheckFlickGUI {
 				//creating the search results table
 				if (count > 0){
 					final Table table = new Table (resultsPersonTable, SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION);
+					resultsPersonTable.setBackground( new Color(display , 177 ,200 , 231));
 					table.setLinesVisible (true);
 					table.setHeaderVisible (true);
 					GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -2011,6 +2019,7 @@ public class CheckFlickGUI {
 				}
 				else {
 					moreInsert = new ExpandBar(insertMovie, SWT.V_SCROLL);
+					moreInsert.setBackground( new Color(display , 177 ,200 , 231));
 					Composite composite = new Composite (moreInsert, SWT.NONE);
 					GridLayout layout = new GridLayout (6,false);
 					Image image = ImageCache.getImage("pie_chart_48.png");
@@ -2213,6 +2222,7 @@ public class CheckFlickGUI {
 				}
 				else{
 					moreInsert = new ExpandBar(insertPerson, SWT.V_SCROLL);
+					moreInsert.setBackground(new Color(display , 177 ,200 , 231));
 					Composite composite = new Composite (moreInsert, SWT.NONE);
 					GridLayout layout = new GridLayout (6,false);
 					Image image = ImageCache.getImage("book_48.png");
@@ -2304,8 +2314,9 @@ public class CheckFlickGUI {
 	static protected void castInsertWindow(final List<DatedEntity> searched, SearchEntitiesEnum search , final int id , final boolean update){	
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
-		final Shell personResults = new Shell();
-	//	personResults.setBackground(shell.getShell().getBackground());
+		final Shell personResults = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		personResults.setBackground(bgColor);
 		Rectangle monitor_bounds = personResults.getShell().getMonitor().getBounds();
 		personResults.setSize(new Point(monitor_bounds.width/4,
 		                        monitor_bounds.height/2));		
@@ -2343,15 +2354,19 @@ public class CheckFlickGUI {
 		}
 		rolesCombo.setItems (rolesString);
 		Label label = new Label(personResults , SWT.NONE);
+		label.setBackground(bgColor);
 		label.setText("Actor's Role:");
 		final Text roleText = new Text(personResults , SWT.BORDER);
 		label = new Label(personResults , SWT.NONE);
+		label.setBackground(bgColor);
 		label.setText("Actor's Rank:");
 		final Text rankText = new Text(personResults , SWT.BORDER);
 		Button add = new Button(personResults, SWT.PUSH);
 		add.setText("Add");
+		add.setBackground(bgColor);
 		Button close = new Button(personResults, SWT.PUSH);
 		close.setText("Close");
+		close.setBackground(bgColor);
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2427,8 +2442,9 @@ public class CheckFlickGUI {
 	static protected void openPersonAddWindow(final PersonDataEnum type , final int personId){
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
-		final Shell addToPerson = new Shell();
-	//	personResults.setBackground(shell.getShell().getBackground());
+		final Shell addToPerson = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		addToPerson.setBackground(bgColor);
 		Rectangle monitor_bounds = addToPerson.getShell().getMonitor().getBounds();
 		addToPerson.setSize(new Point(monitor_bounds.width/5,100));		
 		addToPerson.setText("Add To Person");		
@@ -2437,6 +2453,7 @@ public class CheckFlickGUI {
 		addToPerson.setLayout(layout);
 		
 		Label label = new Label(addToPerson , SWT.NONE);
+		label.setBackground(bgColor);
 		final Text text = new Text(addToPerson , SWT.FILL|SWT.BORDER);
 		switch(type){
 		case PERSON_AKAS:{
@@ -2450,8 +2467,10 @@ public class CheckFlickGUI {
 		}
 		Button add = new Button(addToPerson, SWT.PUSH);
 		add.setText("Add");
+		add.setBackground(bgColor);
 		Button close = new Button(addToPerson, SWT.PUSH);
 		close.setText("Close");
+		close.setBackground(bgColor);
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2489,8 +2508,9 @@ public class CheckFlickGUI {
 	static protected void openMovieAddWindow(final MovieDataEnum type , final int id){
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
-		final Shell addToMovie = new Shell();
-	//	personResults.setBackground(shell.getShell().getBackground());
+		final Shell addToMovie = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		addToMovie.setBackground(bgColor);
 		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
 		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
 		addToMovie.setText("Add To Movie");		
@@ -2498,6 +2518,7 @@ public class CheckFlickGUI {
 		String buttonString = "Add";
 		addToMovie.setLayout(layout);
 		Label label = new Label(addToMovie , SWT.NONE);
+		label.setBackground(bgColor);
 		final Text text = new Text(addToMovie , SWT.FILL|SWT.BORDER);
 		switch(type){
 		case MOVIE_QUOTES:{
@@ -2512,8 +2533,10 @@ public class CheckFlickGUI {
 		}
 		Button add = new Button(addToMovie, SWT.PUSH);
 		add.setText(buttonString);
+		add.setBackground(bgColor);
 		Button close = new Button(addToMovie, SWT.PUSH);
 		close.setText("Close");
+		close.setBackground(bgColor);
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -2565,14 +2588,16 @@ public class CheckFlickGUI {
 	static protected void openMovieAddFromListWindow(final MovieDataEnum type , final int id){
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
-		final Shell addToMovie = new Shell();
-	//	personResults.setBackground(shell.getShell().getBackground());
+		final Shell addToMovie = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		addToMovie.setBackground(bgColor);
 		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
 		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
 		addToMovie.setText("Add To Movie");		
 		GridLayout layout = new GridLayout(2 , false);
 		addToMovie.setLayout(layout);
 		Label label = new Label(addToMovie , SWT.NONE);
+		label.setBackground(bgColor);
 		final Combo combo = new Combo(addToMovie , SWT.FILL|SWT.BORDER|SWT.READ_ONLY);
 		
 		String[] listString;
@@ -2603,8 +2628,10 @@ public class CheckFlickGUI {
 		combo.setItems (listString);
 		Button add = new Button(addToMovie, SWT.PUSH);
 		add.setText("Add");
+		add.setBackground(bgColor);
 		Button close = new Button(addToMovie, SWT.PUSH);
 		close.setText("Close");
+		close.setBackground(bgColor);
 		add.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
