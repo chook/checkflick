@@ -70,6 +70,8 @@ public class CheckFlickGUI {
 	static ExpandBar bar;
 	static ExpandItem otherResults;
 	static AppData settings = null; 
+	static Label importLabel;
+	static Button closeImportButton;
 	public static void main(String args []) {
 		AppData.getInstance().parseINIFile("ini\\checkflick.ini");
 		pool = new ThreadPool(AppData.getInstance().getMaxThreads());
@@ -542,13 +544,6 @@ public class CheckFlickGUI {
 		//closing the program.
 		shell.getShell().addListener(SWT.Close, new Listener(){
 			public void handleEvent(Event e){    			
-    		/*	switch(yesNoMessageBox("Are you sure you want to exit?")){
-    				case(SWT.YES):{shell.getShell().dispose();}
-    				case(SWT.NO):{
-    					e.doit = false;
-	    				
-    				}
-    			}*/
     			pool.stopRequestAllWorkers();
 			}
 		});
@@ -746,6 +741,42 @@ public class CheckFlickGUI {
 				insertPerson.setBackground(shell.getShell().getBackground());
 				insertPerson(insertPerson);
 			}	
+		});
+		importButton.addSelectionListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				if ((searchByMovie!= null) && !(searchByMovie.isDisposed()))
+					searchByMovie.dispose();
+				if ((searchByPerson!= null) && !(searchByPerson.isDisposed()))	
+					searchByPerson.dispose();
+				if ((insertMovie!= null) && !(insertMovie.isDisposed()))
+					insertMovie.dispose();
+				if ((insertPerson!= null) && !(insertPerson.isDisposed()))	
+					insertPerson.dispose();
+				if ((movieButtons != null) && !(movieButtons.isDisposed()))
+					movieButtons.dispose();
+				if ((personButtons != null) && !(personButtons.isDisposed()))
+					personButtons.dispose();
+				if ((otherResults != null) && !(otherResults.isDisposed()))
+					otherResults.dispose();
+				if ((resultsMovieTable!=null) && (resultsMovieTable.isDisposed())) 
+					resultsMovieTable.dispose();
+				if ((resultsPersonTable!=null) && (resultsPersonTable.isDisposed())) 
+					resultsPersonTable.dispose();
+				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+					entityDetails.dispose();
+				if ((bar!=null)&& !(bar.isDisposed()))
+					bar.dispose();
+				if ((entityDetails!= null) && !(entityDetails.isDisposed()))
+					entityDetails.dispose();
+				try {
+					openImportMessage(importLabel ,closeImportButton);
+					pool.execute(DataManager.importIntoDb(AppData.getInstance().getImportFolder()));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
 		});
 	}				
 	
@@ -2309,6 +2340,7 @@ public class CheckFlickGUI {
 		Color bgColor = new Color(display , 177 ,200 , 231);
 		personResults.setBackground(bgColor);
 		Rectangle monitor_bounds = personResults.getShell().getMonitor().getBounds();
+		personResults.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
 		personResults.setSize(new Point(monitor_bounds.width/4,
 		                        monitor_bounds.height/2));		
 		personResults.setText("Persons List");		
@@ -2434,9 +2466,11 @@ public class CheckFlickGUI {
 		shell.getShell().setEnabled(false);
 		//final RibbonShell personResults = new RibbonShell(display);	
 		final Shell addToPerson = new Shell(SWT.CLOSE);
+		Utils.centerDialogOnScreen(addToPerson);
 		Color bgColor = new Color(display , 177 ,200 , 231);
 		addToPerson.setBackground(bgColor);
 		Rectangle monitor_bounds = addToPerson.getShell().getMonitor().getBounds();
+		addToPerson.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
 		addToPerson.setSize(new Point(monitor_bounds.width/5,100));		
 		addToPerson.setText("Add To Person");		
 		GridLayout layout = new GridLayout(2 , false);
@@ -2498,11 +2532,11 @@ public class CheckFlickGUI {
 	}
 	static protected void openMovieAddWindow(final MovieDataEnum type , final int id){
 		shell.getShell().setEnabled(false);
-		//final RibbonShell personResults = new RibbonShell(display);	
 		final Shell addToMovie = new Shell(SWT.CLOSE);
 		Color bgColor = new Color(display , 177 ,200 , 231);
 		addToMovie.setBackground(bgColor);
 		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
+		addToMovie.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
 		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
 		addToMovie.setText("Add To Movie");		
 		GridLayout layout = new GridLayout(2 , false);
@@ -2583,6 +2617,7 @@ public class CheckFlickGUI {
 		Color bgColor = new Color(display , 177 ,200 , 231);
 		addToMovie.setBackground(bgColor);
 		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
+		addToMovie.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
 		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
 		addToMovie.setText("Add To Movie");		
 		GridLayout layout = new GridLayout(2 , false);
@@ -2658,7 +2693,66 @@ public class CheckFlickGUI {
 		});
 		addToMovie.open();
 	}
-
+	static protected void openImportMessage(Label label , Button close){
+		shell.getShell().setEnabled(false);
+		final Shell importShell = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		importShell.setBackground(bgColor);
+		Rectangle monitor_bounds = importShell.getShell().getMonitor().getBounds();
+		importShell.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
+		importShell.setSize(new Point(monitor_bounds.width/5,100));		
+		importShell.setText("Importing...");		
+		GridLayout layout = new GridLayout(2 , false);
+		importShell.setLayout(layout);
+		label = new Label(importShell , SWT.NONE);
+		label.setBackground(bgColor);
+		label.setText("Please wait while importing the data...");
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.CENTER;
+		gridData.horizontalSpan = 2;
+		label.setLayoutData(gridData);
+		Label empty = new Label(importShell, SWT.NONE);
+		empty.setBackground(bgColor);
+		Button cancel =  new Button(importShell, SWT.PUSH);
+		cancel.setText("Cancel");
+		cancel.setBackground(bgColor);
+		cancel.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);
+				pool.stopRequestIdleWorkers();
+				try {
+					Thread.sleep(1000);
+					pool.stopRequestAllWorkers();
+					Thread.sleep(500);
+					pool.stopRequestAllWorkers();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				pool = new ThreadPool(AppData.getInstance().getMaxThreads());
+				importShell.close();
+			}
+		});
+		close = new Button(importShell, SWT.PUSH);
+		close.setText("Close");
+		close.setBackground(bgColor);
+		close.setVisible(false);
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				shell.getShell().setEnabled(true);
+				importShell.close();
+			}
+		});
+		importShell.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+			}			
+		});
+		importShell.open();
+	}
 	static protected void redrawPersonTable(final int id ,final PersonDataEnum type){
 		display.asyncExec(new Runnable() {
 			public void run() {
@@ -2699,6 +2793,17 @@ public class CheckFlickGUI {
 			public void run() {
 				if (!result)
 					okMessageBox("There was a problem deleting the entity. Sorry for the inconvenience :)");		
+			}
+		});
+	}
+	static protected void handleFinishImport(final boolean result){
+		display.asyncExec(new Runnable() {
+			public void run() {
+				if (result)
+					importLabel.setText("Import Succeded");
+				else
+					importLabel.setText("There was a problem importing the data to the database. Sorry for the inconvenience :)");
+				closeImportButton.setVisible(true);
 			}
 		});
 	}
