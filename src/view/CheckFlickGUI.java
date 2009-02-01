@@ -11,9 +11,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -23,7 +21,6 @@ import org.eclipse.swt.widgets.*;
 import com.hexapixel.widgets.generic.ImageCache;
 import com.hexapixel.widgets.generic.Utils;
 import com.hexapixel.widgets.ribbon.ButtonSelectGroup;
-import com.hexapixel.widgets.ribbon.QuickAccessShellToolbar;
 import com.hexapixel.widgets.ribbon.RibbonButton;
 import com.hexapixel.widgets.ribbon.RibbonGroup;
 import com.hexapixel.widgets.ribbon.RibbonGroupSeparator;
@@ -383,7 +380,6 @@ public class CheckFlickGUI {
 							if (list!=null){
 								if (getName(list , map.get(toGet))!=null)
 									item.setText (1, getName(list , map.get(toGet)));
-								//else item.setText(1, "null");
 							}
 							else
 								if (map.get(toGet)!=null)
@@ -814,9 +810,6 @@ public class CheckFlickGUI {
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.horizontalSpan = 4;
 		langCombo.setLayoutData(gridData);
-		label = new Label(composite,SWT.NONE);
-		label = new Label(composite,SWT.NONE);
-		label = new Label(composite,SWT.NONE);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -827,7 +820,7 @@ public class CheckFlickGUI {
 		
 		item0.setExpanded(true);
 		bar.setSpacing(8);
-		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/4);
+		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 		//listener for the search button
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -930,9 +923,10 @@ public class CheckFlickGUI {
 			countryString[i+1]=countriesList.get(i).getName();
 		}
 		countryCombo.setItems (countryString);
-		label= new Label(composite, SWT.NONE);
-		label= new Label(composite, SWT.NONE);
-		label = new Label(composite,SWT.NONE);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 4;
+		countryCombo.setLayoutData(gridData);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Search");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -944,7 +938,7 @@ public class CheckFlickGUI {
 		item0.setExpanded(true);
 		bar.setSpacing(8);
 		//searchByActor.setVisible(checked);
-		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/4);
+		search.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 		button.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1205,22 +1199,17 @@ public class CheckFlickGUI {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				Calendar toDay = Calendar.getInstance();
-				int today = toDay.get(Calendar.YEAR);
 				boolean valid = true ;
-				int year = 0;
-				int color = 0;
+				int mYear = 0;
 				int time = 0;
-				String taglines = null;
 				String plot = null;
-				String location = null;
 				if ((nameText.getText() == "" )||(yearText.getText()== "") )
 					okMessageBox("Please insert movie name and movie year.");
 				else{
 					try{
-						year =Integer.parseInt(yearText.getText());
-						if ((year < 1880) || (year >today+100)){
-							okMessageBox("Year is not valid. Must be between 1880 and " +(today+100)+".");
+						mYear =Integer.parseInt(yearText.getText());
+						if ((mYear < 1880) || (mYear >year+100)){
+							okMessageBox("Year is not valid. Must be between 1880 and " +(year+100)+".");
 							valid = false;
 						}
 					}
@@ -1244,7 +1233,7 @@ public class CheckFlickGUI {
 					if (plotText.getText() != "")
 						plot = plotText.getText();
 					if (valid){
-						AbsType movie = new MovieEntity(0, nameText.getText(), year, null, null, color, time, taglines, plot, location);
+						AbsType movie = new MovieEntity(0, nameText.getText(),mYear,null , null, time ,null, plot);
 						try {
 							pool.execute(DataManager.insertMovieData(MovieDataEnum.MOVIE, movie , false));
 						} catch (InterruptedException e1) {
@@ -1282,6 +1271,9 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		label.setText("Year Of Birth:");
 		final Text birthText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
+		label = new Label(composite ,SWT.NONE);
+		label.setText("Year Of Death:");
+		final Text deathText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
 		label = new Label(composite,SWT.NONE);
 		label.setText("Origin City:");
 		final Text cityText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
@@ -1294,11 +1286,10 @@ public class CheckFlickGUI {
 			countryString[i+1]=countriesList.get(i).getName();
 		}
 		countryCombo.setItems (countryString);
-		label = new Label(composite ,SWT.NONE);
-		label.setText("Year Of Death:");
-		final Text deathText = new Text(composite ,SWT.SINGLE|SWT.FILL|SWT.BORDER);
-		label= new Label(composite, SWT.NONE);
-		label= new Label(composite, SWT.NONE);
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 3;
+		countryCombo.setLayoutData(gridData);
 		Button button = new Button (composite, SWT.PUSH);
 		button.setText("Insert");
 		ExpandItem item0 = new ExpandItem(bar, SWT.NONE, 0);
@@ -1312,18 +1303,9 @@ public class CheckFlickGUI {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void widgetSelected(SelectionEvent e) {
-				Calendar toDay = Calendar.getInstance();
-				int today = toDay.get(Calendar.YEAR);
 				boolean valid = true ;
-				String nick = null;
-				String rName = null;
 				String city = null;
 				int country = 0;
-				int height = 0;
-				String mark = null;
-				String bio = null;
-				Date birth = null;
-				Date death = null;
 				int bYear = 0;
 				int dYear = 0;
 				
@@ -1332,8 +1314,8 @@ public class CheckFlickGUI {
 				else{
 					try{
 						bYear =Integer.parseInt(birthText.getText());
-						if ((bYear < 1800) || (bYear >today)){
-							okMessageBox("Birth year is not valid. Must be between 1800 and " +(today)+".");
+						if ((bYear < 1800) || (bYear >year)){
+							okMessageBox("Birth year is not valid. Must be between 1800 and " +(year)+".");
 							valid = false;
 						}
 					}
@@ -1344,8 +1326,8 @@ public class CheckFlickGUI {
 					if (deathText.getText()!=""){
 						try{
 							dYear =Integer.parseInt(deathText.getText());
-							if ((dYear < bYear) || (dYear >today)){
-								okMessageBox("Death year is not valid. Must be between the birth year and " +(today)+".");
+							if ((dYear < bYear) || (dYear >year)){
+								okMessageBox("Death year is not valid. Must be between the birth year and " +(year)+".");
 								valid = false;
 							}
 						}
@@ -1365,7 +1347,7 @@ public class CheckFlickGUI {
 						valid = false;
 					}
 					if (valid){
-						AbsType person = new PersonEntity(0,nameText.getText() , rName , nick , birth ,bYear , city , country , death , dYear , height, mark , bio );
+						AbsType person = new PersonEntity(0,nameText.getText() ,bYear , city , country , dYear);
 						try {
 							pool.execute(DataManager.insertPersonData(PersonDataEnum.PERSON, person , false));
 						} catch (InterruptedException e1) {
@@ -1378,7 +1360,7 @@ public class CheckFlickGUI {
 		});
 		
 		bar.setSpacing(8);
-		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/4);
+		insert.setSize((shell.getShell().getSize().x)-5, (shell.getShell().getSize().y)/3);
 	}
 	
 	static private String getID(List<NamedEntity> list , String name){
