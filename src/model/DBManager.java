@@ -34,6 +34,8 @@ public class DBManager {
 	
 	private static String INSERT_MOVIE_SINGLE_DATATYPE = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
 	
+	private static int maxFetches = AppData.getInstance().getMaxFetchFromDB();
+	
 	// Singleton instance
 	private static DBManager instance = null;
 	/**
@@ -124,7 +126,7 @@ public class DBManager {
 			resultSet = stmt.executeQuery(sbQuery.toString());
 			while (resultSet.next() == true) {
 				retList.add(resultSetToAbsEntity(resultSet, data));
-				if(retList.size() > 100)
+				if(retList.size() > maxFetches)
 					break;
 			}
 		} catch (SQLException e) {
@@ -165,7 +167,6 @@ public class DBManager {
 			if(conn == null)
 				return null;
 			pstmt = conn.prepareStatement(pstmtStr);
-
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
 			moviesMap = new HashMap<String, Integer>();
@@ -247,39 +248,35 @@ public class DBManager {
 	 * The function receives a hard-coded query and executes it
 	 * @param query the query to be executed
 	 */
-	public void executeSQL(String query) {
+	public void executeSQL(Connection conn, String query) {
 		
 		PreparedStatement pstmt = null;
-		Connection conn = null;
 		String pstmtStr = query;
 		
 		System.out.println(pstmtStr);
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return;
 			pstmt = conn.prepareStatement(pstmtStr);
 			pstmt.executeQuery();
 			pstmt.close();
 		} catch (SQLException e) {
-			System.out.println("Error in searchMovies");
+			System.out.println("Error in executeSQL");
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer in searchMovies");
 		}
 	}
 		
-	public void findAndUpdateDuplicates() {
+	public void findAndUpdateDuplicates(Connection conn) {
 		ResultSet set = null;
 		Set<Relation> duplicatesSet = new LinkedHashSet<Relation>();
 
 		PreparedStatement pstmt = null;
-		Connection conn = null;
 		String pstmtStr = "SELECT * FROM " + DBTablesEnum.PERSONS.getTableName() +
 							" ORDER BY " + DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName() + ", "
 										+ DBFieldsEnum.PERSONS_PERSON_ID.getFieldName();
 		System.out.println(pstmtStr);
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return;
 			pstmt = conn.prepareStatement(pstmtStr);
@@ -311,15 +308,15 @@ public class DBManager {
 				}
 				// flush results every BATCH_SIZE
 				if ((duplicatesSet.size() > 0) && (duplicatesSet.size() % DataImporter.PSTMT_BATCH_SIZE == 0)) {
-					System.out.println("DUPLICATES: Inserting " + duplicatesSet.size() + " elements to the DB");
-					updateDuplicates(duplicatesSet);
+					System.out.println("DUPLICATES: updating " + duplicatesSet.size() + " elements to the DB");
+					updateDuplicates(conn, duplicatesSet);
 					duplicatesSet.clear();
 				}
 			}
 			// flush the results that were left
 			if ((duplicatesSet.size() > 0)) {
-				System.out.println("DUPLICATES: Inserting " + duplicatesSet.size() + " elements to the DB");
-				updateDuplicates(duplicatesSet);
+				System.out.println("DUPLICATES: updating " + duplicatesSet.size() + " elements to the DB");
+				updateDuplicates(conn, duplicatesSet);
 				duplicatesSet.clear();
 			}
 			set.close();
@@ -330,20 +327,18 @@ public class DBManager {
 			System.out.println("Null pointer in searchMovies");
 		}
 		
-		pool.returnConnection(conn);
 	}
 	
-	public void updateDuplicates(Set<Relation> duplicatesSet) {
+	public void updateDuplicates(Connection conn, Set<Relation> duplicatesSet) {
 
 		PreparedStatement pstmt = null;
-		Connection conn = null;
 		String pstmtStr = "UPDATE " + DBTablesEnum.PERSONS.getTableName() + " SET " +
 							DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName() + " = 'Y', " +
 							DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName() + " = ? " +
 							"WHERE " + DBFieldsEnum.PERSONS_PERSON_ID.getFieldName() + " = ?";
+		
 		System.out.println("updating duplicates");
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return;
 			pstmt = conn.prepareStatement(pstmtStr);
@@ -356,9 +351,8 @@ public class DBManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+		System.out.println("executing updateDuplicates batch");
 		executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
 	}
 
 	/**
@@ -466,7 +460,7 @@ public class DBManager {
 			set = s.executeQuery(query);
 			while (set.next() == true) {
 				list.add(new NamedEntity(set.getInt(1), set.getString(2)));
-				if(list.size() > 10000)
+				if(list.size() > maxFetches)
 					break;
 			}
 		} catch (SQLException e) {
@@ -651,20 +645,19 @@ public class DBManager {
 	 *            - The name of the Value_name field
 	 * 
 	 **/
-	public boolean insertMovieSingleDataTypeSetToDB(Set<NamedRelation> set, DBTablesEnum table,
+	public boolean insertMovieSingleDataTypeSetToDB(Connection conn, Set<NamedRelation> set, DBTablesEnum table,
 			DBFieldsEnum field1, DBFieldsEnum field2) {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = null;
 		String statementStr;
+		
 		statementStr = String.format(INSERT_MOVIE_SINGLE_DATATYPE, 
 										table.getTableName(), 
 										field1.getFieldName(),
 										field2.getFieldName());
 
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return false;
 			pstmt = conn.prepareStatement(statementStr);
@@ -679,7 +672,6 @@ public class DBManager {
 		}
 
 		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
 		return bReturn;
 	}
 	
@@ -695,13 +687,11 @@ public class DBManager {
 	 *            - The name of the Value_name field
 	 * 
 	 **/
-	public boolean insertMoviesSetToDB(Set<MovieEntity> set) {
+	public boolean insertMoviesSetToDB(Connection conn, Set<MovieEntity> set) {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = null;
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return false;
 			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)", 
@@ -725,21 +715,19 @@ public class DBManager {
 		}
 
 		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
 		return bReturn;
 	}
-	public boolean insertPersonsSetToDB(Set<NamedEntity> set) {
+	
+	public boolean insertPersonsSetToDB(Connection conn, Set<NamedEntity> set) {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = null;
 		String statementStr;
 		statementStr = String.format("INSERT INTO %s (%s, %s) VALUES (?, ?)", 
 										DBTablesEnum.PERSONS.getTableName(), 
 										DBFieldsEnum.PERSONS_PERSON_NAME.getFieldName(),
 										DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName());
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return false;
 			pstmt = conn.prepareStatement(statementStr);
@@ -754,15 +742,13 @@ public class DBManager {
 		}
 
 		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
 		return bReturn;
 	}
 	
-	public boolean insertPersonMovieCreditsSetToDB(Set<CastingRelation> set) {
+	public boolean insertPersonMovieCreditsSetToDB(Connection conn, Set<CastingRelation> set) {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = null;
 		String statementStr;
 		statementStr = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)", 
 										DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
@@ -774,7 +760,6 @@ public class DBManager {
 										DBFieldsEnum.PERSON_MOVIE_CREDITS_ACTOR_CREDITS_RANK.getFieldName());
 		System.out.println(statementStr);
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return false;
 			pstmt = conn.prepareStatement(statementStr);
@@ -796,7 +781,6 @@ public class DBManager {
 		}
 
 		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
 		return bReturn;
 	}
 	
@@ -842,14 +826,12 @@ public class DBManager {
 	 *            - The name of the Value_name field
 	 * 
 	 **/
-	public boolean insertSingleDataTypeSetToDB(Set<String> set, DBTablesEnum table, DBFieldsEnum field) {
+	public boolean insertSingleDataTypeSetToDB(Connection conn, Set<String> set, DBTablesEnum table, DBFieldsEnum field) {
 
 		PreparedStatement pstmt = null;
 		boolean bReturn = false;
-		Connection conn = null;
 
 		try {
-			conn = pool.getConnection();
 			if(conn == null)
 				return false;
 			pstmt = conn.prepareStatement(String.format("INSERT INTO %s (%s) VALUES (?)",
@@ -861,10 +843,10 @@ public class DBManager {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
 		}
 
 		bReturn = executePreparedStatementBatch(pstmt);
-		pool.returnConnection(conn);
 		return bReturn;
 	}
 	
@@ -915,7 +897,7 @@ public class DBManager {
 			while (set.next() == true) {
 				if ((result = fillDatedSearchResult(set, tableToSearch)) != null) {
 					arlSearchResults.add(result);
-					if(arlSearchResults.size() > 100)
+					if(arlSearchResults.size() > maxFetches)
 						break;
 				}
 			}
@@ -1256,5 +1238,13 @@ public class DBManager {
 		}
 		pool.returnConnection(conn);
 		return true;
+	}
+
+	protected static DBConnectionPool getPool() {
+		return pool;
+	}
+
+	protected static void setPool(DBConnectionPool pool) {
+		DBManager.pool = pool;
 	}
 }
