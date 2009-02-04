@@ -13,25 +13,25 @@ import org.ini4j.*;
  * 
  */
 public class AppData {
+	private static AppData instance = null;
+
 	public synchronized static AppData getInstance() {
 		if (instance == null)
 			instance = new AppData();
 		return instance;
 	}
-
-	private String importFolder;
+	private String adminPass;
+	private int bucketMaxSize;
 	private String dbHost;
-	private String dbUsername;
 	private String dbPassword;
 	private String dbPort;
 	private String dbServer;
-	private String adminPass;
-	private int maxThreads;
+	private String dbUsername;
+	private String importFolder;
 	private int maxConnections;
-	private int bucketMaxSize;
+	private int maxFetchFromDB;
+	private int maxThreads;
 	private int preparedStatementMaxBatchSize;
-	
-	private static AppData instance = null;
 
 	protected AppData() {
 		resetToDefaults();
@@ -101,6 +101,13 @@ public class AppData {
 	}
 
 	/**
+	 * @return the maxFetchFromDB
+	 */
+	public int getMaxFetchFromDB() {
+		return maxFetchFromDB;
+	}
+
+	/**
 	 * @return the maxThreads
 	 */
 	public int getMaxThreads() {
@@ -140,6 +147,7 @@ public class AppData {
 			setPreparedStatementMaxBatchSize(Integer.parseInt(prefs.node(
 					"settings").get("maxbatch", null)));
 			setAdminPass(prefs.node("settings").get("adminPassword", null));
+			setMaxFetchFromDB(Integer.parseInt(prefs.node("db").get("maxfetch", null)));
 		} catch (BackingStoreException e) {
 			resetToDefaults();
 		}
@@ -160,6 +168,7 @@ public class AppData {
 		setMaxThreads(6);
 		setPreparedStatementMaxBatchSize(20000);
 		setAdminPass("admin");
+		setMaxFetchFromDB(1000);
 	}
 
 	/**
@@ -232,6 +241,13 @@ public class AppData {
 	 */
 	private void setMaxConnections(int maxConnections) {
 		this.maxConnections = maxConnections;
+	}
+
+	/**
+	 * @param maxFetchFromDB the maxFetchFromDB to set
+	 */
+	private void setMaxFetchFromDB(int maxFetchFromDB) {
+		this.maxFetchFromDB = maxFetchFromDB;
 	}
 
 	/**

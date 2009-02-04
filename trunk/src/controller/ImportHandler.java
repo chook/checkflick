@@ -31,21 +31,21 @@ public class ImportHandler {
 		
 		// preparing an error string
 		String errMsg = "The following error has occurred\n";
-		boolean isError = false;
+		boolean isOkay = true;
 		
 		// going over all the different elements in the ListFilesEnum,
 		// and making sure every list was attached a filename, and that all files exist
 		for (ListFilesEnum enumField: ListFilesEnum.values()) {
 			if (!(listfilesMap.containsKey(enumField))) {
-				isError = true;
+				isOkay = false;
 				errMsg += "a filename for the " + enumField.toString().toLowerCase() + " wasn't given\n";
 			} 
 		}
 		
-		if (isError)
+		if (!isOkay)
 			System.out.println(errMsg);
 			
-		return isError;
+		return isOkay;
 	}
 	
 

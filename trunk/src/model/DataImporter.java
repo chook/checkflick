@@ -1,5 +1,7 @@
 package model;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.regex.*;
 import java.util.*;
 import controller.AppData;
@@ -24,7 +26,8 @@ public class DataImporter {
 	// (?:\\s+\\(.+\\)\\s*)* 			- check if this group appears zero or more times
 	//											the group contains whitespaces, then '(', different characters and whitespaces, and then ')'
 	//											(there can be more than one comments in parentheses)
-	static String languagePattern = "([^\"].+[)}])\\s+([\\P{InGreek}\\-\\s',&&[^(]]+)(?:\\s+\\(.+\\)\\s*)*";
+	static String languagePattern = "([^\"].+[)}])\\s+([\\P{InGreek}\\-\\s',&&[^//(]]+)(?:\\s+\\(.+\\)\\s*)*";
+//	static String languagePattern = "([^\"].+[)}])\\s+([^\\(]+)(?:\\s+\\(.+)*";
 	static String genresCountriesPattern = "(.+[)}])\\s+(.+)";
 	// moviePattern explanation:
 	// (([^\"].*)\\s\\((?:[\\d\\?]){4}(?:/((?:[IVX])+))?\\)\\s?(?:\\((..*)\\))?\\s*(?:\\{\\{SUSPENDED\\}\\})?) 	- group 1: the full movie name
@@ -55,6 +58,8 @@ public class DataImporter {
 		
 	private Map<ListFilesEnum, String> listfilesMap;
 	
+	private Connection connection = null;
+	
 	/**
 	 * DataImporter Constructor
 	 * Receives the map of filenames and adds it to its private listfilesMap field
@@ -62,6 +67,7 @@ public class DataImporter {
 	 */
 	public DataImporter(Map<ListFilesEnum, String> listfilesMap) {
 		this.listfilesMap = listfilesMap;
+		connection = DBManager.getPool().getConnection();
 	}
 	
 	/**
@@ -70,7 +76,7 @@ public class DataImporter {
 	 */
 	public void createMoviesTempField() {
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s VARCHAR2(300 CHAR)",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD %s VARCHAR2(300 CHAR)",
 														DBTablesEnum.MOVIES.getTableName(), 
 														DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName()));
 	}
@@ -81,7 +87,7 @@ public class DataImporter {
 	 */
 	public void deleteMoviesTempField() {
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s DROP COLUMN %s",
 														DBTablesEnum.MOVIES.getTableName(),
 														DBFieldsEnum.MOVIES_TEMP_MOVIE_NAME.getFieldName()));
 	}
@@ -95,7 +101,7 @@ public class DataImporter {
 		String sql = "ALTER TABLE %s ADD CONSTRAINT %s_FK%d FOREIGN KEY (%s) REFERENCES %s (%s) ON DELETE CASCADE ENABLE";
 		
 		// Ref Constraints for Table PERSON_MOVIE_CREDITS
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 				1,
@@ -103,7 +109,7 @@ public class DataImporter {
 				DBTablesEnum.MOVIES.getTableName(),
 				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 				2,
@@ -111,7 +117,7 @@ public class DataImporter {
 				DBTablesEnum.PERSONS.getTableName(),
 				DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 				DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 				3,
@@ -120,7 +126,7 @@ public class DataImporter {
 				DBFieldsEnum.PRODUCTION_ROLES_PRODUCTION_ROLE_ID.getFieldName()));
 		
 		// Ref Constraints for Table MOVIE_COUNTRIES
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
 				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
 				1,
@@ -128,7 +134,7 @@ public class DataImporter {
 				DBTablesEnum.COUNTRIES.getTableName(),
 				DBFieldsEnum.COUNTRIES_COUNTRY_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
 				DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
 				2,
@@ -137,7 +143,7 @@ public class DataImporter {
 				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 		
 		// Ref Constraints for Table MOVIE_GENRES
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_GENRES.getTableName(),
 				DBTablesEnum.MOVIE_GENRES.getTableName(),
 				1,
@@ -145,7 +151,7 @@ public class DataImporter {
 				DBTablesEnum.GENRES.getTableName(),
 				DBFieldsEnum.GENRES_GENRE_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_GENRES.getTableName(),
 				DBTablesEnum.MOVIE_GENRES.getTableName(),
 				2,
@@ -154,7 +160,7 @@ public class DataImporter {
 				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 		
 		// Ref Constraints for Table MOVIE_LANGUAGES
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
 				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
 				1,
@@ -162,7 +168,7 @@ public class DataImporter {
 				DBTablesEnum.LANGUAGES.getTableName(),
 				DBFieldsEnum.LANGUAGES_LANGUAGE_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
 				DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
 				2,
@@ -171,7 +177,7 @@ public class DataImporter {
 				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 
 		// Ref Constraints for Table MOVIE_QUOTES
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.MOVIE_QUOTES.getTableName(),
 				DBTablesEnum.MOVIE_QUOTES.getTableName(),
 				1,
@@ -180,7 +186,7 @@ public class DataImporter {
 				DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
 
 		// Ref Constraints for Table PERSON_AKA_NAMES
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
 				DBTablesEnum.PERSON_AKA_NAMES.getTableName(),
 				1,
@@ -189,7 +195,7 @@ public class DataImporter {
 				DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 
 		// Ref Constraints for Table PERSON_QUOTES
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.PERSON_QUOTES.getTableName(),
 				DBTablesEnum.PERSON_QUOTES.getTableName(),
 				1,
@@ -198,7 +204,7 @@ public class DataImporter {
 				DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 
 		// Ref Constraints for Table PERSONS
-		DBManager.getInstance().executeSQL(String.format(sql,
+		DBManager.getInstance().executeSQL(connection, String.format(sql,
 				DBTablesEnum.PERSONS.getTableName(),
 				DBTablesEnum.PERSONS.getTableName(),
 				1,
@@ -206,6 +212,9 @@ public class DataImporter {
 				DBTablesEnum.COUNTRIES.getTableName(),
 				DBFieldsEnum.COUNTRIES_COUNTRY_ID.getFieldName()));
 
+		// Returns the connection back to the pool
+		DBManager.getPool().returnConnection(connection);
+		
 		return true;
 	}
 
@@ -236,7 +245,7 @@ public class DataImporter {
 		pattern = Pattern.compile(patternRegExp);
 
 		// retrieving the list to put inside a map
-		// the language map would be small enough to stay resident in memory during the whole method
+		// the data types map would be small enough to stay resident in memory during the whole method
 		datatypesList = DBManager.getAllNamedEntities(namedEntitiesEnum);
 		for (NamedEntity entity : datatypesList) {
 			datatypesMap.put(entity.getName(), entity.getId());
@@ -266,14 +275,14 @@ public class DataImporter {
 						// flush results every BATCH_SIZE 
 						if ((movieDatatypeSet.size() > 0) && (movieDatatypeSet.size() % PSTMT_BATCH_SIZE == 0)) {
 							System.out.println("Inserting " + movieDatatypeSet.size() + " elements to the DB");
-							DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieDatatypeSet, tablesEnum, movieFieldsEnum, datatypeFieldsEnum);
+							DBManager.getInstance().insertMovieSingleDataTypeSetToDB(connection, movieDatatypeSet, tablesEnum, movieFieldsEnum, datatypeFieldsEnum);
 							totalElementsNum += movieDatatypeSet.size();
 							movieDatatypeSet.clear();
 						}
 					}
 					// flush the results that were left
 					System.out.println("Inserting " + movieDatatypeSet.size() + " elements to the DB");
-					DBManager.getInstance().insertMovieSingleDataTypeSetToDB(movieDatatypeSet, tablesEnum, movieFieldsEnum, datatypeFieldsEnum);
+					DBManager.getInstance().insertMovieSingleDataTypeSetToDB(connection, movieDatatypeSet, tablesEnum, movieFieldsEnum, datatypeFieldsEnum);
 					totalElementsNum += movieDatatypeSet.size();
 					System.out.println("Total number of elements entered into DB: " + totalElementsNum);
 
@@ -304,12 +313,12 @@ public class DataImporter {
 
 			case 2:
 				System.out.println("Working on the genres file");
-				getDatatypes(ListFilesEnum.LANGUAGES, genresCountriesPattern, DBTablesEnum.GENRES, DBFieldsEnum.GENRES_GENRE_NAME);
+				getDatatypes(ListFilesEnum.GENRES, genresCountriesPattern, DBTablesEnum.GENRES, DBFieldsEnum.GENRES_GENRE_NAME);
 				break;
 
 			case 3:
 				System.out.println("Working on the countries file");
-				getDatatypes(ListFilesEnum.LANGUAGES, genresCountriesPattern, DBTablesEnum.COUNTRIES, DBFieldsEnum.COUNTRIES_COUNTRY_NAME);
+				getDatatypes(ListFilesEnum.COUNTRIES, genresCountriesPattern, DBTablesEnum.COUNTRIES, DBFieldsEnum.COUNTRIES_COUNTRY_NAME);
 				break;
 			}
 		}
@@ -355,26 +364,30 @@ public class DataImporter {
 			}
 		}
 
-		createDataTypesIndex();
+		// since there are anomalies in the original lists,
+		// primary indices can't be defined since there can be duplicates according to these lists
+		//createMoviesDataTypesIndex();
 
 		return true;
 	}
 	
 	public void importPersonsAndCredits() {
 		
-		int[] personIndexNextMarkStart = new int[5]; 
+		// these mark the different position of every start and finish of the different persons list that
+		// were added to the DB
+		int[] personIndexMark = new int[6]; 
 		
 		// creating the temporary fields in PERSONS needed for the import
 		createPersonsTempFields();
 		
 		System.out.println("==========================================================");
 		// adding the different persons from all the different lists
-		personIndexNextMarkStart[0] = 1;
-		personIndexNextMarkStart[1] = personIndexNextMarkStart[0] + getPersons(ListFilesEnum.ACTORS);
-		personIndexNextMarkStart[2] = personIndexNextMarkStart[1] + getPersons(ListFilesEnum.ACTRESSES);
-		personIndexNextMarkStart[3] = personIndexNextMarkStart[2] + getPersons(ListFilesEnum.DIRECTORS);
-		personIndexNextMarkStart[4] = personIndexNextMarkStart[3] + getPersons(ListFilesEnum.PRODUCERS);
-		getPersons(ListFilesEnum.WRITERS);
+		personIndexMark[0] = 1;
+		personIndexMark[1] = personIndexMark[0] + getPersons(ListFilesEnum.ACTORS);
+		personIndexMark[2] = personIndexMark[1] + getPersons(ListFilesEnum.ACTRESSES);
+		personIndexMark[3] = personIndexMark[2] + getPersons(ListFilesEnum.DIRECTORS);
+		personIndexMark[4] = personIndexMark[3] + getPersons(ListFilesEnum.PRODUCERS);
+		personIndexMark[5] = personIndexMark[4] + getPersons(ListFilesEnum.WRITERS);
 		
 		// creating the PERSONS indexes
 		createPersonsIndex();
@@ -383,11 +396,11 @@ public class DataImporter {
 		preparePersonsTempFields();
 		findAndUpdateDuplicates();
 		
-		getPersonMovieCredits(ListFilesEnum.ACTORS, personIndexNextMarkStart[0]);
-		getPersonMovieCredits(ListFilesEnum.ACTRESSES, personIndexNextMarkStart[1]);
-		getPersonMovieCredits(ListFilesEnum.DIRECTORS, personIndexNextMarkStart[2]);
-		getPersonMovieCredits(ListFilesEnum.PRODUCERS, personIndexNextMarkStart[3]);
-		getPersonMovieCredits(ListFilesEnum.WRITERS, personIndexNextMarkStart[4]);
+		getPersonMovieCredits(ListFilesEnum.ACTORS, personIndexMark[0], personIndexMark[1] - 1);
+		getPersonMovieCredits(ListFilesEnum.ACTRESSES, personIndexMark[1], personIndexMark[2] - 1);
+		getPersonMovieCredits(ListFilesEnum.DIRECTORS, personIndexMark[2], personIndexMark[3] - 1);
+		getPersonMovieCredits(ListFilesEnum.PRODUCERS, personIndexMark[3], personIndexMark[4] - 1);
+		getPersonMovieCredits(ListFilesEnum.WRITERS, personIndexMark[4], personIndexMark[5] - 1);
 		
 		// creating the PERSONS indexes
 		createPersonMovieCreditsIndex();
@@ -399,19 +412,39 @@ public class DataImporter {
 	
 	private boolean createDataTypesIndex() {
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+											DBTablesEnum.LANGUAGES.getTableName(),
+											DBTablesEnum.LANGUAGES.getTableName(),
+											DBFieldsEnum.LANGUAGES_LANGUAGE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+											DBTablesEnum.GENRES.getTableName(),
+											DBTablesEnum.GENRES.getTableName(),
+											DBFieldsEnum.GENRES_GENRE_ID.getFieldName()));
+		
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+											DBTablesEnum.COUNTRIES.getTableName(),
+											DBTablesEnum.COUNTRIES.getTableName(),
+											DBFieldsEnum.COUNTRIES_COUNTRY_ID.getFieldName()));
+
+		return true;
+	}
+	
+	private boolean createMoviesDataTypesIndex() {
+		
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
 											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
 											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
 											DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
 											DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
 											DBTablesEnum.MOVIE_GENRES.getTableName(),
 											DBTablesEnum.MOVIE_GENRES.getTableName(),
 											DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(),
 											DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
 											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
 											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
 											DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(),
@@ -419,10 +452,10 @@ public class DataImporter {
 
 		return true;
 	}
-	
+
 	private boolean createMoviesIndex() {
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
 											DBTablesEnum.MOVIES.getTableName(),
 											DBTablesEnum.MOVIES.getTableName(), 
 											DBFieldsEnum.MOVIES_MOVIE_ID.getFieldName()));
@@ -432,18 +465,18 @@ public class DataImporter {
 	
 	private boolean createPersonMovieCreditsIndex() {
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s, %s) ENABLE",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s, %s) ENABLE",
 											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 											DBTablesEnum.PERSON_MOVIE_CREDITS.getTableName(),
 											DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
-											DBFieldsEnum.PERSON_MOVIE_CREDITS_PERSON_ID.getFieldName(),
+											DBFieldsEnum.PERSON_MOVIE_CREDITS_MOVIE_ID.getFieldName(),
 											DBFieldsEnum.PERSON_MOVIE_CREDITS_PRODUCTION_ROLE_ID.getFieldName()));
 		return true;
 	}
 
 	private boolean createPersonsIndex() {
 
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
 														DBTablesEnum.PERSONS.getTableName(),
 														DBTablesEnum.PERSONS.getTableName(), 
 														DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
@@ -457,15 +490,15 @@ public class DataImporter {
 	 */
 	private void createPersonsTempFields() {
 
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD %s NUMBER",
 														DBTablesEnum.PERSONS.getTableName(), 
 														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD %s NUMBER",
 														DBTablesEnum.PERSONS.getTableName(), 
 														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s CHAR(1)",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD %s CHAR(1)",
 														DBTablesEnum.PERSONS.getTableName(), 
 														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
@@ -476,21 +509,21 @@ public class DataImporter {
 	 */
 	private void deletePersonsTempFields() {
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s DROP COLUMN %s",
 														DBTablesEnum.PERSONS.getTableName(),
 														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s DROP COLUMN %s",
 														DBTablesEnum.PERSONS.getTableName(),
 														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
 		
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s DROP COLUMN %s",
+		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s DROP COLUMN %s",
 														DBTablesEnum.PERSONS.getTableName(),
 														DBFieldsEnum.PERSONS_TEMP_PERSON_LINE_NUMBER.getFieldName()));
 	}
 
 	private void findAndUpdateDuplicates() {
-		DBManager.getInstance().findAndUpdateDuplicates();
+		DBManager.getInstance().findAndUpdateDuplicates(connection);
 	}
 	
 	/**
@@ -522,7 +555,7 @@ public class DataImporter {
 			}
 
 			System.out.println("Inserting " + elementsSet.size() + " elements to the DB");
-			DBManager.getInstance().insertSingleDataTypeSetToDB(elementsSet, tablesEnum, fieldsEnum);
+			DBManager.getInstance().insertSingleDataTypeSetToDB(connection, elementsSet, tablesEnum, fieldsEnum);
 		} else
 			return false;
 
@@ -540,11 +573,6 @@ public class DataImporter {
 		Pattern pattern;
 		Matcher matcher;
 		int totalElementsNum = 0;
-		
-		// add temp field
-		DBManager.getInstance().executeSQL(String.format("ALTER TABLE %s ADD %s NUMBER",
-				DBTablesEnum.PERSONS.getTableName(), 
-				DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName()));
 		
 		parser.loadFile(listfilesMap.get(ListFilesEnum.MOVIES), ListFilesEnum.MOVIES);
 		patternRegExp = moviesPattern;
@@ -577,7 +605,7 @@ public class DataImporter {
 				// flush results every BATCH_SIZE 
 				if ((moviesSet.size() > 0) && (moviesSet.size() % PSTMT_BATCH_SIZE == 0)) {
 					System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-					DBManager.getInstance().insertMoviesSetToDB(moviesSet);
+					DBManager.getInstance().insertMoviesSetToDB(connection, moviesSet);
 					totalElementsNum += moviesSet.size();
 					moviesSet.clear();
 				}
@@ -585,7 +613,7 @@ public class DataImporter {
 			// flush the results that were left
 			if ((moviesSet.size() > 0)) {
 				System.out.println("Inserting " + moviesSet.size() + " elements to the DB");
-				DBManager.getInstance().insertMoviesSetToDB(moviesSet);
+				DBManager.getInstance().insertMoviesSetToDB(connection, moviesSet);
 				totalElementsNum += moviesSet.size();
 			}
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
@@ -604,7 +632,7 @@ public class DataImporter {
 	 * @param personIndexMarkStart the start row of this specific person's list
 	 * @return boolean whether the method succeeded or not
 	 */
-	private boolean getPersonMovieCredits(ListFilesEnum listType, int personIndexMarkStart) {
+	private boolean getPersonMovieCredits(ListFilesEnum listType, int personIndexMarkStart, int personIndexMarkEnd) {
 
 		Parser parser = new Parser();
 		Map<String, Integer> moviesMap = new HashMap<String, Integer>();
@@ -662,6 +690,10 @@ public class DataImporter {
 		isPersonsEmpty = false;
 		personsStartRow = personIndexMarkStart;
 		personsEndRow = personsStartRow + SELECT_BUCKET_SIZE - 1;
+		// if the end row of the persons to retrieve is bigger than the line where this type of persons' list ends,
+		// then run only until the end of that persons' list
+		if (personsEndRow > personIndexMarkEnd)
+			personsEndRow = personIndexMarkEnd;
 		do {
 			// retrieving part of the persons list to put inside a map
 			// since the movie list is huge, we select buckets and iterate over all of them
@@ -714,14 +746,14 @@ public class DataImporter {
 							// flush results every BATCH_SIZE  
 							if ((personMovieCreditsSet.size() > 0) && (personMovieCreditsSet.size() % PSTMT_BATCH_SIZE == 0)) {
 								System.out.println("Inserting " + personMovieCreditsSet.size() + " elements to the DB");
-								DBManager.getInstance().insertPersonMovieCreditsSetToDB(personMovieCreditsSet);
+								DBManager.getInstance().insertPersonMovieCreditsSetToDB(connection, personMovieCreditsSet);
 								totalElementsNum += personMovieCreditsSet.size();
 								personMovieCreditsSet.clear();
 							}
 						}
 						// flush the results that were left
 						System.out.println("Inserting " + personMovieCreditsSet.size() + " elements to the DB");
-						DBManager.getInstance().insertPersonMovieCreditsSetToDB(personMovieCreditsSet);
+						DBManager.getInstance().insertPersonMovieCreditsSetToDB(connection, personMovieCreditsSet);
 						totalElementsNum += personMovieCreditsSet.size();
 						personMovieCreditsSet.clear();
 						System.out.println("clearing moviesMap");
@@ -737,6 +769,14 @@ public class DataImporter {
 			}
 			personsStartRow += SELECT_BUCKET_SIZE;
 			personsEndRow += SELECT_BUCKET_SIZE;
+			// if we have already retrieved all the persons that belong to this type of persons
+			// finish the run
+			if (personsStartRow > personIndexMarkEnd)
+				isPersonsEmpty = true;
+			// if the end row of the persons to retrieve is bigger than the line where this type of persons' list ends,
+			// then run only until the end of that persons' list
+			if (personsEndRow > personIndexMarkEnd)
+				personsEndRow = personIndexMarkEnd;
 		} while (!isPersonsEmpty);
 
 		return true;
@@ -784,7 +824,7 @@ public class DataImporter {
 				// flush results every BATCH_SIZE 
 				if ((personsSet.size() > 0) && (personsSet.size() % PSTMT_BATCH_SIZE == 0)) {
 					System.out.println("Inserting " + personsSet.size() + " elements to the DB");
-					DBManager.getInstance().insertPersonsSetToDB(personsSet);
+					DBManager.getInstance().insertPersonsSetToDB(connection, personsSet);
 					totalElementsNum += personsSet.size();
 					personsSet.clear();
 				}
@@ -792,7 +832,7 @@ public class DataImporter {
 			// flush the results that were left
 			if ((personsSet.size() > 0)) {
 				System.out.println("Inserting " + personsSet.size() + " elements to the DB");
-				DBManager.getInstance().insertPersonsSetToDB(personsSet);
+				DBManager.getInstance().insertPersonsSetToDB(connection, personsSet);
 				totalElementsNum += personsSet.size();
 			}
 			System.out.println("Total number of elements entered into DB: " + totalElementsNum);
@@ -813,12 +853,12 @@ public class DataImporter {
 	private void preparePersonsTempFields() {
 		
 		// copy the PERSON_ID to the TEMP_PERSON_ID
-		DBManager.getInstance().executeSQL(String.format("UPDATE %s SET %s = %s",
+		DBManager.getInstance().executeSQL(connection, String.format("UPDATE %s SET %s = %s",
 														DBTablesEnum.PERSONS.getTableName(), 
 														DBFieldsEnum.PERSONS_TEMP_PERSON_ID.getFieldName(),
 														DBFieldsEnum.PERSONS_PERSON_ID.getFieldName()));
 		// mark the TO_DELETE field as 'N'
-		DBManager.getInstance().executeSQL(String.format("UPDATE %s SET %s = 'N'",
+		DBManager.getInstance().executeSQL(connection, String.format("UPDATE %s SET %s = 'N'",
 														DBTablesEnum.PERSONS.getTableName(), 
 														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
@@ -830,7 +870,7 @@ public class DataImporter {
 	private void removeDuplicates() {
 	
 		// removing the records that are marked as duplicates and aren't needed
-		DBManager.getInstance().executeSQL(String.format("DELETE FROM %s WHERE %s = 'Y'",
+		DBManager.getInstance().executeSQL(connection, String.format("DELETE FROM %s WHERE %s = 'Y'",
 														DBTablesEnum.PERSONS.getTableName(),
 														DBFieldsEnum.PERSONS_TEMP_IS_DUPLICATE.getFieldName()));
 	}
