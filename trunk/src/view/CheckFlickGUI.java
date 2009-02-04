@@ -8,6 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ControlEditor;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -71,6 +73,7 @@ public class CheckFlickGUI {
 	static AppData settings = null; 
 	static Label importLabel;
 	static Button closeImportButton;
+	static boolean isAdmin = false;
 	
 	public static void main(String args []) {
 		try {
@@ -105,15 +108,19 @@ public class CheckFlickGUI {
 		}
 		CheckFlickGUI app = new CheckFlickGUI();
 		app.createShell();
-		
+		//isAdmin = (yesNoMessageBox("Connect as Admin?","CheckFlick admin check") == 128 ? false : true);
+		//app.addTabs();
 		Utils.centerDialogOnScreen(shell.getShell());
 		app.shell.open();
+		openAdminPassword(app);
+		System.out.println((isAdmin));
 		
 		while (!app.shell.isDisposed ()) {
 			if (!display.readAndDispatch ()) display.sleep ();
 		}
 		display.dispose();
 	}
+
 	/**
 	 * Disposing all the composites that are not disposed
 	 */
@@ -144,7 +151,7 @@ public class CheckFlickGUI {
 	/**
 	 * Drawing the general information about a movie
 	 */
-	static private void drawGeneralInformationMovie(final MovieEntity movie , final int tabIndex){
+	protected static void drawGeneralInformationMovie(final MovieEntity movie , final int tabIndex){
 		cleanAllComposites();	
 		Color frontColor = new Color(display , 222 ,235 , 247);
 		entityDetails = new Composite(shell.getShell(),SWT.BORDER);
@@ -203,6 +210,8 @@ public class CheckFlickGUI {
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.setBackground(frontColor);
+		save.setEnabled(isAdmin);
+		
 		//listen to the save button
 		save.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -323,6 +332,8 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		Button delete = new Button(composite , SWT.PUSH);
 		delete.setText("Delete Movie");
+		delete.setEnabled(isAdmin);
+		
 		//listen to the delete button
 		delete.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -377,7 +388,7 @@ public class CheckFlickGUI {
 	/**
 	 * Drawing the general information about a person
 	 */
-	static private void drawGeneralInformationPerson(final PersonEntity person , final int tabIndex){
+	protected static void drawGeneralInformationPerson(final PersonEntity person , final int tabIndex){
 		cleanAllComposites();
 		Color frontColor = new Color(display , 222 ,235 , 247);
 		entityDetails = new Composite(shell.getShell(),SWT.BORDER);
@@ -443,6 +454,7 @@ public class CheckFlickGUI {
 		Button save = new Button (composite, SWT.PUSH);
 		save.setText("Save");
 		save.setBackground(frontColor);
+		save.setEnabled(isAdmin);
 		
 		//listen to the save button
 		save.addSelectionListener(new SelectionListener() {
@@ -575,6 +587,8 @@ public class CheckFlickGUI {
 		label = new Label(composite,SWT.NONE);
 		Button delete = new Button(composite , SWT.PUSH);
 		delete.setText("Delete Person");
+		delete.setEnabled(isAdmin);
+		
 		// listen to the delete button
 		delete.addSelectionListener(new SelectionListener(){
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -709,6 +723,7 @@ public class CheckFlickGUI {
 		final Text rankText = new Text(personResults , SWT.BORDER);
 		Button add = new Button(personResults, SWT.PUSH);
 		add.setText("Add");
+		add.setEnabled(isAdmin);
 		add.setBackground(bgColor);
 		Button close = new Button(personResults, SWT.PUSH);
 		close.setText("Close");
@@ -824,7 +839,7 @@ public class CheckFlickGUI {
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
 				
-				if(id == -1) {
+				if(id <= 0) {
 					//couldn't insert the movie
 					okMessageBox("There was a problem inserting the movie. Sorry for the inconvenience :)");
 				}
@@ -1032,7 +1047,7 @@ public class CheckFlickGUI {
 			public void run() {
 				if ((moreInsert!= null) && !(moreInsert.isDisposed()))
 						moreInsert.dispose();
-				if(id == -1) {
+				if(id <= 0) {
 					//couldn't insert the person
 					okMessageBox("There was a problem inserting the person. Sorry for the inconvenience :)");
 				}
@@ -1187,7 +1202,6 @@ public class CheckFlickGUI {
 						column.setText(titles[i]);
 					}	
 					final int count = result.size();
-					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
 						if (result.get(i)!= null){
@@ -1226,6 +1240,7 @@ public class CheckFlickGUI {
 					Button add = new Button(movieButtons , SWT.PUSH);
 					add.setText("Add");
 					add.setBackground(frontColor);
+					add.setEnabled(isAdmin);
 					add.addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {	
 						}
@@ -1239,6 +1254,7 @@ public class CheckFlickGUI {
 					Button delete = new Button(movieButtons , SWT.PUSH);
 					delete.setText("Delete");
 					delete.setBackground(frontColor);
+					delete.setEnabled(isAdmin);
 					delete.addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {	
 						}
@@ -1300,6 +1316,7 @@ public class CheckFlickGUI {
 					movieButtons.setLayout(layout);
 					Button add = new Button(movieButtons , SWT.PUSH);
 					add.setText("Add");
+					add.setEnabled(isAdmin);
 					add.addSelectionListener(new SelectionListener() {
 						public void widgetDefaultSelected(SelectionEvent e) {	
 						}
@@ -1388,7 +1405,6 @@ public class CheckFlickGUI {
 						column.setText (titles [i]);
 					}	
 					final int count = result.size();
-					System.out.println(count);
 					Map<String, String> map = null;
 					for (int i=0; i<count; i++) {
 						if (result.get(i)!=null){
@@ -1422,6 +1438,7 @@ public class CheckFlickGUI {
 						Label label = new Label(personButtons , SWT.NONE);
 						Button add = new Button(personButtons , SWT.PUSH);
 						add.setText("Add");
+						add.setEnabled(isAdmin);
 						add.setBackground(frontColor);
 						add.addSelectionListener(new SelectionListener() {
 							public void widgetDefaultSelected(SelectionEvent e) {	
@@ -1433,6 +1450,7 @@ public class CheckFlickGUI {
 						Button delete = new Button(personButtons , SWT.PUSH);
 						delete.setText("Delete");
 						delete.setBackground(frontColor);
+						delete.setEnabled(isAdmin);
 						delete.addSelectionListener(new SelectionListener() {
 							public void widgetDefaultSelected(SelectionEvent e) {	
 							}
@@ -1472,6 +1490,7 @@ public class CheckFlickGUI {
 						personButtons.setLayout(layout);
 						Button add = new Button(personButtons , SWT.PUSH);
 						add.setText("Add");
+						add.setEnabled(isAdmin);
 						add.addSelectionListener(new SelectionListener() {
 							public void widgetDefaultSelected(SelectionEvent e) {	
 							}
@@ -1500,8 +1519,11 @@ public class CheckFlickGUI {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				//creating the search results table
-				final int count = searched.size();
-				System.out.println(count);
+				final int count;
+				if (searched != null)
+					count = searched.size();
+				else
+					count = 0;
 				if (count > 0){
 					if ((resultsPersonTable != null) && !(resultsPersonTable.isDisposed()))
 						resultsPersonTable.dispose();
@@ -1533,7 +1555,8 @@ public class CheckFlickGUI {
 					}
 					table.getColumn(3).setWidth(0);
 					table.getColumn(3).setResizable(false);
-					//by double clicking a row you get a new tab with the whole information
+					
+					// by double clicking a row you get a new tab with the whole information
 					table.addListener(SWT.MouseDoubleClick, new Listener() {
 						public void handleEvent(Event event) {
 							Point pt = new Point(event.x, event.y);
@@ -1570,7 +1593,12 @@ public class CheckFlickGUI {
 	static protected void drawSearchPersonTable(final List<DatedEntity> searched, final SearchEntitiesEnum search) {
 		display.asyncExec(new Runnable() {
 			public void run() {
-				final int count = searched.size();
+				final int count;
+				if (searched != null)
+					count = searched.size();
+				else
+					count = 0;
+
 				//creating the search results table
 				if (count > 0){
 					if ((resultsPersonTable != null) && !(resultsPersonTable.isDisposed()))
@@ -1659,10 +1687,9 @@ public class CheckFlickGUI {
 		display.asyncExec(new Runnable() {
 			public void run() {
 				if (result)
-					importLabel.setText("Import Succeded");
+					okMessageBox("Import succeeded");
 				else
-					importLabel.setText("There was a problem importing the data to the database. Sorry for the inconvenience :)");
-				closeImportButton.setVisible(true);
+					okMessageBox("Import failed!");
 			}
 		});
 	}
@@ -1678,13 +1705,18 @@ public class CheckFlickGUI {
 		}
 	}
 	
+	protected static int okMessageBox(String q) {	
+		return okMessageBox(q, "CheckFlick");
+	}
+	
 	/**
 	 * message box that is opened whenever OK question is asked
 	 */
-	protected static int okMessageBox(String q){	
+	protected static int okMessageBox(String q, String t){	
 		shell.getShell().setEnabled(false);
 		MessageBox mb = new MessageBox(shell.getShell(), SWT.OK); 
 		mb.setMessage(q);
+		mb.setText(t);
 		int answer = mb.open();	
 		shell.getShell().setEnabled(true);
 		return answer;		
@@ -1696,7 +1728,7 @@ public class CheckFlickGUI {
 	static protected void openImportMessage(Label label , Button close){
 		shell.getShell().setEnabled(false);
 		final Shell importShell = new Shell(SWT.CLOSE);
-		Color bgColor = new Color(display , 177 ,200 , 231);
+		Color bgColor = new Color(display , 222 ,235 , 247);
 		importShell.setBackground(bgColor);
 		Rectangle monitor_bounds = importShell.getShell().getMonitor().getBounds();
 		importShell.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
@@ -1756,6 +1788,105 @@ public class CheckFlickGUI {
 	}
 	
 	/**
+	 * This window handles the admin password
+	 */
+	static protected void openAdminPassword(final CheckFlickGUI app) {
+		shell.getShell().setEnabled(false);	
+		final Shell addToMovie = new Shell(SWT.CLOSE);
+		Color bgColor = new Color(display , 177 ,200 , 231);
+		addToMovie.setBackground(bgColor);
+		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
+		addToMovie.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
+		addToMovie.setText("Admin login");		
+		GridLayout layout = new GridLayout(2 , false);
+		addToMovie.setLayout(layout);
+		Label label = new Label(addToMovie , SWT.NONE);
+		label.setBackground(bgColor);
+		label.setText("Password: ");
+		final Text txtPassword = new Text(addToMovie, SWT.BORDER);
+		addToMovie.setSize(220,120);
+		Button add = new Button(addToMovie, SWT.PUSH);
+		add.setText("OK");
+		add.setBackground(bgColor);
+		Button skip = new Button(addToMovie, SWT.PUSH);
+		final Label l = new Label(addToMovie, SWT.NONE);
+		l.setText("Password Incorrect");
+		l.setBackground(bgColor);
+		l.setVisible(false);
+		l.setForeground(new Color(display, 255, 0,0));
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 2;
+		l.setLayoutData(gridData);
+		skip.setText("Skip");
+		skip.setBackground(bgColor);
+		isAdmin = false;
+		txtPassword.addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if(arg0.keyCode != 13) {
+					l.setVisible(false);
+				} else {
+					if(txtPassword.getText().equals("")) {
+						addToMovie.close();
+					}
+					else if (txtPassword.getText().equals(AppData.getInstance().getAdminPass())) {
+						isAdmin = true;
+						okMessageBox("Welcome back commander!", "CheckFlick");
+						addToMovie.close();
+					} else {
+						txtPassword.selectAll();
+						l.setVisible(true);
+					}
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+			}
+		});
+		
+		//listen to add button
+		add.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+			public void widgetSelected(SelectionEvent e) {
+				if(txtPassword.getText().equals("")) {
+					addToMovie.close();
+				}
+				else if (txtPassword.getText().equals(AppData.getInstance().getAdminPass())) {
+					isAdmin = true;
+					okMessageBox("Welcome back commander!", "CheckFlick");
+					addToMovie.close();
+				} else {
+					txtPassword.selectAll();
+					l.setVisible(true);
+				}
+			}
+		});
+		skip.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				addToMovie.close();
+			}
+		});
+		//listen to the X button
+		addToMovie.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+				app.addTabs();
+				if(isAdmin)
+					shell.getShell().setText(shell.getShell().getText() + " (Admin Mode)");
+				shell.setMaximized(true);		
+			}	
+		});
+		addToMovie.open();
+	}
+	
+	/**
 	 * Open a new window that adds extra data to a movie that is from tables
 	 */
 	static protected void openMovieAddFromListWindow(final MovieDataEnum type , final int id){
@@ -1765,7 +1896,6 @@ public class CheckFlickGUI {
 		addToMovie.setBackground(bgColor);
 		Rectangle monitor_bounds = addToMovie.getShell().getMonitor().getBounds();
 		addToMovie.setLocation(monitor_bounds.width/2-100, monitor_bounds.height/2-100);
-		addToMovie.setSize(new Point(monitor_bounds.width/5,100));		
 		addToMovie.setText("Add To Movie");		
 		GridLayout layout = new GridLayout(2 , false);
 		addToMovie.setLayout(layout);
@@ -1799,8 +1929,10 @@ public class CheckFlickGUI {
 		}
 		final List<NamedEntity> finalList = list;
 		combo.setItems (listString);
+		addToMovie.setSize(combo.getSize().x+120,100);
 		Button add = new Button(addToMovie, SWT.PUSH);
 		add.setText("Add");
+		add.setEnabled(isAdmin);
 		add.setBackground(bgColor);
 		Button close = new Button(addToMovie, SWT.PUSH);
 		close.setText("Close");
@@ -1876,6 +2008,7 @@ public class CheckFlickGUI {
 		}
 		Button add = new Button(addToMovie, SWT.PUSH);
 		add.setText(buttonString);
+		add.setEnabled(isAdmin);
 		add.setBackground(bgColor);
 		Button close = new Button(addToMovie, SWT.PUSH);
 		close.setText("Close");
@@ -1967,6 +2100,7 @@ public class CheckFlickGUI {
 		}
 		Button add = new Button(addToPerson, SWT.PUSH);
 		add.setText("Add");
+		add.setEnabled(isAdmin);
 		add.setBackground(bgColor);
 		Button close = new Button(addToPerson, SWT.PUSH);
 		close.setText("Close");
@@ -2010,6 +2144,28 @@ public class CheckFlickGUI {
 		addToPerson.open();
 	}
 	
+	/**
+	 * Open a new window that adds extra data to a person
+	 */
+	static protected void openAboutWindow(){
+		shell.getShell().setEnabled(false);
+		final Shell aboutWin = new Shell(SWT.CLOSE);
+		Utils.centerDialogOnScreen(aboutWin);
+		Color bgColor = new Color(display , 222 ,235 , 247);
+		aboutWin.setBackground(bgColor);
+		aboutWin.setBackgroundImage(ImageCache.getImage("logo.png"));
+		Rectangle monitor_bounds = aboutWin.getShell().getMonitor().getBounds();
+		aboutWin.setLocation(monitor_bounds.width/2-225, monitor_bounds.height/2-125);
+		aboutWin.setSize(new Point(455,235));		
+		aboutWin.setText("About CheckFlick");		
+		//listen to the X button
+		aboutWin.addDisposeListener( new DisposeListener(){
+			public void widgetDisposed(DisposeEvent e) {
+				shell.getShell().setEnabled(true);
+			}			
+		});
+		aboutWin.open();
+	}
 	/**
 	 * Calling a function that open a new window after a person
 	 * was searched in a purpose of adding it as a cast to a movie 
@@ -2158,7 +2314,6 @@ public class CheckFlickGUI {
 			public void widgetSelected(SelectionEvent e) {
 				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();;
-				System.out.println(nameText.getText());
 				if (nameText.getText()!= "" && nameText.getText().length() > 0){
 					// Search without wildcard
 					if(checkWildCard.getSelection())
@@ -2175,7 +2330,6 @@ public class CheckFlickGUI {
 				//search by year only if the years parameters were changed
 				if ((Integer.parseInt(yearFrom.getText())!= 1880) || ((Integer.parseInt(yearTo.getText())!= (year+100))))
 					list.add(dm.getFilter(SearchEntitiesEnum.MOVIE_YEAR, yearFrom.getText() , yearTo.getText()));
-				System.out.println(list.toString());
 
 				//search for movies
 				try {
@@ -2278,7 +2432,6 @@ public class CheckFlickGUI {
 			public void widgetSelected(SelectionEvent e) {				
 				//creating the filter to search by
 				List<AbsFilter> list = new ArrayList<AbsFilter>();
-				System.out.println(nameText.getText());
 				if (nameText.getText()!= "" && nameText.getText().length() > 0){
 					if(checkWildCard.getSelection())
 						list.add(dm.getFilter(SearchEntitiesEnum.PERSON_NAME_WILDCARD, nameText.getText()));
@@ -2295,9 +2448,8 @@ public class CheckFlickGUI {
 				//search by age only if the ages parameters were changed
 				if ((Integer.parseInt(ageFrom.getText())!= 0) || ((Integer.parseInt(ageTo.getText())!= (100))))
 					list.add(dm.getFilter(SearchEntitiesEnum.PERSON_AGE, ageFrom.getText() , ageTo.getText()));
-				System.out.println(list.toString());
-				//search for persons
-				
+
+				//search for persons		
 				try {
 					pool.execute(DataManager.search(SearchEntitiesEnum.PERSONS, list ));
 				} catch (InterruptedException e1) {
@@ -2305,7 +2457,6 @@ public class CheckFlickGUI {
 				}
 			}			
 		});
-
 	}
 	
 	/**
@@ -2526,9 +2677,13 @@ public class CheckFlickGUI {
 	 * message box that is opened whenever Yes/No question is asked
 	 */
 	protected static int yesNoMessageBox(String q){	
+		return yesNoMessageBox(q, "CheckFlick");
+	}
+	protected static int yesNoMessageBox(String q, String t){	
 		shell.getShell().setEnabled(false);
 		MessageBox mb = new MessageBox(shell.getShell(), SWT.YES | SWT.NO); 
 		mb.setMessage(q);
+		mb.setText(t);
 		int answer = mb.open();	
 		shell.getShell().setEnabled(true);
 		return answer;		
@@ -2539,17 +2694,28 @@ public class CheckFlickGUI {
 	 */
 	private void createShell() {
 		shell = new RibbonShell(display);
-		shell.setText("DB Project, TAU 2009");
+		shell.setText("CheckFlick v1.0");
 		Rectangle monitor_bounds = shell.getShell().getMonitor().getBounds();
-		shell.setSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
-		
+		shell.setSize(new Point(monitor_bounds.width-100, monitor_bounds.height-100));
 		shell.getShell().setMinimumSize(new Point(monitor_bounds.width-100,monitor_bounds.height-100));
+
 		//closing the program.
 		shell.getShell().addListener(SWT.Close, new Listener(){
 			public void handleEvent(Event e){    			
     			pool.stopRequestAllWorkers();
 			}
 		});
+		shell.setBigButtonTooltip(new RibbonTooltip("About", "Opens the about window"));
+		shell.addBigButtonListener(new SelectionListener(){
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+			public void widgetSelected(SelectionEvent arg0) {
+				openAboutWindow();
+			}
+		});
+	}
+	
+	private void addTabs() {
 		// Tab folder
 		RibbonTabFolder tabs = shell.getRibbonTabFolder();
 			
@@ -2579,10 +2745,13 @@ public class CheckFlickGUI {
 		ButtonSelectGroup group = new ButtonSelectGroup();
 			
 		movieInsert.setButtonSelectGroup(group);
+		movieInsert.setEnabled(isAdmin);
 		personInsert.setButtonSelectGroup(group);
+		personInsert.setEnabled(isAdmin);
 		movieSearch.setButtonSelectGroup(group);
 		personSearch.setButtonSelectGroup(group);
 		importButton.setButtonSelectGroup(group);
+		importButton.setEnabled(isAdmin);
 		
 		movieSearch.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {	

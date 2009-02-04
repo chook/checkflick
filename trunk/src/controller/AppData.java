@@ -25,15 +25,23 @@ public class AppData {
 	private String dbPassword;
 	private String dbPort;
 	private String dbServer;
+	private String adminPass;
 	private int maxThreads;
 	private int maxConnections;
 	private int bucketMaxSize;
 	private int preparedStatementMaxBatchSize;
-
+	
 	private static AppData instance = null;
 
 	protected AppData() {
 		resetToDefaults();
+	}
+
+	/**
+	 * @return the adminPass
+	 */
+	public String getAdminPass() {
+		return adminPass;
 	}
 
 	/**
@@ -131,6 +139,7 @@ public class AppData {
 					"threads", null)));
 			setPreparedStatementMaxBatchSize(Integer.parseInt(prefs.node(
 					"settings").get("maxbatch", null)));
+			setAdminPass(prefs.node("settings").get("adminPassword", null));
 		} catch (BackingStoreException e) {
 			resetToDefaults();
 		}
@@ -150,6 +159,15 @@ public class AppData {
 		setMaxConnections(6);
 		setMaxThreads(6);
 		setPreparedStatementMaxBatchSize(20000);
+		setAdminPass("admin");
+	}
+
+	/**
+	 * @param adminPass
+	 *            the adminPass to set
+	 */
+	private void setAdminPass(String adminPass) {
+		this.adminPass = adminPass;
 	}
 
 	/**

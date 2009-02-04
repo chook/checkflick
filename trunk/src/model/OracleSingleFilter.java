@@ -44,7 +44,7 @@ public class OracleSingleFilter extends AbsSingleFilter {
 			strFilter = table + "." + column + " IN (" + value + ")";
 			break;
 		case STRING_WILDCARD:
-			strFilter = table + "." + column + " LIKE '%" + value + "%'";
+			strFilter = "upper(" + table + "." + column + ") LIKE upper('%" + value + "%')";
 			break;
 		case NUMBER_RANGE:
 			// We rely on the fact that value is of type "3 and 10"
