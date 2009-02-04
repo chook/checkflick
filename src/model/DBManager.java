@@ -165,6 +165,7 @@ public class DBManager {
 			if(conn == null)
 				return null;
 			pstmt = conn.prepareStatement(pstmtStr);
+
 			set = pstmt.executeQuery();
 			set.setFetchSize(RESULTS_FETCH_SIZE);
 			moviesMap = new HashMap<String, Integer>();

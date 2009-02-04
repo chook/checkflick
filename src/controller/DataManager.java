@@ -105,17 +105,18 @@ public class DataManager {
 	public static Runnable importIntoDb(final String path) {
 		return new Runnable() {
 			public void run() {
-				ImportHandler ih = new ImportHandler();
-				ih.addListFile(ListFilesEnum.MOVIES, path + "movies.list");
-				ih.addListFile(ListFilesEnum.LANGUAGES, path + "language.list");
-				ih.addListFile(ListFilesEnum.GENRES, path + "genres.list");
-				ih.addListFile(ListFilesEnum.COUNTRIES, path + "countries.list");
-				ih.addListFile(ListFilesEnum.ACTORS, path + "actors.list");
-				ih.addListFile(ListFilesEnum.ACTRESSES, path + "actresses.list");
-				ih.addListFile(ListFilesEnum.DIRECTORS, path + "directors.list");
-				ih.addListFile(ListFilesEnum.PRODUCERS, path + "producers.list");
-				ih.addListFile(ListFilesEnum.WRITERS, path + "writers.list");
-				RibbonInterface.finishImport(ih.importIntoDB());
+//				ImportHandler ih = new ImportHandler();
+//				ih.addListFile(ListFilesEnum.MOVIES, path + "movies.list");
+//				ih.addListFile(ListFilesEnum.LANGUAGES, path + "language.list");
+//				ih.addListFile(ListFilesEnum.GENRES, path + "genres.list");
+//				ih.addListFile(ListFilesEnum.COUNTRIES, path + "countries.list");
+//				ih.addListFile(ListFilesEnum.ACTORS, path + "actors.list");
+//				ih.addListFile(ListFilesEnum.ACTRESSES, path + "actresses.list");
+//				ih.addListFile(ListFilesEnum.DIRECTORS, path + "directors.list");
+//				ih.addListFile(ListFilesEnum.PRODUCERS, path + "producers.list");
+//				ih.addListFile(ListFilesEnum.WRITERS, path + "writers.list");
+//				RibbonInterface.finishImport(ih.importIntoDB());
+				RibbonInterface.finishImport(true);
 			}
 		};
 	}
