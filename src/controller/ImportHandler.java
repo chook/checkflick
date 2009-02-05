@@ -18,7 +18,7 @@ public class ImportHandler {
 		return true;
 	}
 	
-	public ImportHandler(/*String importPath*/) {
+	public ImportHandler() {
 		listfilesMap = new HashMap<ListFilesEnum, String>();
 		//importFolderPath = importPath;
 	}
@@ -34,7 +34,7 @@ public class ImportHandler {
 		boolean isOkay = true;
 		
 		// going over all the different elements in the ListFilesEnum,
-		// and making sure every list was attached a filename, and that all files exist
+		// and making sure every list was attached a filename
 		for (ListFilesEnum enumField: ListFilesEnum.values()) {
 			if (!(listfilesMap.containsKey(enumField))) {
 				isOkay = false;
@@ -67,7 +67,7 @@ public class ImportHandler {
 		
 		importer.importDataTypes();
 		
-		// creating temp field used to import movies and other entities
+		// creating a temp field used to import movies and other entities
 		importer.createMoviesTempField();
 		importer.importMovies();
 		
