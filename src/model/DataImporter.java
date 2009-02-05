@@ -1,7 +1,6 @@
 package model;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.regex.*;
 import java.util.*;
 import controller.AppData;

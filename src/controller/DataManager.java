@@ -3,7 +3,6 @@ package controller;
 import java.util.*;
 import view.RibbonInterface;
 import controller.entity.*;
-import controller.enums.ListFilesEnum;
 import controller.enums.MovieDataEnum;
 import controller.enums.NamedEntitiesEnum;
 import controller.enums.PersonDataEnum;
