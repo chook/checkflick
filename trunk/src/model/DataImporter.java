@@ -429,29 +429,6 @@ public class DataImporter {
 		return true;
 	}
 	
-	private boolean createMoviesDataTypesIndex() {
-		
-		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
-											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
-											DBTablesEnum.MOVIE_LANGUAGES.getTableName(),
-											DBFieldsEnum.MOVIE_LANGUAGES_MOVIE_ID.getFieldName(),
-											DBFieldsEnum.MOVIE_LANGUAGES_LANGUAGE_ID.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
-											DBTablesEnum.MOVIE_GENRES.getTableName(),
-											DBTablesEnum.MOVIE_GENRES.getTableName(),
-											DBFieldsEnum.MOVIE_GENRES_MOVIE_ID.getFieldName(),
-											DBFieldsEnum.MOVIE_GENRES_GENRE_ID.getFieldName()));
-		
-		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s, %s) ENABLE",
-											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
-											DBTablesEnum.MOVIE_COUNTRIES.getTableName(),
-											DBFieldsEnum.MOVIE_COUNTRIES_MOVIE_ID.getFieldName(),
-											DBFieldsEnum.MOVIE_COUNTRIES_COUNTRY_ID.getFieldName()));
-
-		return true;
-	}
-
 	private boolean createMoviesIndex() {
 		
 		DBManager.getInstance().executeSQL(connection, String.format("ALTER TABLE %s ADD CONSTRAINT %s_PK PRIMARY KEY (%s) ENABLE",
