@@ -364,7 +364,8 @@ public class DataImporter {
 		}
 
 		// since there are anomalies in the original lists,
-		// primary indices can't be defined since there can be duplicates according to these lists
+		// primary indices can't be defined on these 3 tables, since there can be duplicates according to these lists
+		// and checking it would require a lot of processing time on these tables
 		//createMoviesDataTypesIndex();
 
 		return true;

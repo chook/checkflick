@@ -16,7 +16,6 @@ import controller.enums.*;
  */
 public class DBManager {
 
-	// Different Connections used in testings
 	private static String CONNECTION_DRIVER_NAME = "oracle.jdbc.OracleDriver";
 	private static String CONNECTION_URI = "jdbc:oracle:thin:@";
 	private static OracleFilterManager filters = null;
