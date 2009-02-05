@@ -158,16 +158,16 @@ public class AppData {
 	 */
 	public void resetToDefaults() {
 		setBucketMaxSize(100000);
-		setDbHost("orasrv");
-		setDbPassword("nadavsh2");
-		setDbPort("1521");
+		setDbHost("localhost");
+		setDbPassword("checkflick");
+		setDbPort("1555");
 		setDbServer("csodb");
-		setDbUsername("nadavsh2");
-		setImportFolder("~/users/courses/database/imdb/extracted/");
+		setDbUsername("checkflick");
+		setImportFolder("/users/courses/databases/imdb/extracted/");
 		setMaxConnections(6);
 		setMaxThreads(6);
 		setPreparedStatementMaxBatchSize(20000);
-		setAdminPass("admin");
+		setAdminPass("boim2");
 		setMaxFetchFromDB(1000);
 	}
 
