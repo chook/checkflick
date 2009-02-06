@@ -695,7 +695,7 @@ public class CheckFlickGUI {
 						newName = nameText.getText();
 						update = true;
 					} else {
-						okMessageBox("You can't leave the name of the movie empty.");
+						okMessageBox("You can't leave the name of the person empty.");
 						valid = false;
 					}
 				}
@@ -714,7 +714,7 @@ public class CheckFlickGUI {
 							valid = false;
 						}
 					} else
-						okMessageBox("You can't leave the year of the movie empty.");
+						okMessageBox("You can't leave the birth year empty.");
 				}
 				if (oldDYear.compareTo(dYearText.getText()) != 0) {
 					if (dYearText.getText() != "") {
@@ -722,22 +722,27 @@ public class CheckFlickGUI {
 							newBYear = Integer.parseInt(bYearText.getText());
 							update = true;
 							if ((newDYear < newBYear) || (newDYear > year)) {
-								okMessageBox("Birth year must be between the birth year and "
+								okMessageBox("Death year must be between the birth year and "
 										+ year + ".");
 								valid = false;
 							}
 						} catch (NumberFormatException nfe) {
-							okMessageBox("The birth year must be a number.");
+							okMessageBox("The death year must be a number.");
 							valid = false;
 						}
 					}
 				}
-
-				if (newCountry != Integer.parseInt(getID(countriesList,
-						countryCombo.getText()))) {
-					newCountry = Integer.parseInt(getID(countriesList,
-							countryCombo.getText()));
-					update = true;
+				if (countryCombo.getText()!=""){
+					if (newCountry != Integer.parseInt(getID(countriesList,
+							countryCombo.getText()))) {
+						newCountry = Integer.parseInt(getID(countriesList,
+								countryCombo.getText()));
+						update = true;
+					}
+				}
+				else{
+					okMessageBox("You have to insert an origin country.");
+					valid = false;
 				}
 
 				if (newCity != null) {
@@ -2763,27 +2768,27 @@ public class CheckFlickGUI {
 
 		// Movie tab
 		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
-		RibbonButton general = new RibbonButton(generalInfo, ImageCache
+		final RibbonButton general = new RibbonButton(generalInfo, ImageCache
 				.getImage("book_48.png"), " \nInformation",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		RibbonGroup results = new RibbonGroup(tab, "More Details");
-		RibbonButton countries = new RibbonButton(results, ImageCache
+		final RibbonButton countries = new RibbonButton(results, ImageCache
 				.getImage("globe_48.png"), " \nCountries",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(results);
-		RibbonButton languages = new RibbonButton(results, ImageCache
+		final RibbonButton languages = new RibbonButton(results, ImageCache
 				.getImage("furl_48.png"), " \nLanguages",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(results);
-		RibbonButton quotes = new RibbonButton(results, ImageCache
+		final RibbonButton quotes = new RibbonButton(results, ImageCache
 				.getImage("speech_bubble_48.png"), " \nQuotes",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(results);
-		RibbonButton genres = new RibbonButton(results, ImageCache
+		final RibbonButton genres = new RibbonButton(results, ImageCache
 				.getImage("pie_chart_48.png"), " \nGenres",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		RibbonGroup personsGroup = new RibbonGroup(tab, "Cast");
-		RibbonButton persons = new RibbonButton(personsGroup, ImageCache
+		final RibbonButton persons = new RibbonButton(personsGroup, ImageCache
 				.getImage("users_two_48.png"), " \nPersons",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 
@@ -2804,6 +2809,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				countries.setSelected(false);
 				drawGeneralInformationMovie(movie, tab.getIndex());
 				entityDetails.setVisible(true);
 				movieButtonsResults(movie.getId(),
@@ -2815,6 +2821,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				languages.setSelected(false);
 				drawGeneralInformationMovie(movie, tab.getIndex());
 				entityDetails.setVisible(true);
 				movieButtonsResults(movie.getId(),
@@ -2826,6 +2833,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				quotes.setSelected(false);
 				drawGeneralInformationMovie(movie, tab.getIndex());
 				entityDetails.setVisible(true);
 				movieButtonsResults(movie.getId(), MovieDataEnum.MOVIE_QUOTES);
@@ -2836,6 +2844,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				genres.setSelected(false);
 				drawGeneralInformationMovie(movie, tab.getIndex());
 				entityDetails.setVisible(true);
 				movieButtonsResults(movie.getId(), MovieDataEnum.MOVIE_GENRES);
@@ -2846,6 +2855,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				persons.setSelected(false);
 				drawGeneralInformationMovie(movie, tab.getIndex());
 				entityDetails.setVisible(true);
 				movieButtonsResults(movie.getId(), MovieDataEnum.MOVIE_CAST);
@@ -2856,6 +2866,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				general.setSelected(false);
 				drawGeneralInformationMovie(movie, tab.getIndex());
 			}
 		});
@@ -2871,21 +2882,21 @@ public class CheckFlickGUI {
 		searchByPerson.setVisible(false);
 		// Person Tab
 		RibbonGroup generalInfo = new RibbonGroup(tab, "General Info");
-		RibbonButton general = new RibbonButton(generalInfo, ImageCache
+		final RibbonButton general = new RibbonButton(generalInfo, ImageCache
 				.getImage("book_48.png"), " \nInformation",
 				RibbonButton.STYLE_TWO_LINE_TEXT);// RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		RibbonGroup results = new RibbonGroup(tab, "More Details");
-		RibbonButton aka = new RibbonButton(results, ImageCache
+		final RibbonButton aka = new RibbonButton(results, ImageCache
 				.getImage("book_48.png"), " \nAKA names",
 				RibbonButton.STYLE_TWO_LINE_TEXT
 						| RibbonButton.STYLE_ARROW_DOWN);// RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton role = new RibbonButton(results, ImageCache
+		final RibbonButton role = new RibbonButton(results, ImageCache
 				.getImage("camera_48.png"), " \nRoles",
 				RibbonButton.STYLE_TWO_LINE_TEXT
 						| RibbonButton.STYLE_ARROW_DOWN);// RibbonButton.STYLE_ARROW_DOWN_SPLIT);
 		new RibbonGroupSeparator(results);
-		RibbonButton quotes = new RibbonButton(results, ImageCache
+		final RibbonButton quotes = new RibbonButton(results, ImageCache
 				.getImage("speech_bubble_48.png"), " \nQuotes",
 				RibbonButton.STYLE_TWO_LINE_TEXT
 						| RibbonButton.STYLE_ARROW_DOWN);// RibbonButton.STYLE_ARROW_DOWN_SPLIT);
@@ -2905,6 +2916,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				aka.setSelected(false);
 				drawGeneralInformationPerson(person, tab.getIndex());
 				personButtonsResults(person.getId(), PersonDataEnum.PERSON_AKAS);
 			}
@@ -2914,6 +2926,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				role.setSelected(false);
 				drawGeneralInformationPerson(person, tab.getIndex());
 				personButtonsResults(person.getId(),
 						PersonDataEnum.PERSON_ROLES);
@@ -2924,6 +2937,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				quotes.setSelected(false);
 				drawGeneralInformationPerson(person, tab.getIndex());
 				personButtonsResults(person.getId(),
 						PersonDataEnum.PERSON_QUOTES);
@@ -2934,6 +2948,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				general.setSelected(false);
 				drawGeneralInformationPerson(person, tab.getIndex());
 			}
 		});
@@ -2950,7 +2965,7 @@ public class CheckFlickGUI {
 					okMessageBox("Error in fetching movie from database");
 				} else {
 					String tabName = movie.getName().substring(0,
-							Math.min(movie.getName().length(), 20));
+							Math.min(movie.getName().length(), 30));
 					final RibbonTabFolder tabs = shell.getRibbonTabFolder();
 					movieTab = new RibbonTab(tabs, tabName);
 					showMovieResult(movieTab, movie);
@@ -2970,7 +2985,7 @@ public class CheckFlickGUI {
 					okMessageBox("Error in fetching person from database");
 				} else {
 					String tabName = person.getName().substring(0,
-							Math.min(person.getName().length(), 8));
+							Math.min(person.getName().length(), 30));
 					final RibbonTabFolder tabs = shell.getRibbonTabFolder();
 					personTab = new RibbonTab(tabs, tabName);
 					ShowPersonResult(personTab, person);
