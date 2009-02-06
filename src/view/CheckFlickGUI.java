@@ -3109,16 +3109,21 @@ public class CheckFlickGUI {
 
 			public void widgetSelected(SelectionEvent e) {
 				importButton.setSelected(false);
-				cleanAllComposites();
-				try {
-					shell.getRibbonTabFolder().getTabs().get(1).setName("Busy");
-					shell.redrawContents();
-
-					openImportMessage(importLabel, closeImportButton);
-					pool.execute(DataManager.importIntoDb(AppData.getInstance()
-							.getImportFolder()));
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+				switch (yesNoMessageBox("Importing the data may take a while (about an hour). Are you sure you want to import the data?")) {
+				case (SWT.YES): {
+					cleanAllComposites();
+					try {
+						shell.getRibbonTabFolder().getTabs().get(1).setName("Busy");
+						shell.redrawContents();
+	
+						openImportMessage(importLabel, closeImportButton);
+						pool.execute(DataManager.importIntoDb(AppData.getInstance()
+								.getImportFolder()));
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+				case (SWT.NO):{} //do nothing
 				}
 			}
 		});
