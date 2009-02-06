@@ -1932,7 +1932,7 @@ public class CheckFlickGUI {
 	static protected void openAdminPassword(final CheckFlickGUI app) {
 		shell.getShell().setEnabled(false);
 		final Shell addToMovie = new Shell(SWT.CLOSE);
-		Color bgColor = new Color(display, 177, 200, 231);
+		Color bgColor = new Color(display, 222, 235, 247);
 		addToMovie.setBackground(bgColor);
 		Rectangle monitor_bounds = addToMovie.getShell().getMonitor()
 				.getBounds();
@@ -3012,27 +3012,27 @@ public class CheckFlickGUI {
 		// Search tab
 		RibbonGroup searching = new RibbonGroup(searchTab, "Search For",
 				searchToolTip);
-		RibbonButton movieSearch = new RibbonButton(searching, ImageCache
+		final RibbonButton movieSearch = new RibbonButton(searching, ImageCache
 				.getImage("camera_48.png"), " \nMovie",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(searching);
-		RibbonButton personSearch = new RibbonButton(searching, ImageCache
+		final RibbonButton personSearch = new RibbonButton(searching, ImageCache
 				.getImage("user_48.png"), " \nPerson",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 
 		// Insert Tab
 		RibbonGroup inserting = new RibbonGroup(insertTab, "Insert",
 				insertToolTip);
-		RibbonButton movieInsert = new RibbonButton(inserting, ImageCache
+		final RibbonButton movieInsert = new RibbonButton(inserting, ImageCache
 				.getImage("camera_48.png"), " \nMovie",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		new RibbonGroupSeparator(inserting);
-		RibbonButton personInsert = new RibbonButton(inserting, ImageCache
+		final RibbonButton personInsert = new RibbonButton(inserting, ImageCache
 				.getImage("user_48.png"), " \nPerson",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 		RibbonGroup importing = new RibbonGroup(insertTab, "Import",
 				importToolTip);
-		RibbonButton importButton = new RibbonButton(importing, ImageCache
+		final RibbonButton importButton = new RibbonButton(importing, ImageCache
 				.getImage("star_48.png"), " \nImport",
 				RibbonButton.STYLE_TWO_LINE_TEXT);
 
@@ -3052,6 +3052,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				movieSearch.setSelected(false);
 				searchByMovie();
 			}
 		});
@@ -3061,6 +3062,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				personSearch.setSelected(false);
 				searchByPerson();
 			}
 		});
@@ -3069,6 +3071,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				movieInsert.setSelected(false);
 				insertMovie();
 			}
 		});
@@ -3077,6 +3080,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				personInsert.setSelected(false);
 				insertPerson();
 			}
 		});
@@ -3085,6 +3089,7 @@ public class CheckFlickGUI {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				importButton.setSelected(false);
 				cleanAllComposites();
 				try {
 					shell.getRibbonTabFolder().getTabs().get(1).setName("Busy");
