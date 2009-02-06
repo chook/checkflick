@@ -635,6 +635,13 @@ public class CheckFlickGUI {
 			bYearText.setText(String.valueOf(person.getYearOfBirth()));
 		final String oldBYear = String.valueOf(person.getYearOfBirth());
 		label = new Label(composite, SWT.NONE);
+		label.setText("Year Of Death: ");
+		label.setBackground(frontColor);
+		final Text dYearText = new Text(composite, SWT.FILL | SWT.BORDER);
+		if (person.getYearOfDeath() != 0)
+			dYearText.setText(String.valueOf(person.getYearOfDeath()));
+		final String oldDYear = String.valueOf(person.getYearOfDeath());
+		label = new Label(composite, SWT.NONE);
 		label.setText("Origin City: ");
 		label.setBackground(frontColor);
 		final Text cityText = new Text(composite, SWT.FILL | SWT.BORDER);
@@ -648,22 +655,16 @@ public class CheckFlickGUI {
 			countryCombo.setText(getName(countriesList, String.valueOf(person
 					.getCountryOfBirth())));
 		String[] countryString = new String[countriesList.size()];
-		int selected = 0;
+		int selected = -1;
 		for (int i = 0; i < countriesList.size(); i++) {
 			countryString[i] = countriesList.get(i).getName();
 			if (person.getCountryOfBirth() == countriesList.get(i).getId())
 				selected = i;
 		}
 		countryCombo.setItems(countryString);
-		countryCombo.select(selected);
-		label = new Label(composite, SWT.NONE);
-		label.setText("Year Of Death: ");
-		label.setBackground(frontColor);
-		final Text dYearText = new Text(composite, SWT.FILL | SWT.BORDER);
-		if (person.getYearOfDeath() != 0)
-			dYearText.setText(String.valueOf(person.getYearOfDeath()));
-		final String oldDYear = String.valueOf(person.getYearOfDeath());
-
+		if (selected != -1)
+			countryCombo.select(selected);
+		
 		label = new Label(composite, SWT.NONE);
 		label.setBackground(frontColor);
 		label = new Label(composite, SWT.NONE);
@@ -789,13 +790,16 @@ public class CheckFlickGUI {
 					dYearText.setText(String.valueOf(person.getYearOfDeath()));
 				else
 					dYearText.setText("");
-				int selected = 0;
+				int selected = -1;
 				for (int i = 0; i < countriesList.size(); i++) {
 					if (person.getCountryOfBirth() == countriesList.get(i)
 							.getId())
 						selected = i;
 				}
-				countryCombo.select(selected);
+				if (selected != -1)
+					countryCombo.select(selected);
+				else
+					countryCombo.deselectAll();
 				if (person.getCityOfBirth() != null)
 					cityText.setText(person.getCityOfBirth());
 				else
@@ -2946,7 +2950,7 @@ public class CheckFlickGUI {
 					okMessageBox("Error in fetching movie from database");
 				} else {
 					String tabName = movie.getName().substring(0,
-							Math.min(movie.getName().length(), 8));
+							Math.min(movie.getName().length(), 20));
 					final RibbonTabFolder tabs = shell.getRibbonTabFolder();
 					movieTab = new RibbonTab(tabs, tabName);
 					showMovieResult(movieTab, movie);
