@@ -157,12 +157,6 @@ public class DataManager {
 	public static Runnable search(final SearchEntitiesEnum entity, final List<AbsFilter> list ) {
 		return new Runnable() {
 			public void run() {
-//				List<DatedEntity> list2 = new ArrayList<DatedEntity>();
-//				list2.add(new DatedEntity(1, "maayan", 2009));
-//				list2.add(new DatedEntity(2, "chook", 2009));
-//				
-//				RibbonInterface.drawMovieSearch(list2, entity);
-//				System.out.println("About to search for " + entity.toString());
 				switch(entity)
 				{
 					case MOVIES:
@@ -182,12 +176,6 @@ public class DataManager {
 		return new Runnable() {
 			public void run() {
 				System.out.println("About to search for " + entity.toString());
-//				List<DatedEntity> list2 = new ArrayList<DatedEntity>();
-//				list2.add(new DatedEntity(1, "maayan", 2009));
-//				list2.add(new DatedEntity(2, "chook", 2009));
-//				
-//				RibbonInterface.drawMovieSearch(list2, entity);
-//				return;
 				switch(entity)
 				{
 					case MOVIES:
